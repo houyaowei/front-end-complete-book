@@ -12,7 +12,7 @@ A book involves some sections: framework, deploy,practise and the feature.
 - [第 6 章: 展望](https://github.com/houyaowei/front-end-complete-book/blob/master/chapters/06-expaction.md)
 
 
-##License
+## License
 
 © houyaowei  @rudyarchitect
 
