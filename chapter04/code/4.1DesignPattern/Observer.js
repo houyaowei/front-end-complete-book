@@ -1,0 +1,6 @@
+class Seller {
+  private 
+  constructor(){
+
+  }
+}
