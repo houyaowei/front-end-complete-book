@@ -1,6 +1,6 @@
 # 前端一体化
 
-###简介
+### 简介
 A book includes some sections: 
 
 * 框架介绍
@@ -10,14 +10,11 @@ A book includes some sections:
   
 
 ### 进度
-<table border='1'>
-	<tr>
-		<td>Note:</td>
-	</tr>
-	<tr>
-		<td style="color:red">Work in progress</td>
-	</tr>
-</table>
+
+| Note:|
+| :--- |
+| Work in progress | 
+
 ### 目录
 
 - [第 1 章: 前端框架分析及趋势](https://github.com/houyaowei/front-end-complete-book/blob/master/chapters/01-frameworks-and-tendency.md)
