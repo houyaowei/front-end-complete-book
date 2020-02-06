@@ -28,7 +28,7 @@
 
 下面我们看下基本的模型：
 
-
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/4-1-1.png)
 
 #### 4.1.5代理模式
 

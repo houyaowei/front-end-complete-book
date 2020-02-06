@@ -1,4 +1,3 @@
-
 /**
  * @Date 2019-12-21
  * @Author houyw
@@ -12,16 +11,17 @@ export default class Customer {
   private telNum: string;
   private orders: Order[];
 
-  constructor(_id:number,_name:string,_address:string, _telNum:string){
+  constructor(_id: number, _name: string, _address: string, _telNum: string) {
     this.id = _id;
     this.name = _name;
     this.address = _address;
     this.telNum = _telNum;
   }
-
-  dealOrder():void {
+  getId(): number {
+    return this.id;
+  }
+  dealOrder(): void {
     //make a order
-    let order1 = new Order("20191221001","macbook pro is coming",21199);
-    this.orders.push(order1);
+    console.log(`I am  + ${this.name} I have got message from seller`);
   }
 }
