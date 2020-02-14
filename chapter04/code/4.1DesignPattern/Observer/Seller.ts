@@ -14,7 +14,7 @@ export default class Seller {
   remove(id: number): void {
     this.customers.forEach(c => {
       if (c.getId() === id) {
-        
+        console.log(`this id: ${id} should be removed`);
       }
     });
   }

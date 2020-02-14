@@ -1,10 +1,11 @@
 import Seller from "./Seller";
 import Customer from "./CustomerModal";
 
-class Observer {
+export default class Observer {
   private seller: Seller;
 
   register(customer: Customer): void {
+    console.log("");
     this.seller.register(customer);
   }
   fire(): void {

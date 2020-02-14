@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es3",
+    "target": "es5",
     "sourceMap": true,
     "experimentalDecorators": true
   },
-  "exclude": ["node_modules"]
+  "include": ["./4.1DesingPattern/Observer/**/*"],
+  "exclude": [""]
 }

@@ -1,19 +1,30 @@
 # 前端一体化
 
 ### 简介
+
 A book includes some sections: 
 
 * 框架介绍
 * 部署方式
 * 实践
 * 前端未来展望
-  
 
 ### 进度
 
-| Note:|
-| :--- |
-| Work in progress | 
+| Note:            |
+|:---------------- |
+| Work in progress |
+
+### 计划
+
+| 章节  | 开始时间 | 结束时间 | 当前状态 | 是否有延期 |
+|:---:| ---- | ---- | ---- |:-----:|
+| 第一章 |      |      |      |       |
+| 第二章 |      |      |      |       |
+| 第三章 |      |      |      |       |
+| 第四章 | 2.5  | 3.15 | 正在进行 | 正常    |
+| 第五章 | 3.16 | 4.15 | 未开始  | -     |
+| 第六章 | 4.16 | 5.15 | 未开始  | -     |
 
 ### 目录
 
@@ -23,7 +34,6 @@ A book includes some sections:
 - [第 4 章: 前端架构核心思想](https://github.com/houyaowei/front-end-complete-book/blob/master/chapters/04-arc-core.md)
 - [第 5 章: 性能优化指南](https://github.com/houyaowei/front-end-complete-book/blob/master/chapters/05-perfermance.md)
 - [第 6 章: 展望](https://github.com/houyaowei/front-end-complete-book/blob/master/chapters/06-expaction.md)
-
 
 ## License
 
