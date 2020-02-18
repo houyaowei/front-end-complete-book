@@ -7,7 +7,9 @@ import Customer from "./CustomerModal";
 
 export default class Seller {
   customers: Customer[];
-
+  constructor() {
+    this.customers = new Array<Customer>();
+  }
   register(customer): void {
     this.customers.push(customer);
   }
@@ -18,6 +20,7 @@ export default class Seller {
       }
     });
   }
+
   notifyAll(): void {
     this.customers.forEach(cus => {
       cus.dealOrder();

@@ -22,6 +22,6 @@ export default class Customer {
   }
   dealOrder(): void {
     //make a order
-    console.log(`I am  + ${this.name} I have got message from seller`);
+    console.log(`I am  ${this.name}， I have got message from seller`);
   }
 }

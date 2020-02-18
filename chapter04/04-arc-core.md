@@ -30,6 +30,184 @@
 
 ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/4-1-1.png)
 
+在上面的模型中可以看出，商家维护着和各位客户的引用关系，通过观察者添加、解除引用关系，就好比说，某天某客户不再中意这款电脑，商家就再无引用这份关系了。
+
+> 本书中所有的代码均是由Typescript描述，周所周知，Typescript为Js的超集，具有强类型约束，在编译期就可以消除安全隐患，具体的介绍可以参考管网，[https://www.typescriptlang.org/](https://www.typescriptlang.org/), 也可以联系笔者可以共享的电子书
+
+下面我们看下代码模型，先看下商家的代码实现：
+
+`
+
+import Customer from  "{path}/CustomerModal";
+
+export  default  class  Seller  {
+
+  customers:  Customer[];
+
+  register(customer):  void  {
+
+   this.customers.push(customer);
+
+}
+
+remove(id:  number):  void  {
+
+  this.customers.forEach(c  =>  {
+
+  if (c.getId() ===  id) {
+
+   console.log(`this id: ${id} should be removed`);
+
+  }
+
+  });
+
+}
+
+notifyAll():  void  {
+
+  this.customers.forEach(cus  =>  {
+
+   cus.dealOrder();
+
+   });
+
+   }
+
+}
+
+`
+
+customers属性维护着所有订阅者，数组中的 每个元素都是Customer对象，我们从模拟对象出发，抽象出该对象：
+
+`
+
+export  default  class  Customer  {
+
+  private  id:  number;
+
+  private  name:  string;
+
+  private  address:  string;
+
+  private  telNum:  string;
+
+  private  orders:  Order[];
+
+constructor(_id:  number, _name:  string, _address:  string, _telNum:  string)  {
+
+  this.id  =  _id;
+
+  this.name  =  _name;
+
+  this.address  =  _address;
+
+  this.telNum  =  _telNum;
+
+}
+
+getId():  number  {
+
+  return  this.id;
+
+}
+
+dealOrder():  void  {
+
+  //make a order
+
+   console.log(`I am + ${this.name}， I have got message from seller`);
+
+  }
+
+}
+
+`
+
+看了商家的模型后，来看下观察者模式的模型：
+
+`
+
+import Seller from  "./Seller";
+
+import Customer from  "./CustomerModal";
+
+export  default  class  Observer  {
+
+  constructor()  {
+
+   this.seller  =  new  Seller();
+
+  }
+
+  private  seller:  Seller;
+
+  register(customer:  Customer):  void  {
+
+   console.log("");
+
+   this.seller.register(customer);
+
+  }
+
+fire():  void  {
+
+  this.seller.notifyAll();
+
+}
+
+remove(customerId:  number):  void  {
+
+  this.seller.remove(customerId);
+
+}
+
+}
+
+`
+
+上面的代码中，是从OOP的实现方式出发进行设计。已经有了观察者模式所需要的两个主要元素：主题（商家）和观察者（各位客户），一旦数据改变，新的数据就会以某种形式推送到观察者的手上。
+
+现在我们来测试下这几段代码：
+
+`
+
+import Customer from  "./CustomerModal";
+
+import Observer from  "./Observer";
+
+let customer1 =  new  Customer(1101,  "caozn",  "shanxi",  "12900000");
+
+let os =  new  Observer();
+
+os.register(customer1);
+
+let customer2 =  new  Customer(1102,  "houyw",  "henan",  "12900001");
+
+os.register(customer2);
+
+console.log(os.getAllCustomers().length);
+
+os.fire();
+
+`
+
+得到的结果如下：
+
+`
+
+现在商家有 2 个客户订阅
+
+I am caozn， I have got message from seller
+
+I am houyw， I have got message from seller
+
+`
+
+主题和观察者之间定义了一对多的关系。观察者依赖整个主题（商家），毕竟要从主题那里获得通知。并且主题是具有状态的，也可以控制这些状态。
+
+观察者模式定义了主题和观察者之间的松耦合关系，并且还可以让两者进行交互，而不用太关注对方的细节。"keep it simple".
+
 #### 4.1.5代理模式
 
 #### 4.1.6装饰者模式
