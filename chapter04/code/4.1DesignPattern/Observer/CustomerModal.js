@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var Customer = /** @class */ (function () {
     function Customer(_id, _name, _address, _telNum) {
         this.id = _id;
@@ -12,8 +12,8 @@ var Customer = /** @class */ (function () {
     };
     Customer.prototype.dealOrder = function () {
         //make a order
-        console.log("I am  + " + this.name + " I have got message from seller");
+        console.log("I am  " + this.name + "\uFF0C I have got message from seller");
     };
     return Customer;
 }());
-exports["default"] = Customer;
+exports.default = Customer;

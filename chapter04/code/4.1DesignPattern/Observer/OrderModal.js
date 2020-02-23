@@ -3,7 +3,7 @@
  * @Date 2019-12-21
  * @author houyw
  */
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var Order = /** @class */ (function () {
     function Order(_id, _description, _price) {
         this.id = _id;
@@ -13,4 +13,4 @@ var Order = /** @class */ (function () {
     }
     return Order;
 }());
-exports["default"] = Order;
+exports.default = Order;
