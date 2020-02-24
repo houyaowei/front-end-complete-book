@@ -14,6 +14,184 @@
 
 #### 4.1.1状态模式
 
+状态模式是一个比较有用的模式，意思是指当一个对象的内部状态发生变化时，会产生不同的行为。
+
+比如说某某牌电灯,按一下按钮打开弱光, 按两下按钮打开强光, 按三下按钮关闭灯光。在我们的想象中，基本的模型应该是如下描述
+
+<img src="./images/4-1-2.png">
+
+状态模式允许对象在内部状态改变时，改变其行为，从对象的角度看好像进行了改变。实际开发中，某处文字可能和模型中的一字段进行关联，根据某一个状态显示不同的内容，这时候状态模式可能是你需要的（当然 switch-case, if-else可以继续）。
+
+状态模式中有几个角色，分别是Context，State，各个子状态的实现。Context中保存了Client端的操作接口，同时也保存子状态的实现，代表着当前状态。抽象类State声明了子状态应该实现的各个方法。
+
+先看下Context的实现
+
+`
+
+ export  default  class  Context  {
+
+   private  state:  State;
+
+   constructor(state:  State)  {
+
+   this.transitionTo(state);
+
+}
+
+public  transitionTo(_s:  State):  void  {
+
+  console.log(`Context: transition to ${(<any>_s).constructor.name}`);
+
+  this.state  =  _s;
+
+  this.state.setContext(this);
+
+}
+
+public  setSlighLight():  void  {
+
+   this.state.slightLight(); 
+
+}
+
+public  setHightLight():  void  {
+
+  this.state.highLight();
+
+}
+
+public  close():  void  {
+
+  this.state.close();
+
+  }
+
+ }
+
+`
+
+在transitionTo方法中改变当前状态，参数为实例化的子状态类。
+
+再看下State的实现及其SlightLightClass的实现，为了篇幅考虑，我们在这里只贴出部分的代码，完整的代码参考[https://github.com/houyaowei/front-end-complete-book/tree/master/chapter04/code/4.1DesignPattern/State](https://github.com/houyaowei/front-end-complete-book/tree/master/chapter04/code/4.1DesignPattern/State)。
+
+`
+
+export  default  abstract  class  State  {
+
+  protected  context:  Context;
+
+  public  setContext(_c:  Context)  {
+
+   this.context  =  _c;
+
+}
+
+public  abstract  slightLight():  void;
+
+public  abstract  highLight():  void;
+
+public  abstract  close():  void;
+
+}
+
+`
+
+`
+
+export  default  class  SlighLightClass  extends  State  {
+
+  public  slightLight():  void  {
+
+   console.log("state in SlighLightClass, I will change state to highLight");
+
+   //切换到新的状态
+
+   this.context.transitionTo(new  HighLight());
+
+}
+
+public  highLight():  void  {
+
+  console.log("hightstate state in SlighLightClass");
+
+}
+
+public  close():  void  {
+
+  console.log("close state in SlighLightClass");
+
+ }
+
+}
+
+`
+
+我们来测试下：
+
+`
+
+import Context from  "./Context";
+
+import SlightLight from  "./SlightLightClass";
+
+import CloseLight from  "./CloseClass";
+
+
+
+// const context = new Context(new SlightLight());
+
+//我们先用close状态初始化
+
+const context =  new  Context(new  CloseLight());
+
+context.close();
+
+context.setSlighLight();
+
+context.setHightLight();
+
+`
+
+结果如下：
+
+`
+
+Context: transition to ColseClass
+
+state in closeClass, I will change state to slight
+
+Context: transition to SlighLightClass
+
+state in SlighLightClass, I will change state to highLight
+
+Context: transition to HighLightClass
+
+highLight state in HighLightClass
+
+`
+
+现在我们把初始状态调整为SlightState,重新编译、运行
+
+`
+
+Context: transition to SlighLightClass
+
+state in SlighLightClass, I will change state to highLight
+
+Context: transition to HighLightClass
+
+highLight state in HighLightClass
+
+state in hightLight, I will change state to close
+
+Context: transition to ColseClass
+
+`
+
+状态模式封装了转换规则，并枚举了可能的状态。将所有的与某个状态有关的行为放到一个类中，所有可以方便地增加状态。
+
+状态模式的使用必然会增加系统类和对象的个数。 状态模式的结构与实现都较为复杂，如果使用不当将导致程序结构和代码的混乱。 状态模式对"开闭原则"的支持并不太好，对于可以切换状态的状态模式，增加新的状态类需要修改那些负责状态转换的源代码，否则无法切换到新增状态，而且修改某个状态类的行为也需修改对应类的源码。
+
 #### 4.1.2策略模式
 
 #### 4.1.3适配器模式
@@ -206,7 +384,7 @@ I am houyw， I have got message from seller
 
 主题和观察者之间定义了一对多的关系。观察者依赖整个主题（商家），毕竟要从主题那里获得通知。并且主题是具有状态的，也可以控制这些状态。
 
-观察者模式定义了主题和观察者之间的松耦合关系，并且还可以让两者进行交互，而不用太关注对方的细节。"keep it simple".
+观察者模式定义了主题和观察者之间的松耦合关系，并且还可以让两者进行交互，而不用太关注对方的细节。"keep it simple".当然缺点也不是完全没有的， 如果过多的使用发布订阅模式, 会增加维护的难度。
 
 #### 4.1.5代理模式
 

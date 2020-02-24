@@ -4,8 +4,9 @@
  **/
 Object.defineProperty(exports, "__esModule", { value: true });
 var Context_1 = require("./Context");
-var SlighLightClass_1 = require("./SlighLightClass");
-var context = new Context_1.default(new SlighLightClass_1.default());
+var SlightLightClass_1 = require("./SlightLightClass");
+var context = new Context_1.default(new SlightLightClass_1.default());
+// const context = new Context(new CloseLight());
 context.setSlighLight();
 context.setHightLight();
 context.close();

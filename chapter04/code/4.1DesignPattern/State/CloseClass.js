@@ -18,21 +18,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * 强光
  */
 var State_1 = require("./State");
-var SlighLightClass_1 = require("./SlighLightClass");
+var SlightLightClass_1 = require("./SlightLightClass");
 var ColseClass = /** @class */ (function (_super) {
     __extends(ColseClass, _super);
     function ColseClass() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    ColseClass.prototype.slightLight = function () {
-        console.log("state in closeClass, I will change state to slight");
-        this.context.transitionTo(new SlighLightClass_1.default());
-    };
+    ColseClass.prototype.slightLight = function () { };
     ColseClass.prototype.highLight = function () {
         console.log("highLight in HighLightClass");
     };
     ColseClass.prototype.close = function () {
-        console.log("close in HighLightClass");
+        console.log("state in closeClass, I will change state to slight");
+        this.context.transitionTo(new SlightLightClass_1.default());
     };
     return ColseClass;
 }(State_1.default));
