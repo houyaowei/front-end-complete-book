@@ -136,8 +136,6 @@ import SlightLight from  "./SlightLightClass";
 
 import CloseLight from  "./CloseClass";
 
-
-
 // const context = new Context(new SlightLight());
 
 //我们先用close状态初始化
