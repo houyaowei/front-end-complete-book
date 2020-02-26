@@ -1,0 +1,12 @@
+{
+  "name": "designpattern_Decorator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "node main.js"
+  },
+  "author": "github.com/houyaowei",
+  "license": "MIT"
+}
