@@ -8,7 +8,9 @@ export default class Player implements Target {
   mediaAdapter : MediaAdapter;
 
   play(type : string, fileName : string) : void {
-    if(type === "vlc" || type == "mp4") {
+    if(type == "mp3") {
+      console.log("Mp3 as the basic format, can play at will");
+    } else if (type === "vlc" || type == "mp4") {
       this.mediaAdapter = new MediaAdapter(type);
       this
         .mediaAdapter

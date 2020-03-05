@@ -3,11 +3,11 @@
  */
 import AdvancePlayer from "./AdvanceTarget";
 
-export default class VlcPlayer implements AdvancePlayer {
-  public playVlcType(fileName: string): void {
+export default class Mp4Player implements AdvancePlayer {
+  public playVlcType(fileName : string) : void {
     //空实现
   }
-  public playMp4Type(fileName: string): void {
+  public playMp4Type(fileName : string) : void {
     console.log(`${fileName} is palying`);
   }
 }

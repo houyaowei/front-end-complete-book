@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var VlcPlayer = /** @class */ (function () {
-    function VlcPlayer() {
+var Mp4Player = /** @class */ (function () {
+    function Mp4Player() {
     }
-    VlcPlayer.prototype.playVlcType = function (fileName) {
+    Mp4Player.prototype.playVlcType = function (fileName) {
         //空实现
     };
-    VlcPlayer.prototype.playMp4Type = function (fileName) {
+    Mp4Player.prototype.playMp4Type = function (fileName) {
         console.log(fileName + " is palying");
     };
-    return VlcPlayer;
+    return Mp4Player;
 }());
-exports.default = VlcPlayer;
+exports.default = Mp4Player;
