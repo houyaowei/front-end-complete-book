@@ -8,5 +8,5 @@ import Subject from "./Subject";
 
 let realSubject = new RealSubject();
 
-let subject: Subject = new Proxy(realSubject);
+let subject : Subject = new Proxy(realSubject);
 subject.proposal();

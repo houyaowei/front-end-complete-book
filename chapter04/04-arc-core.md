@@ -732,6 +732,122 @@ I am houyw， I have got message from seller
 
 #### 4.1.5代理模式
 
+代理模式是一种结构性模式，作用是提供一个中间对象，为其他对象提供控制这个对象的能力。
+
+代理模式在现实的生活中有很多的实例，信用卡是银行账号代理，银行账号则是一捆一捆现金的代理，他们都有相同的功能(接口)-付款。信用卡的付款方式让用户和商户都比较满意，用户不用随身携带大量的现金，商户也因为交易收入能以电子化的方式进入银行账户中，  无需担心存款时出现现金丢失或被抢劫的情况，减少很多的麻烦。
+
+影视剧86版《西游记》中也有代码模式的影子，在第七集《计收猪八戒》中，孙悟空为了给高家“除妖”，扮成高翠兰的模样。从代理模式的角度看，对高翠兰的外貌和行为抽象成接口，高小姐和孙悟空都实现这个接口，孙悟空就是高小姐的代理类。
+
+我们的例子以一个求婚为原型进行说明，一位男士想向他女朋友求婚，但由于各种原因不好意思说出口，就想请他的好朋友（办大事得找个靠谱的朋友）帮忙转达意思。
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/proxy.jpg)
+
+先看下接口
+
+`
+
+ interface  Subject  {
+
+    proposal()  :  void;
+
+}
+
+`
+
+实现类
+
+`
+
+class  RealSubject  implements  Subject  {
+
+    public  proposal():  void  {
+
+        console.log("Darling, Can you marray me?");
+
+    }
+
+}
+
+`
+
+代理类
+
+`
+
+class  Proxy  implements  Subject  {
+
+    private  realSubject  :  RealSubject;
+
+    private  chcekIsGoodFriend()  :  boolean  {
+
+        console.log("It's is checking if good friend");
+
+        const  r  =  Math.ceil(Math.random() *  10);
+
+        //只有够意思才给你传话
+
+        if (r  >  6  ||  r  ==  6) {
+
+            return  true;
+
+        }  else  {
+
+            return  false;
+
+        }
+
+    }
+
+    private  checkPromission()  {
+
+        console.log("It's checking the promission");
+
+        if (this.chcekIsGoodFriend()) {
+
+            return  true;
+
+        }
+
+        return  false;
+
+}
+
+    public  proposal()  :  void  {
+
+         if(this.checkPromission()) {
+
+            this.realSubject.proposal();
+
+        }
+
+    }
+
+}
+
+`
+
+帮忙传话需要征得当事人的同意(checkPromission)，还是个靠谱的朋友(chcekIsGoodFriend)。这两个条件具备了，这事儿就会靠谱很多。
+
+现在我们测试下：
+
+`
+
+let realSubject =  new  RealSubject();
+
+let subject :  Subject  =  new  Proxy(realSubject);
+
+subject.proposal();
+
+`
+
+请自行检测啊，看某位朋友靠不靠谱，同意还是不同意。
+
+
+
+代理模式的优缺点：
+
+代理模式可以代理目标对象，并且是在毫无绝唱的情况下进行。
+
 #### 4.1.6装饰者模式
 
 #### 4.2 V8引擎该了解的

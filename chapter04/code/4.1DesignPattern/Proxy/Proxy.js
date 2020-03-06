@@ -12,6 +12,7 @@ var Proxy = /** @class */ (function () {
             return true;
         }
         else {
+            console.log("This friend is not worth be trusted. ");
             return false;
         }
     };
@@ -24,7 +25,12 @@ var Proxy = /** @class */ (function () {
     };
     Proxy.prototype.proposal = function () {
         if (this.checkPromission()) {
-            this.realSubject.proposal();
+            this
+                .realSubject
+                .proposal();
+        }
+        else {
+            console.log("This friend is unwilling to talk to his girlfriend");
         }
     };
     return Proxy;
