@@ -8,7 +8,7 @@ export default class BlueShapeDecorator extends ShapeDecorator {
     super.draw();
     this.setBGImage();
   }
-  public setBGImage(): void {
+  private setBGImage(): void {
     console.log("set background Image im BlueShapeDecorator");
   }
 }

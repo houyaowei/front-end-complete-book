@@ -520,8 +520,6 @@ player.play("mp3",  "背水姑娘.mp3");
 
 player.play("wma",  "左手指月.mp3");
 
-
-
 测试结果：
 
 笑看风云.mp4 is palying
@@ -541,8 +539,6 @@ sorry,type wma is not support
 将接口或者数据转换代码分离了出来，代码看起来非常清晰。也同样遵循开闭原则，能在不修改现有客户端代码的情况下在程序中添加新类型的适配器。
 
 适配器模式使整体复杂度增加，这是因为你每增加一种需要适配的类型，都要增加相应的接口和实现类。
-
-
 
 #### 4.1.4观察者模式
 
@@ -842,13 +838,163 @@ subject.proposal();
 
 请自行检测啊，看某位朋友靠不靠谱，同意还是不同意。
 
-
-
 代理模式的优缺点：
 
-代理模式可以代理目标对象，并且是在毫无绝唱的情况下进行。
+代理模式可以代理目标对象，并且是在毫无绝唱的情况下进行。可以在不对服务或客户端做出修改的情况下创建新代理
 
 #### 4.1.6装饰者模式
+
+装饰者模式能够在不改变对象自身的前提下，在运行期给对象增加额外的功能。提到增强对象，我们的第一印象可以使用继承扩展这个类，但是不能否认的是继承还是有如下几个问题：
+
+1、继承是静态的，无法在运行时更改已有对象的行为。
+
+2、在某些编译型语言中(如Java)是不允许同时继承多个类的。
+
+下面我们通过一个简单的示例进行说明：
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/decorator.jpg)
+
+在接口中，定义一个基本draw方法
+
+`
+
+interface  Shape  {
+
+    draw():  void;
+
+}
+
+`
+
+然后实现两个类实现该接口：
+
+`
+
+CircleShape implements Shape {
+
+    public draw(): void {
+
+        console.log("the drow method in class CircleShape");
+
+    }
+
+}
+
+class  RectangleShape  implements  Shape  {
+
+    public  draw():  void  {
+
+        console.log("the drow method in class RectangleShape");
+
+    }
+
+}
+
+`
+
+接下来定义装饰类的基类
+
+`
+
+class  ShapeDecorator  implements  Shape  {
+
+    protected  shape:  Shape;
+
+    constructor(s:  Shape)  {
+
+        this.shape  =  s;
+
+    }
+
+    public  draw()  {
+
+        this.shape.draw();
+
+    }
+
+}
+
+`
+
+protected属性保存着Shape对象的引用，调用draw方法，就调用该对象的该方法。接下来定义扩展后的装饰类。
+
+`
+
+class  BlueShapeDecorator  extends  ShapeDecorator  {
+
+    public  draw():  void  {
+
+        super.draw();
+
+        this.setBGImage();
+
+    }
+
+    private  setBGImage():  void  {
+
+        console.log("set background Image im BlueShapeDecorator");
+
+    }
+
+}
+
+class  GreenShapeDecorator  extends  ShapeDecorator  {
+
+    public  draw():  void  {
+
+        super.draw();
+
+        this.setBorder();
+
+    }
+
+    private  setBorder():  void  {
+
+        console.log("set border in GreenShapeDecorator");
+
+    }
+
+}
+
+`
+
+万事俱备只欠东风，下面进行下测试：
+
+`
+
+let shape:  Shape  =  new  CircleShape();
+
+let shape2:  Shape  =  new  RectangleShape();
+
+const decorator1 =  new  BlueShapeDecorator(shape);
+
+const decorator2 =  new  GreenShapeDecorator(shape2);
+
+decorator1.draw();
+
+console.log("---------------------");
+
+decorator2.draw();
+
+`
+
+输出结果：
+
+`
+
+the drow method in class CircleShape
+
+set background Image im BlueShapeDecorator
+
+---------------------
+
+the drow method in class RectangleShape
+
+set border in GreenShapeDecorator
+
+`
+
+按照老规矩还是要总结下装饰者模式：装饰者和被装饰者相对对立，不是相互耦合。装饰者模式是继承的替代品，可以动态扩展出一个实现类。
 
 #### 4.2 V8引擎该了解的
 
