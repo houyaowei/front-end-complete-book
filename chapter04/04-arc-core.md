@@ -998,7 +998,39 @@ set border in GreenShapeDecorator
 
 #### 4.2 V8引擎该了解的
 
-#### 4.3 任务详解
+V8,这个词对很多前端码农来说，即熟悉又陌生。熟悉的是它师出名门，是由Google开发的高性能引擎。我们熟悉nodejs是基于这个开发的，对前端开发比较友好的Chrome浏览器也是有它的影子，甚至它也实现了前端的ECMAScript和WebAssembly规范。陌生的是它就想个黑盒子。在这一小节中我们了解下它的基本情况（这块的表达再需要调整下）。
+
+V8可以运行在各主流平台，windows， MacOS，Linux，Android ，IOS。它是可以单独运行的，并且能嵌入到其他的C++程序中。
+
+V8是Webkit的子集。关于这个由来，我们需要简单介绍下二次浏览器大战。
+
+1993年，浏览器Mosaic诞生，它是由Marc Andreessen领导的团队开发，这就是后来鼎鼎大名的Netscape（网景）浏览器。该浏览器只能显示静态的HTML元素，不支持js和CSS。但是并不妨碍它当时收到网民的欢迎，在世界范围内得到认可。市场占有率甚至达到90%。然而，事情从1995年开始变的有些不一样，这一年微软退出了IE，鉴于和windows绑定的天然优势，IE获得空前的成功，并逐渐取代了网景浏览器。Netscape的市占率从1990年代中期的90%也下降至2006年底的不到1%，并于2008年初停止对网景浏览器的研发。网景公司也从1998年开始成立Mozilla基金会，重新发力，研发FireFox（火狐浏览器），并于2004发布1.0版，正式拉开第二次浏览器大战的序幕。IE也因为自身发展较慢，Firefox自推出以来因为插件丰富、功能完善、兼容性更好，市场占有率不断攀升。
+
+浏览器之间的纷纷扰扰好像永无停歇。2003年，苹果公司发布了Safari浏览器，并在2005年开源了该浏览器的内核，发起了一个叫做Webkit的开源项目。浏览器的春天来了。2008年，Google以Webkit为内核，创建了一个新的项目叫Chromium（管网：http://www.chromium.org/  这个本身也是一个浏览器）,在这个项目的基础上发布了自己的浏览器产品Chrome，Chromium像一个开源实验室，它会尝试较新的技术，等这些技术稳定了，Chrome才会把他们集成进来。
+
+2013年，Google宣布了Blink内核，这个其实是从Webkit复制出去独立运作的。其中的原因是Google和苹果公司之间有了一些分歧。Webkit将于Chromium相关的代码删除了，同时，Blink将除了chromium需要的之外的移植代码也进行了删除。Chrome从28.0.1469.0正式版本开始正式使用该引擎。
+
+#### 4.2.1 webkit架构
+
+我们先看下Webkit的架构图：
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/webkit-arch.jpg)
+
+webkit一个比较显著的特征就是它支持不同的浏览器，甚至微软的Edge也加入到了这个阵营。虚线部分表示该模块在不同浏览器中使用的webkit内核实现可能是不一样的。实线部分标记的模块表示它们基本上是共享的。
+
+webkit中默认js引擎指的是JS Core,而在Chromium中则是如雷贯耳的V8。什么是JavaScript引擎，就是能够将JavaScript代码处理并执行的运行环境。渲染引擎提供了渲染网页的功能，渲染引擎主要包含HTML解析器、css解释器、布局和JavaScript引擎。
+
+![](/Users/eason/Library/Application Support/marktext/images/2020-03-13-23-11-24-image.png)
+
+- HTML解析器：主要负责解释HTML元素，将HTML元素解析成DOM。
+
+- CSS解释器：负责解析css文本，计算DOm中各元素样式信息，为布局提供样式基础。
+
+- 布局：把DOM信息和css信息结合起来，计算出它们的元素大小及位置信息，形成具有所有信息的表示模型。
+
+- JavaScript引擎：使用JavaScript可以操作网页的内容，也能修改css的信息，JavaScript引擎能够解释JavaScript代码，可以操作网页内容及样式信息。
+
+
 
 #### 4.4 异步加载规范
 
