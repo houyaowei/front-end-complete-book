@@ -1012,7 +1012,7 @@ V8是Webkit的子集。关于这个由来，我们需要简单介绍下二次浏
 
 #### 4.2.1 webkit架构
 
-我们先看下Webkit的架构图：
+我们先看下Webkit的大致架构图：
 
 ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/webkit-arch.jpg)
 
@@ -1030,15 +1030,110 @@ webkit中默认js引擎指的是JS Core,而在Chromium中则是如雷贯耳的V8
 
 - JavaScript引擎：使用JavaScript可以操作网页的内容，也能修改css的信息，JavaScript引擎能够解释JavaScript代码，可以操作网页内容及样式信息。
 
-##### 4.2.2 V8中的对象结构
+上面的表述还是比较抽象，我们是用一张图来描述下网页是怎么呈现到客户眼前的
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/webkit-render.png)
+
+> 虚线表示渲染过程中，该阶段可能依赖其他模块。比如在网页的下载过程中，需要使用到网络和存储。
+
+
+
+##### 4.2.2 隐藏类和对象表示
+
+1、隐藏类
+
+虽然在JavaScript没有类型的明确定义，但是V8是在C++的基础上开发完成的，也是可以为JavaScript的对象构造类型信息的。V8是借用了类和偏移位置的思想，将本来通过属性名匹配来访问属性值的方法进行了改进，使用类似C++编译器的偏移位置机制来实现，这就是隐藏类。
+
+隐藏类将对象分为不同的组，在同一个组的对象如果有相同的属性名和属性值的情况下，会将这些属性名和对应的偏移位置保存到一个隐藏类中。这样介绍还是比较抽象，下面通过一个简单的例子解释：
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/obj.png)
+
+创建了两个对象p1,p2, 他们有相同的属性name和age.在v8中，它们被“安排”到同一个组（即隐藏类中），并且这些属性有相同的偏移值。这样p1和p2可以共享这个类型信息。访问这些属性时就根据隐藏类的偏移值就可以知道它们的值继而访问。如果你再给某一个对象运行时添加属性时，比如加入一下代码：
+
+`p1.address='xi，an'`
+
+那么，p1对应的就是一个新的隐藏类。
+
+我们了解了隐藏类，下面看下代码是如何使用这些隐藏类来高效访问对象的属性的。我们以以下代码进行说明：
+
+`
+
+function getName(person){
+    if(person && person.name){
+        return person.name
+    }
+}
+
+`
+
+访问的基本过程是这样的：首先获取隐藏类的地址，然后根据属性值查找偏移值，计算出属性的地址。不过遗憾的是，这个过程是比较耗时的。那么是否可以使用缓存机制呢？答案是肯定的，这套缓存机制叫做内联缓存(inline-cache)，主要思想就是将使用之前查找的结果缓存起来，避免方法和属性被存取时出现的因哈希表查找带来的问题。
+
+上面的getName方法中，为了查找name属性，如果未缓存，则退回到前面说的通过查找哈希表的方法查找。否则直接读取缓存。
+
+2、对象在内存中的表示
+
+JavaScript中有6种基础类型，分别是String, Number, Boolean, Null, Undefined, Symbol,这些类型的值都有固定的存储大小，往往都会保存到栈内容中，由系统自动分配存储空间。我们可以直接按值访问这部分的值。其他类型为引用类型，比如对象，内存中分配值就不是固定的。该类型的变量值是保存到堆内存中的，这部分的值是不允许我们直接访问的。
+
+`
+
+var name="houyw";
+var age = 23;
+var isMale = true;
+var empty = null;
+
+var person = {
+    name: "houyw",
+    age: 23,
+    isMale: true;
+}
+
+`
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/stackAndHeap.png)
+
+上面是变量在内存分配空间的宏观观察，具体的实现细节对我们来说还是个黑盒。不急，接下来我们就会详细介绍下具体的过程。
+
+默认情况下JavaScript对象会在堆上分配固定大小的空间存储内部属性，预分配空间不足时(无空闲slot)，新增属性就会存储到properties中。而数字存储在element中。如果properties和elements空间不足时，会创建一个更大的FixedArray。为了便于说明问题，我们举例说明：
+
+`
+
+var obj ={};
+
+`
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/jsobject-1.png)
+
+> V8使用map结构来描述对象。map可以理解为像table一样的描述结构。
+
+通过对象字面量创建的空属性对象默认分配4个内部属性存储空间。
+
+继续添加两个属性：
+
+`
+
+obj.name="houyw";
+
+obj.age =23;
+
+`
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/jsobject-2.png)
+
+name和age属性默认存储到对象的内部属性中。再添加两个数字属性：
+
+`
+
+obj[0]="aaa";
+
+obj[1] = "bbb";
+
+`
 
 ##### 4.2.3 内存管理
 
 ##### 4.2.4 沙箱模型
 
 ##### 4.2.5 资源加载及cookie机制
-
-
 
 #### 4.4 异步加载规范
 
