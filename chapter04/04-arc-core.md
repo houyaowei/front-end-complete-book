@@ -28,131 +28,98 @@
 
 先看下Context的实现
 
-`
+```ts
+export default class Context {
+    private state: State;
+    constructor(state: State) {
+        this.transitionTo(state);
+    }
 
- export  default  class  Context  {
+    public transitionTo(_s: State): void {
+        console.log(`Context: transition to ${(<any>_s).constructor.name}`);
+    this.state = _s;
+    this.state.setContext(this);
+    }
 
-   private  state:  State;
+    public setSlighLight(): void {
+        this.state.slightLight();
+    }
 
-   constructor(state:  State)  {
+    public setHightLight(): void {
+        this.state.highLight();
+    }
 
-   this.transitionTo(state);
-
-}
-
-public  transitionTo(_s:  State):  void  {
-
-  console.log(`Context: transition to ${(<any>_s).constructor.name}`);
-
-  this.state  =  _s;
-
-  this.state.setContext(this);
-
-}
-
-public  setSlighLight():  void  {
-
-   this.state.slightLight(); 
-
-}
-
-public  setHightLight():  void  {
-
-  this.state.highLight();
+    public close(): void {
+        this.state.close();
+    }
 
 }
+```
 
-public  close():  void  {
-
-  this.state.close();
-
-  }
-
- }
-
-`
+ 
 
 在transitionTo方法中改变当前状态，参数为实例化的子状态类。
 
 再看下State的实现及其SlightLightClass的实现，为了篇幅考虑，我们在这里只贴出部分的代码，完整的代码参考[https://github.com/houyaowei/front-end-complete-book/tree/master/chapter04/code/4.1DesignPattern/State](https://github.com/houyaowei/front-end-complete-book/tree/master/chapter04/code/4.1DesignPattern/State)。
 
-`
+```ts
+export default abstract class State {
 
-export  default  abstract  class  State  {
+    protected context: Context;
+    public setContext(_c: Context) {
+        this.context = _c;
+    }
 
-  protected  context:  Context;
-
-  public  setContext(_c:  Context)  {
-
-   this.context  =  _c;
-
-}
-
-public  abstract  slightLight():  void;
-
-public  abstract  highLight():  void;
-
-public  abstract  close():  void;
+    public abstract slightLight(): void;
+    public abstract highLight(): void;
+    public abstract close(): void;    
 
 }
+```
 
-`
+
 
 > 请注意，如果对TypeScript的抽象类语法还不是很理解的话可以参考官网的class部分。
 
-`
+```ts
+export default class SlighLightClass extends State {
 
-export  default  class  SlighLightClass  extends  State  {
+    public slightLight(): void {
 
-  public  slightLight():  void  {
+        console.log("state in SlighLightClass, I will change state to         highLight");
+    //切换到新的状态
+    this.context.transitionTo(new HighLight());
+    }
 
-   console.log("state in SlighLightClass, I will change state to highLight");
+    public highLight(): void {
+        console.log("hightstate state in SlighLightClass");
+    }
 
-   //切换到新的状态
-
-   this.context.transitionTo(new  HighLight());
-
-}
-
-public  highLight():  void  {
-
-  console.log("hightstate state in SlighLightClass");
-
-}
-
-public  close():  void  {
-
-  console.log("close state in SlighLightClass");
-
- }
+    public close(): void {
+        console.log("close state in SlighLightClass");
+    }
 
 }
+```
 
-`
+
 
 我们来测试下：
 
-`
-
-import Context from  "./Context";
-
-import SlightLight from  "./SlightLightClass";
-
-import CloseLight from  "./CloseClass";
+```ts
+import Context from "./Context";
+import SlightLight from "./SlightLightClass";
+import CloseLight from "./CloseClass";
 
 // const context = new Context(new SlightLight());
-
 //我们先用close状态初始化
-
-const context =  new  Context(new  CloseLight());
-
+const context = new Context(new CloseLight());
 context.close();
-
 context.setSlighLight();
-
 context.setHightLight();
+```
 
-`
+
 
 结果如下：
 
@@ -204,113 +171,89 @@ Context: transition to ColseClass
 
 先声明一个策略接口：
 
-`
-
- interface  Strategy  {
-
-     toHandleStringArray(_d:  string[]):  string[];
-
+```ts
+interface Strategy {
+     toHandleStringArray(_d: string[]): string[];
 }
+```
 
-`
+
 
 再实现Sort方法的策略实现（这里我们不讨论sort方法的缺陷）
 
-`
+```ts
+class StrategyAImpl implements Strategy {
 
-class  StrategyAImpl  implements  Strategy  {
-
-    public  toHandleStringArray(_d:  string[]):  string[] {
-
+    public toHandleStringArray(_d: string[]): string[] {
         //其他业务逻辑
-
-        return  _d.sort();
-
+        return _d.sort();
     }
 
 }
+```
 
-`
+
 
 接下来看看reverse方法的策略实现
 
-`
+```ts
+class StrategyBImpl implements Strategy {
 
-class  StrategyBImpl  implements  Strategy  {
-
-    public  toHandleStringArray(_d:  string[]):  string[] {
-
+    public toHandleStringArray(_d: string[]): string[] {
         //其他业务逻辑
-
-        return  _d.reverse();
-
+        return _d.reverse();
     }
-
 }
+```
 
-`
+
 
 你也许已经发现了，如果我们想实现数组的其他策略，只需要实现对应的接口即可。即能在不扩展类的情况下向用户提供能改变其行为的方法。
 
 到现在还缺少一个关键的零件，改变策略的载体--Context类。
 
-`
-
-class  Context  {
-
-    private  strategy:  Strategy;
-
-    constructor(_s:  Strategy)  {
-
-        this.strategy  =  _s;
-
+```ts
+class Context {
+    private strategy: Strategy;
+    constructor(_s: Strategy) {
+    this.strategy = _s;
 }
 
-public  setStrategy(_s:  Strategy)  {
-
-    this.strategy  =  _s;
-
+public setStrategy(_s: Strategy) {
+    this.strategy = _s;
 }
 
 //执行的方法是策略中定义的方法
+public executeStrategy() {
 
-public  executeStrategy()  {
-
-     //标明是哪个策略类
-
+    //标明是哪个策略类
     console.log(
-
-        `Context: current strategy is ${(<any>this.strategy).constructor.name}`
-
+`Context: current strategy is ${(<any>this.strategy).constructor.name}`
     );
-
-     const  result  =  this.strategy.toHandleStringArray(names);
-
-     console.log("result:",  result.join("->"));
-
+     const result = this.strategy.toHandleStringArray(names);
+     console.log("result:", result.join("->"));
     }
 
 }
+```
 
-`
+
 
 我们来测试一下，看效果是怎么样的，先假定Context类中的数组是如下形式的：
 
-`
-
-const names:  string[] = ["hou",  "cao",  "ss"];
-
-`
+```ts
+const names: string[] = ["hou", "cao", "ss"];
+```
 
 现在开始实例化reverse方法的策略
 
-`
-
-const context =  new  Context(new  StrategyB());
+```ts
+const context = new Context(new StrategyB());
 
 context.executeStrategy();
+```
 
-`
+
 
 效果如下：
 
@@ -362,15 +305,13 @@ result: cao->hou->ss
 
 我们先定义一个通用的播放接口
 
-`
-
-export  default  interface  Target  {
-
-    play(type:  string, fileName:  string):  void;
-
+```ts
+export default interface Target {
+    play(type: string, fileName: string): void;
 }
+```
 
-`
+
 
 play方法需要两个参数，类型和文件名。因为我们要根据文件类型做适配，所有这个参数很有必要。
 
@@ -378,149 +319,125 @@ play方法需要两个参数，类型和文件名。因为我们要根据文件�
 
 我们先定义一个高级播放接口
 
-`
+```ts
+export default interface AdvanceTarget {
 
-export  default  interface  AdvanceTarget  {
+    playVlcType(fileName: string): void;
 
-    playVlcType(fileName:  string):  void;
-
-    playMp4Type(fileName:  string):  void;
+    playMp4Type(fileName: string): void;
 
 }
+```
 
-`
+
 
 实现两个具体的播放类，一个播放VLC格式的，一个播放Mp4格式的。
 
-`
+```ts
+export default class VlcPlayer implements AdvancePlayer {
 
-export  default  class  VlcPlayer  implements  AdvancePlayer  {
-
-    public  playVlcType(fileName :  string)  :  void  {
+    public playVlcType(fileName : string) : void {
 
         console.log(`${fileName} is palying!`);
 
 }
 
-    public  playMp4Type(fileName :  string)  :  void  {
+    public playMp4Type(fileName : string) : void {
 
         //假定Vlc播放器不能播放mp4格式
 
     }
 
 }
+```
 
-`
 
-`
 
-export  default  class  Mp4Player  implements  AdvancePlayer  {
+```ts
+export default class Mp4Player implements AdvancePlayer {
 
-    public  playVlcType(fileName:  string):  void  {
-
+    public playVlcType(fileName: string): void {
         // 假定mp4播放器不支持VLC格式播放
-
     }
 
-    public  playMp4Type(fileName:  string):  void  {
-
+    public playMp4Type(fileName: string): void {
         console.log(`${fileName} is palying`);
-
     }
 
 }
+```
 
-`
+
 
 是时候实现适配器类的时候，以便更好解释适配器是如何架起两种接口的。
 
-`
+```ts
+class MediaAdatper implements Target {
 
-class  MediaAdatper  implements  Target  {
+    private advanceTarget: AdvanceTarget;
 
-    private  advanceTarget:  AdvanceTarget;
-
-    constructor(type:  string)  {
-
-        if (type  ===  "vlc") {
-
-            this.advanceTarget  =  new  VlcPlayer();
-
+    constructor(type: string) {
+        if (type === "vlc") {
+            this.advanceTarget = new VlcPlayer();
         }
-
-        if (type  ==  "mp4") {
-
-            this.advanceTarget  =  new  Mp4Player();
-
+        if (type == "mp4") {
+            this.advanceTarget = new Mp4Player();
         }
-
     }
 
-public  play(type:  string, fileName:  string):  void  {
+public play(type: string, fileName: string): void {
 
-    if (type  ===  "vlc") {
-
+    if (type === "vlc") {
         this.advanceTarget.playVlcType(fileName);
-
     }
-
-    if (type  ==  "mp4") {
-
+    if (type == "mp4") {
         this.advanceTarget.playMp4Type(fileName);
-
     }
 
     }
 
 }
+```
 
-`
+
 
 适配器类中持有高级接口的引用，根据文件类型初始化相应的类。所以在play方法就有了相应的实例，可以调用具体的方法。
 
 现在，我们初始化好了适配器，主角播放器也该上场了，是到播放音乐的时候。
 
-`
+```ts
+class Player implements Target {
 
-class  Player  implements  Target  {
-
-    mediaAdapter  :  MediaAdapter;
-
-    play(type :  string, fileName :  string)  :  void  {
-
-        if(type  ==  "mp3") {
-
-            //mp3直接播放
-
-        }  else  if (type  ===  "vlc"  ||  type  ==  "mp4") {
-
-            this.mediaAdapter  =  new  MediaAdapter(type);
-
-            this.mediaAdapter.play(type,  fileName);
-
-        }  
+    mediaAdapter : MediaAdapter;
+    play(type : string, fileName : string) : void {
+        if(type == "mp3") {
+          //mp3直接播放
+        } else if (type === "vlc" || type == "mp4") {
+            this.mediaAdapter = new MediaAdapter(type);
+            this.mediaAdapter.play(type, fileName);
+        }
 
     }
 
 }
+```
 
-`
+
 
 下面我们进行下测试，
 
-`
+```ts
+const player = new Player();
 
-const player =  new  Player();
-
-player.play("mp4",  "笑看风云.mp4");
-
-player.play("vlc",  "烟雨唱扬州.vlc");
-
-player.play("mp3",  "背水姑娘.mp3");
-
-player.play("wma",  "左手指月.mp3");
+player.play("mp4", "笑看风云.mp4");
+player.play("vlc", "烟雨唱扬州.vlc");
+player.play("mp3", "背水姑娘.mp3");
+player.play("wma", "左手指月.mp3");
+```
 
 测试结果：
+
+`
 
 笑看风云.mp4 is palying
 
@@ -558,157 +475,117 @@ sorry,type wma is not support
 
 下面我们看下代码模型，先看下商家的代码实现：
 
-`
+```ts
+import Customer from "{path}/CustomerModal";
 
-import Customer from  "{path}/CustomerModal";
+export default class Seller {
 
-export  default  class  Seller  {
+    customers: Customer[];
+    register(customer): void {
+        this.customers.push(customer);
+    }
 
-  customers:  Customer[];
+    remove(id: number): void {
+        this.customers.forEach(c => {
+        if (c.getId() === id) {
+            console.log(`this id: ${id} should be removed`);
+        }
+        });
+    }
 
-  register(customer):  void  {
-
-   this.customers.push(customer);
-
-}
-
-remove(id:  number):  void  {
-
-  this.customers.forEach(c  =>  {
-
-  if (c.getId() ===  id) {
-
-   console.log(`this id: ${id} should be removed`);
-
-  }
-
-  });
+    notifyAll(): void {
+        this.customers.forEach(cus => {
+        cus.dealOrder();
+    });
+    }
 
 }
+```
 
-notifyAll():  void  {
 
-  this.customers.forEach(cus  =>  {
-
-   cus.dealOrder();
-
-   });
-
-   }
-
-}
-
-`
 
 customers属性维护着所有订阅者，数组中的 每个元素都是Customer对象，我们从模拟对象出发，抽象出该对象：
 
-`
+```ts
+export default class Customer {
 
-export  default  class  Customer  {
+    private id: number;
+    private name: string;
+    private address: string;
+    private telNum: string;
+    private orders: Order[];
 
-  private  id:  number;
+    constructor(_id: number, _name: string, _address: string, _telNum: string) {
 
-  private  name:  string;
+        this.id = _id;
+        this.name = _name;
+        this.address = _address;
+        this.telNum = _telNum;
+    }
 
-  private  address:  string;
+    getId(): number {
+        return this.id;
+    }
 
-  private  telNum:  string;
-
-  private  orders:  Order[];
-
-constructor(_id:  number, _name:  string, _address:  string, _telNum:  string)  {
-
-  this.id  =  _id;
-
-  this.name  =  _name;
-
-  this.address  =  _address;
-
-  this.telNum  =  _telNum;
-
-}
-
-getId():  number  {
-
-  return  this.id;
+    dealOrder(): void {
+        //make a order
+        console.log(`I am + ${this.name}， I have got message from seller`);
+    }
 
 }
+```
 
-dealOrder():  void  {
 
-  //make a order
-
-   console.log(`I am + ${this.name}， I have got message from seller`);
-
-  }
-
-}
-
-`
 
 看了商家的模型后，来看下观察者模式的模型：
 
-`
+```ts
+import Seller from "./Seller";
 
-import Seller from  "./Seller";
+import Customer from "./CustomerModal";
 
-import Customer from  "./CustomerModal";
+export default class Observer {
 
-export  default  class  Observer  {
+    constructor() {
+        this.seller = new Seller();
+    }
+    private seller: Seller;
 
-  constructor()  {
+    register(customer: Customer): void {
+        console.log("");
+        this.seller.register(customer);
+    }
 
-   this.seller  =  new  Seller();
+    fire(): void {
+        this.seller.notifyAll();
+    }
 
-  }
-
-  private  seller:  Seller;
-
-  register(customer:  Customer):  void  {
-
-   console.log("");
-
-   this.seller.register(customer);
-
-  }
-
-fire():  void  {
-
-  this.seller.notifyAll();
+    remove(customerId: number): void {
+        this.seller.remove(customerId);
+    }
 
 }
+```
 
-remove(customerId:  number):  void  {
 
-  this.seller.remove(customerId);
-
-}
-
-}
-
-`
 
 上面的代码中，是从OOP的实现方式出发进行设计。已经有了观察者模式所需要的两个主要元素：主题（商家）和观察者（各位客户），一旦数据改变，新的数据就会以某种形式推送到观察者的手上。
 
 现在我们来测试下这几段代码：
 
-`
-
-let customer1 =  new  Customer(1101,  "caozn",  "shanxi",  "12900000");
-
-let os =  new  Observer();
-
+```ts
+let customer1 = new Customer(1101, "caozn", "shanxi", "12900000");
+let os = new Observer();
 os.register(customer1);
 
-let customer2 =  new  Customer(1102,  "houyw",  "henan",  "12900001");
-
+let customer2 = new Customer(1102, "houyw", "henan", "12900001");
 os.register(customer2);
-
 console.log(os.getAllCustomers().length);
 
 os.fire();
+```
 
-`
+
 
 得到的结果如下：
 
@@ -740,101 +617,79 @@ I am houyw， I have got message from seller
 
 先看下接口
 
-`
-
- interface  Subject  {
-
-    proposal()  :  void;
-
+```ts
+interface Subject {
+    proposal() : void;
 }
+```
 
-`
+ 
 
 实现类
 
-`
-
-class  RealSubject  implements  Subject  {
-
-    public  proposal():  void  {
-
+```ts
+class RealSubject implements Subject {
+    public proposal(): void {
         console.log("Darling, Can you marray me?");
-
     }
 
 }
+```
 
-`
+
 
 代理类
 
-`
+```ts
+class Proxy implements Subject {
 
-class  Proxy  implements  Subject  {
+    private realSubject : RealSubject;
 
-    private  realSubject  :  RealSubject;
-
-    private  chcekIsGoodFriend()  :  boolean  {
-
+    private chcekIsGoodFriend() : boolean {
         console.log("It's is checking if good friend");
-
-        const  r  =  Math.ceil(Math.random() *  10);
-
+        const r = Math.ceil(Math.random() * 10);
         //只有够意思才给你传话
-
-        if (r  >  6  ||  r  ==  6) {
-
-            return  true;
-
-        }  else  {
-
-            return  false;
-
+        if (r > 6 || r == 6) {
+            return true;
+        } else {
+            return false;
         }
 
     }
 
-    private  checkPromission()  {
-
+    private checkPromission() {
         console.log("It's checking the promission");
-
         if (this.chcekIsGoodFriend()) {
-
-            return  true;
-
+            return true;
         }
+        return false;
+    }
 
-        return  false;
-
-}
-
-    public  proposal()  :  void  {
-
+    public proposal() : void {
          if(this.checkPromission()) {
-
             this.realSubject.proposal();
-
         }
 
     }
 
 }
+```
 
-`
+
 
 帮忙传话需要征得当事人的同意(checkPromission)，还是个靠谱的朋友(chcekIsGoodFriend)。这两个条件具备了，这事儿就会靠谱很多。
 
 现在我们测试下：
 
-`
+```ts
+let realSubject = new RealSubject();
 
-let realSubject =  new  RealSubject();
-
-let subject :  Subject  =  new  Proxy(realSubject);
+let subject : Subject = new Proxy(realSubject);
 
 subject.proposal();
+```
 
-`
+
 
 请自行检测啊，看某位朋友靠不靠谱，同意还是不同意。
 
@@ -856,107 +711,88 @@ subject.proposal();
 
 在接口中，定义一个基本draw方法
 
-`
+```typescript
+interface Shape {
 
-interface  Shape  {
-
-    draw():  void;
+    draw(): void;
 
 }
+```
 
-`
+
 
 然后实现两个类实现该接口：
 
-`
-
+```ts
 CircleShape implements Shape {
 
     public draw(): void {
-
-        console.log("the drow method in class CircleShape");
-
+       console.log("the drow method in class CircleShape");
     }
-
 }
 
-class  RectangleShape  implements  Shape  {
+class RectangleShape implements Shape {
 
-    public  draw():  void  {
-
+    public draw(): void {
         console.log("the drow method in class RectangleShape");
-
     }
 
 }
+```
 
-`
+
 
 接下来定义装饰类的基类
 
-`
+```ts
+class ShapeDecorator implements Shape {
 
-class  ShapeDecorator  implements  Shape  {
+    protected shape: Shape;
 
-    protected  shape:  Shape;
-
-    constructor(s:  Shape)  {
-
-        this.shape  =  s;
-
+    constructor(s: Shape) {
+        this.shape = s;
     }
 
-    public  draw()  {
-
+    public draw() {
         this.shape.draw();
-
     }
 
 }
+```
 
-`
+
 
 protected属性保存着Shape对象的引用，调用draw方法，就调用该对象的该方法。接下来定义扩展后的装饰类。
 
-`
+```ts
+class BlueShapeDecorator extends ShapeDecorator {
 
-class  BlueShapeDecorator  extends  ShapeDecorator  {
-
-    public  draw():  void  {
-
+    public draw(): void {
         super.draw();
-
         this.setBGImage();
-
     }
 
-    private  setBGImage():  void  {
-
+    private setBGImage(): void {
         console.log("set background Image im BlueShapeDecorator");
-
     }
 
 }
 
-class  GreenShapeDecorator  extends  ShapeDecorator  {
+class GreenShapeDecorator extends ShapeDecorator {
 
-    public  draw():  void  {
-
+    public draw(): void {
         super.draw();
-
         this.setBorder();
-
     }
 
-    private  setBorder():  void  {
-
+    private setBorder(): void {
         console.log("set border in GreenShapeDecorator");
-
     }
 
 }
+```
 
-`
+
 
 万事俱备只欠东风，下面进行下测试：
 
@@ -1054,15 +890,15 @@ webkit中默认js引擎指的是JS Core,而在Chromium中则是如雷贯耳的V8
 
 我们了解了隐藏类，下面看下代码是如何使用这些隐藏类来高效访问对象的属性的。我们以以下代码进行说明：
 
-`
-
+```js
 function getName(person){
-    if(person && person.name){
-        return person.name
-    }
+ if(person && person.name){
+ return person.name
+ }
 }
+```
 
-`
+
 
 访问的基本过程是这样的：首先获取隐藏类的地址，然后根据属性值查找偏移值，计算出属性的地址。不过遗憾的是，这个过程是比较耗时的。那么是否可以使用缓存机制呢？答案是肯定的，这套缓存机制叫做内联缓存(inline-cache)，主要思想就是将使用之前查找的结果缓存起来，避免方法和属性被存取时出现的因哈希表查找带来的问题。
 
@@ -1072,20 +908,20 @@ function getName(person){
 
 JavaScript中有6种基础类型，分别是String, Number, Boolean, Null, Undefined, Symbol,这些类型的值都有固定的存储大小，往往都会保存到栈中，由系统自动分配存储空间。我们可以直接按值访问这部分的值。其他类型为引用类型，比如对象，内存中分配值就不是固定的。该类型的变量值是保存到堆（堆是非结构化区域，堆中的对象占用分配的内存。这种分配是动态的，因为对象的大小/寿命/数量是未知的，所以需要在运行时分配和释放）内存中的，这部分的值是不允许我们直接访问的。
 
-`
-
+```js
 var name="houyw";
 var age = 23;
 var isMale = true;
 var empty = null;
 
 var person = {
-    name: "houyw",
-    age: 23,
-    isMale: true;
+ name: "houyw",
+ age: 23,
+ isMale: true;
 }
+```
 
-`
+
 
 ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/stackAndHeap.png)
 
@@ -1093,11 +929,11 @@ var person = {
 
 默认情况下JavaScript对象会在堆上分配固定大小的空间存储内部属性，预分配空间不足时(无空闲slot)，新增属性就会存储到properties中。而数字存储在element中。如果properties和elements空间不足时，会创建一个更大的FixedArray。为了便于说明问题，我们举例说明：
 
-`
-
+```js
 var obj ={};
+```
 
-`
+
 
 ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/jsobject-1.png)
 
@@ -1107,25 +943,25 @@ var obj ={};
 
 继续添加两个属性：
 
-`
-
+```js
 obj.name="houyw";
 
 obj.age =23;
+```
 
-`
+
 
 ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/jsobject-2.png)
 
 name和age属性默认存储到对象的内部属性中。再添加两个数字属性：
 
-`
-
+```js
 obj[0]="aaa";
 
 obj[1] = "bbb";
+```
 
-`
+
 
 ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/jsobject-3.png)
 
@@ -1161,120 +997,123 @@ V8使用了精简整理的算法，用来标记那些还有引用关系的对象
 
 amd(Asynchronous Module Definition，规范地址：[https://github.com/amdjs/amdjs-api/wiki/AMD](https://github.com/amdjs/amdjs-api/wiki/AMD))，中文翻译为异步模块定义。该规范通过define方法定义模块，通过require方法加载模块。
 
+RequireJS 想成为浏览器端的模块加载器，同时也想成为 Rhino / Node 等环境的模块加载器。。
+
 我们先看下define的api定义:
 
-`
-
+```js
 define(id?, dependencies?, factory);
+```
 
-`
+
 
 该方法接受3个参数，？表示可选项，定义模块时可以不用指定。第一个参数表示该模块的ID，第二个参数dependencies表示该模块所依赖的模块，该参数是一个数组，表示可以依赖多个。第三个factory是一个函数（也可以是对象），既然是函数，就可以有参数，那么参数是怎么传递进来的呢？这时候我们再想起来dependencies这个参数了，依赖的声明顺序和该工厂函数参数的声明顺序保持一致，如下面的实例代码：
 
-`
-
-define([ 'service',  'jquery' ],  function  (service,  $)  {
-
+```js
+define([ 'service', 'jquery' ], function (service, $) {
     //业务
-
 }
-
-    return  { }
+   return { }
 
 })
+```
 
-`
+
 
 依赖模块service和jquery在工厂方法执行前完成依赖注入，即依赖前置。
 
 下面我们看下完整的例子，我们以AMD规范的requirejs实现为例，我们先在HTML文件中加入：
-`
 
-<script  data-main="js/main" src="js/libs/require.js"></script>
+```js
+<script data-main="js/main" src="js/libs/require.js"></script>
+```
 
-`
+
+
 
 data-main属性指定工程文件入口，在main.js中配置基础路径和进行模块声明：
 
-`
-
+```js
 requirejs.config({
 
     //基础路径
 
-    baseUrl:  "js/",
+    baseUrl: "js/",
 
     //模块定义与模块路径映射
 
-    paths:  {
+    paths: {
 
-        "message":  "modules/message",
+        "message": "modules/message",
 
-        "service":  "modules/service",
+        "service": "modules/service",
 
-        "jquery":  "libs/jquery-3.4.1"
+        "jquery": "libs/jquery-3.4.1"
 
-}
+    }
 
 })
 
 //引入模块
 
-requirejs(['message'],  function  (msg)  {
+requirejs(['message'], function (msg) {
 
     msg.showMsg()
 
 })
+```
 
-`
+
 
 再message模块中引入依赖模块service和jquery，
 
-`
+```js
+define(['service', 'jquery'], function (service, $) {
 
-define(['service',  'jquery'],  function  (service,  $)  {
+    var name = 'front-end-complete-book';
 
-    var  name  =  'front-end-complete-book';
+    function showMsg() {
 
-    function  showMsg()  {
+        $('body').css('background', 'gray');
 
-        $('body').css('background',  'gray');
-
-        console.log(service.formatMsg() +  ', from:'  +  name);
+        console.log(service.formatMsg() + ', from:' + name);
 
     }
 
-    return  {showMsg}
+    return {showMsg}
 
 })
+```
 
-`
+
 
 service代码如下：
 
-`
+```js
+define(function () {
 
-define(function  ()  {
+    var msg = 'this is service module';
 
-    var  msg  =  'this is service module';
+    function formatMsg() {
 
-    function  formatMsg()  {
-
-        return  msg.toUpperCase()
+        return msg.toUpperCase()
 
 };
 
-    return  {formatMsg}
+    return {formatMsg}
 
 })
+```
 
-`
+
 
 详细的代码请参考代码实例。
 
 ##### 4.4.2 cmd和seajs
 
 requirejs在声明依赖的模块时会在第一之间加载并执行。cmd（ Common Module Definition，通用模块定义,规范地址：[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)）是另一种模块加载方案，和amd稍有不同，不同点主要体现在：amd推崇依赖前置，提前执行。cmd是就近依赖，延迟执行。
+
+Seajs 则专注于 Web 浏览器，同时通过 Node 扩展的方式可以在 Node 环境中运行。
 
 > 扩展阅读：
 > 
@@ -1286,15 +1125,17 @@ requirejs在声明依赖的模块时会在第一之间加载并执行。cmd（ C
 > 
 > require书写规范[https://github.com/seajs/seajs/issues/259](https://github.com/seajs/seajs/issues/259)
 
+
+
 seajs官方：[https://github.com/seajs/seajs](https://github.com/seajs/seajs)，是cmd规范实现。规范部分不做详细的介绍，我们通过一个例子来说明：
 
 和一般引入js文件的方法导入seajs支持,
 
-`
+```js
+<script src="./js/libs/sea.js"></script>
+```
 
-<script  src="./js/libs/sea.js"></script>
 
-`
 
 > alias:当模块标识很长时，可以用这个简化，让文件的真实路径与调用标识分开。
 > 
@@ -1302,31 +1143,31 @@ seajs官方：[https://github.com/seajs/seajs](https://github.com/seajs/seajs)�
 
 下面对seajs做基本都配置，并声明模块
 
-`
-
+```js
 seajs.config({
 
-    charset:  "utf-8",
+    charset: "utf-8",
 
-    base:  "./js/",
+    base: "./js/",
 
-    alias:  {
+    alias: {
 
-        jquery:  "libs/jquery-3.4.1",
+        jquery: "libs/jquery-3.4.1",
 
-        message:  "modules/message",
+        message: "modules/message",
 
-        service:  "modules/service"
+        service: "modules/service"
 
 },
 
-    paths:  {}
+    paths: {}
 
 });
 
 seajs.use("./js/main.js");
+```
 
-`
+
 
 使用seajs.use方法在页面中加载任意模块， base指定seajs的基础路径，该属性结合alias中模块路径配置一起指向某一模块，这里需要注意的是路径的解析方法:
 
@@ -1346,41 +1187,39 @@ seajs.use("./js/main.js");
 
 继续回到js/main.js中，引入message模块：
 
-`
-
-define(function  (require,  exports,  module)  {
+```js
+define(function (require, exports, module) {
 
     require("message").showMsg();
 
 })
-
-`
+```
 
 message模块中serivce模块和jquery模块，
 
-`
+```js
+define(function (require, exports, module) {
 
-define(function  (require,  exports,  module)  {
+    var service = require("service");
 
-    var  service  =  require("service");
+    var $ = require("jquery");
 
-    var  $  =  require("jquery");
+    var name = 'front-end-complete-book';
 
-    var  name  =  'front-end-complete-book';
+    function showMsg() {
 
-    function  showMsg()  {
+        $('body').css('background', 'gray');
 
-        $('body').css('background',  'gray');
-
-        console.log(service.formatMsg() +  ', from:'  +  name);
+        console.log(service.formatMsg() + ', from:' + name);
 
     }
 
-    exports.showMsg  =  showMsg;
+    exports.showMsg = showMsg;
 
 })
+```
 
-`
+
 
 > 在seajs引入jquery模块需要做简单点改造，因为jquery遵循amd规范，所以需要做简单的改造，改造方式如下：
 > 
@@ -1397,6 +1236,30 @@ define(function  (require,  exports,  module)  {
 
 
 ##### 4.4.3 Umd
+
+兼容AMD和commonJS规范的同时，还兼容全局引用的方式, 常用写法如下：
+
+`
+
+```js
+(function (root, factory) {    
+ if (typeof define === 'function' && define.amd) {        
+     //AMD        
+     define(['jquery'], factory);
+ } else if (typeof exports === 'object') {       
+  //Node, CommonJS支持       
+  module.exports = factory(require('jquery'));
+ } else {        
+    //浏览器全局变量(root 即 window)        
+    root.returnExports = factory(root.jQuery);
+ }}(window, function ($) {       
+    function myFunc(){};
+    //暴露公共方法    
+    return myFunc;
+}));
+```
+
+`
 
 ##### 4.4.4 Systemjs
 
