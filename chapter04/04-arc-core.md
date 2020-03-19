@@ -991,7 +991,7 @@ V8使用了精简整理的算法，用来标记那些还有引用关系的对象
 
 模块化的贯彻执行离不开相应的约定，即规范。这个是能够进行模块化工作的重中之重，孟子说的“不以规矩不能成为方圆”也是这个道理。
 
-下面，我们看下目前流行的前端模块规范：CommonJS，Amd，Cmd和ES6 module
+下面，我们看下目前流行的前端模块规范：Amd，Cmd,ES6 module和CommonJS.
 
 ##### 4.4.1 Amd和requirejs
 
@@ -1035,19 +1035,12 @@ data-main属性指定工程文件入口，在main.js中配置基础路径和进�
 
 ```js
 requirejs.config({
-
     //基础路径
-
     baseUrl: "js/",
-
     //模块定义与模块路径映射
-
     paths: {
-
         "message": "modules/message",
-
         "service": "modules/service",
-
         "jquery": "libs/jquery-3.4.1"
 
     }
@@ -1057,7 +1050,6 @@ requirejs.config({
 //引入模块
 
 requirejs(['message'], function (msg) {
-
     msg.showMsg()
 
 })
@@ -1073,13 +1065,9 @@ define(['service', 'jquery'], function (service, $) {
     var name = 'front-end-complete-book';
 
     function showMsg() {
-
         $('body').css('background', 'gray');
-
         console.log(service.formatMsg() + ', from:' + name);
-
     }
-
     return {showMsg}
 
 })
@@ -1093,13 +1081,9 @@ service代码如下：
 define(function () {
 
     var msg = 'this is service module';
-
     function formatMsg() {
-
         return msg.toUpperCase()
-
-};
-
+    };
     return {formatMsg}
 
 })
@@ -1147,21 +1131,13 @@ seajs官方：[https://github.com/seajs/seajs](https://github.com/seajs/seajs)�
 seajs.config({
 
     charset: "utf-8",
-
     base: "./js/",
-
     alias: {
-
         jquery: "libs/jquery-3.4.1",
-
         message: "modules/message",
-
         service: "modules/service"
-
-},
-
+    },
     paths: {}
-
 });
 
 seajs.use("./js/main.js");
@@ -1201,21 +1177,14 @@ message模块中serivce模块和jquery模块，
 define(function (require, exports, module) {
 
     var service = require("service");
-
-    var $ = require("jquery");
-
+    var $ = require("jquery");
     var name = 'front-end-complete-book';
 
-    function showMsg() {
-
+    function showMsg() {
         $('body').css('background', 'gray');
-
         console.log(service.formatMsg() + ', from:' + name);
-
     }
-
     exports.showMsg = showMsg;
-
 })
 ```
 
@@ -1237,7 +1206,7 @@ define(function (require, exports, module) {
 
 ##### 4.4.3 Umd
 
-兼容AMD和commonJS规范的同时，还兼容全局引用的方式, 常用写法如下：
+兼容AMD和commonJS规范的同时，还兼容全局引用的方式, 规范地址：[https://github.com/umdjs/umd](https://github.com/umdjs/umd)  ， 常用写法如下：
 
 `
 
@@ -1261,9 +1230,123 @@ define(function (require, exports, module) {
 
 `
 
-##### 4.4.4 Systemjs
+##### 4.4.4 ES6 module
 
-##### 4.4.5 commonjs
+ES6在语言标准的层面上引入了module，应该也更加规范。Es6 module编译时加载需要的模块，使用export或者export.default暴露出方法、类、变量，使用import导入需要的模块。
+
+下面我们看个例子：
+
+我们定义3个模块，moduleA, moduleB和moduleC, 其中moduleA作为主模块，在浏览器以module的方式导入。
+
+```js
+ import name, { msg, person } from "./moduleA.js";
+```
+
+在moduleA中可以导出各种数据结构：
+
+```js
+export var msg = "msg from moduleA";
+
+var obj = {
+  name: "hyw",
+  age: 23
+};
+
+export { obj as person };
+
+export default name = "module-A";
+```
+
+ 可以把这些数据输出到页面上看看是否能被正确导入，
+
+```js
+<script type="module">
+      import name, { msg, person } from "./moduleA.js";
+
+      document.getElementById("test").innerHTML =
+        msg + ",person name:" + person.name + ", module name is:" + name;
+</script>
+```
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/ES6-1.png)
+
+可以在浏览器（Chrome,Safari,Opera, Firefox）正常执行。
+
+另外，import方法返回Promise对象，所以也可以写成这样的：
+
+```js
+if (true) {
+  import("./moduleB.js").then(res => {
+    console.log(res.obj.name + ", module name:" + res.default);
+  });
+}
+
+Promise.all([import("./moduleB.js"), import("./moduleC.js")]).then(
+  ([moduleB, moduleC]) => {
+    console.log( moduleB.obj.name + ", module name:" +
+        moduleB.default + ", another module is :" + moduleC.default
+    );
+  }
+);
+```
+
+moduleC模块中的代码较简单，
+
+```js
+export default name = "module-C";
+```
+
+刷新浏览器，可以输出：
+
+`
+
+czn, module name:module-B
+ czn, module name:module-B, another module is :module-C
+
+`
+
+> 需要注意的是，ES6module输出的模块是引用，原始值发生变化，import加载的值也会跟着变。
+
+
+
+
+
+##### 4.4.5 Commonjs
+
+CommonJS(官网：[http://www.commonjs.org/](http://www.commonjs.org/)) 是以在浏览器环境之外构建 JavaScript 生态系统为目标而产生的项目，比如在服务器和桌面环境(nw.js, electron)中。前身叫做Serverjs，是由Mozilla的工程师Kevin Dangoor 在2009年1月创建的，在2009年正式更名为commonjs。
+
+CommonJS 规范是为了解决 JavaScript 的作用域问题而产生，可以使每个模块在它自身的命名空间中执行。该规范的主要内容是，模块必须通过 module.exports 导出对外的变量或接口,通过 require() 来运行时加载其他模块的输出到当前模块中。
+
+> 扩展阅读：Google group [https://groups.google.com/forum/#!forum/commonjs](https://groups.google.com/forum/#!forum/commonjs)
+
+
+
+下面看一个简单点例子：
+
+```js
+module.exports = function(num) {
+  if (typeof num != "number") {
+    return 0;
+  } else {
+    return num * num;
+  }
+};
+```
+
+该模块中暴露一个方法，计算一个数字的平方，在主文件引入这个模块
+
+```js
+var square = require("./moduleA");
+console.log(square(4));
+```
+
+> 补充一个知识点，exports和module.exports的关系：
+> 
+> 1. module.exports 初始值为一个空对象 ；
+> 2. exports 是指向的 module.exports 的引用；
+> 3. require() 返回的是 module.exports；
+
+> 另一个需要注意点，commonjs模块输出到是值得拷贝，模块内部的变化不会影响到已经导出的值。
 
 #### 4.5 函数式编程入门
 

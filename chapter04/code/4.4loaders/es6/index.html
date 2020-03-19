@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ES6 module测试</title>
+    <!-- <script type="module" src="./moduleA.js"></script> -->
+    <style>
+      .test {
+        margin: 25% 40%;
+        width: 400px;
+        height: 200px;
+        color: crimson;
+        font-size: 24px;
+        border: 1px solid gray;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="test" class="test"></div>
+
+    <script type="module">
+      import name, { msg, person } from "./moduleA.js";
+
+      document.getElementById("test").innerHTML =
+        msg + ",person name:" + person.name + ", module name is:" + name;
+    </script>
+  </body>
+</html>
