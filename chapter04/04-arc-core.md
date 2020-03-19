@@ -1036,8 +1036,6 @@ webkit中默认js引擎指的是JS Core,而在Chromium中则是如雷贯耳的V8
 
 > 虚线表示渲染过程中，该阶段可能依赖其他模块。比如在网页的下载过程中，需要使用到网络和存储。
 
-
-
 ##### 4.2.2 隐藏类和对象表示
 
 1、隐藏类
@@ -1138,6 +1136,7 @@ v8的内存管理只要有两点：一是V8内存的划分，二是V8对于JavaS
 V8的内存划分如下：
 
 - Zone类：该类主要管理小块内存。当一块小内存被分配之后，不能被Zone回收，只能一次性回收Zone分配的所有小块内存。当一个过程需要很多内存，Zone将需要分配大量的内存，却又不能及时释放，结果导致内存不足。
+
 - 堆：管理JavaScript使用的数据、生成的代码、哈希表等。为方便实现垃圾回收，堆被分为三个部分：
   
   ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/js-gc.png)
@@ -1147,8 +1146,6 @@ V8的内存划分如下：
 V8使用了精简整理的算法，用来标记那些还有引用关系的对象，然后回收没有被标记的对象。最后对这些对象进行整理和压缩。
 
 那么垃圾回收机制是怎么判断对象是否存活呢？如何检查对象的生死，是通过客户机或者程序代码是否可以触达此对象。可触达性(Reachability)还可以这么理解：另一个对象是否可以获得它，如果可以的话，该对象所需的内存会被保留。
-
-
 
 #### 4.3 宏任务和微任务
 
@@ -1162,9 +1159,9 @@ V8使用了精简整理的算法，用来标记那些还有引用关系的对象
 
 ##### 4.4.1 Amd和requirejs
 
-amd(Asynchronous Module Definition)，中文翻译为异步模块定义。规范(规范地址：https://github.com/amdjs/amdjs-api/wiki/AMD )，该规范通过define方法定义模块，通过require方法加载模块。
+amd(Asynchronous Module Definition，规范地址：[https://github.com/amdjs/amdjs-api/wiki/AMD](https://github.com/amdjs/amdjs-api/wiki/AMD))，中文翻译为异步模块定义。该规范通过define方法定义模块，通过require方法加载模块。
 
-我们先看下define的api定义
+我们先看下define的api定义:
 
 `
 
@@ -1172,7 +1169,232 @@ define(id?, dependencies?, factory);
 
 `
 
-##### 4.4.2 cmd
+该方法接受3个参数，？表示可选项，定义模块时可以不用指定。第一个参数表示该模块的ID，第二个参数dependencies表示该模块所依赖的模块，该参数是一个数组，表示可以依赖多个。第三个factory是一个函数（也可以是对象），既然是函数，就可以有参数，那么参数是怎么传递进来的呢？这时候我们再想起来dependencies这个参数了，依赖的声明顺序和该工厂函数参数的声明顺序保持一致，如下面的实例代码：
+
+`
+
+define([ 'service',  'jquery' ],  function  (service,  $)  {
+
+    //业务
+
+}
+
+    return  { }
+
+})
+
+`
+
+依赖模块service和jquery在工厂方法执行前完成依赖注入，即依赖前置。
+
+下面我们看下完整的例子，我们以AMD规范的requirejs实现为例，我们先在HTML文件中加入：
+`
+
+<script  data-main="js/main" src="js/libs/require.js"></script>
+
+`
+
+data-main属性指定工程文件入口，在main.js中配置基础路径和进行模块声明：
+
+`
+
+requirejs.config({
+
+    //基础路径
+
+    baseUrl:  "js/",
+
+    //模块定义与模块路径映射
+
+    paths:  {
+
+        "message":  "modules/message",
+
+        "service":  "modules/service",
+
+        "jquery":  "libs/jquery-3.4.1"
+
+}
+
+})
+
+//引入模块
+
+requirejs(['message'],  function  (msg)  {
+
+    msg.showMsg()
+
+})
+
+`
+
+再message模块中引入依赖模块service和jquery，
+
+`
+
+define(['service',  'jquery'],  function  (service,  $)  {
+
+    var  name  =  'front-end-complete-book';
+
+    function  showMsg()  {
+
+        $('body').css('background',  'gray');
+
+        console.log(service.formatMsg() +  ', from:'  +  name);
+
+    }
+
+    return  {showMsg}
+
+})
+
+`
+
+service代码如下：
+
+`
+
+define(function  ()  {
+
+    var  msg  =  'this is service module';
+
+    function  formatMsg()  {
+
+        return  msg.toUpperCase()
+
+};
+
+    return  {formatMsg}
+
+})
+
+`
+
+详细的代码请参考代码实例。
+
+##### 4.4.2 cmd和seajs
+
+requirejs在声明依赖的模块时会在第一之间加载并执行。cmd（ Common Module Definition，通用模块定义,规范地址：[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)）是另一种模块加载方案，和amd稍有不同，不同点主要体现在：amd推崇依赖前置，提前执行。cmd是就近依赖，延迟执行。
+
+> 扩展阅读：
+> 
+> seajs与requirejs的不同[https://github.com/seajs/seajs/issues/277](https://github.com/seajs/seajs/issues/277)，
+> 
+> seajs和requirejs对比[https://www.douban.com/note/283566440/](https://www.douban.com/note/283566440/)，
+> 
+> seajs规范文档[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)
+> 
+> require书写规范[https://github.com/seajs/seajs/issues/259](https://github.com/seajs/seajs/issues/259)
+
+seajs官方：[https://github.com/seajs/seajs](https://github.com/seajs/seajs)，是cmd规范实现。规范部分不做详细的介绍，我们通过一个例子来说明：
+
+和一般引入js文件的方法导入seajs支持,
+
+`
+
+<script  src="./js/libs/sea.js"></script>
+
+`
+
+> alias:当模块标识很长时，可以用这个简化，让文件的真实路径与调用标识分开。
+> 
+> paths: 当目录比较深，或需要跨目录调用模块时，可以使用 `paths` 来简化
+
+下面对seajs做基本都配置，并声明模块
+
+`
+
+seajs.config({
+
+    charset:  "utf-8",
+
+    base:  "./js/",
+
+    alias:  {
+
+        jquery:  "libs/jquery-3.4.1",
+
+        message:  "modules/message",
+
+        service:  "modules/service"
+
+},
+
+    paths:  {}
+
+});
+
+seajs.use("./js/main.js");
+
+`
+
+使用seajs.use方法在页面中加载任意模块， base指定seajs的基础路径，该属性结合alias中模块路径配置一起指向某一模块，这里需要注意的是路径的解析方法:
+
+(1)相对标识
+
+ 在http://example.com/modules/a.js 中 require('./b')引入b模块，那么解析后的路径为: http://example.com/modules/b.js
+
+(2)顶级标识
+
+顶级标识**不以点（"."）或斜线（"/"）开始**， 会相对 SeaJS 的 base 路径来解析。假如base路径http://example.com/modules/libs/ ，在某模块中require('jquery/query-3.4.1')引入jquery模块，解析后的路径为 http://example.com/modules/libs/jquery/jquery-3.4.1.js
+
+(3)普通路径
+
+在某个模块中引入模块 require('http://example.com/modules/a') , 普通路径的解析规则，会相对当前页面来解析。
+
+
+
+继续回到js/main.js中，引入message模块：
+
+`
+
+define(function  (require,  exports,  module)  {
+
+    require("message").showMsg();
+
+})
+
+`
+
+message模块中serivce模块和jquery模块，
+
+`
+
+define(function  (require,  exports,  module)  {
+
+    var  service  =  require("service");
+
+    var  $  =  require("jquery");
+
+    var  name  =  'front-end-complete-book';
+
+    function  showMsg()  {
+
+        $('body').css('background',  'gray');
+
+        console.log(service.formatMsg() +  ', from:'  +  name);
+
+    }
+
+    exports.showMsg  =  showMsg;
+
+})
+
+`
+
+> 在seajs引入jquery模块需要做简单点改造，因为jquery遵循amd规范，所以需要做简单的改造，改造方式如下：
+> 
+> define(function(){
+> 
+>     //jquery源代码
+> 
+>     return jQuery.noConflict();
+> 
+> });
+
+完整的代码请参考源码部分。
+
+
 
 ##### 4.4.3 Umd
 

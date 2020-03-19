@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>amd demo</title>
-    <script data-main="js/main" src="js/libs/require.js"></script>
+    <title>cmd demo</title>
+    <script src="./js/libs/sea.js"></script>
     <style>
       div {
         margin: 25% 40%;
@@ -17,8 +17,21 @@
     </style>
   </head>
   <body>
+    <script>
+      seajs.config({
+        charset: "utf-8",
+        base: "./js/",
+        alias: {
+          jquery: "libs/jquery-3.4.1",
+          message: "modules/message",
+          service: "modules/service"
+        },
+        paths: {}
+      });
+      seajs.use("./js/main.js");
+    </script>
     <div>
-      Amd模块及requirejs实现
+      Cmd模块及seajs实现
     </div>
   </body>
 </html>

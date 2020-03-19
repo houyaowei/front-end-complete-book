@@ -3,7 +3,7 @@
   requirejs.config({
     //基础路径
     baseUrl: "js/",
-    //模块标与模块路径映射
+    //模块声明与路径映射
     paths: {
       "message": "modules/message",
       "service": "modules/service",
@@ -11,7 +11,7 @@
     }
   })
 
-  //引入使用模块
+  //加载模块
   requirejs(['message'], function (msg) {
     msg.showMsg()
   })
