@@ -1177,6 +1177,42 @@ console.log("settimeout-2");
 > promise-1
 > settimeout-2
 
+
+
+我们再看一个例子是关于async/await的，该特性已经被广泛应用，所以有必要看下它的执行情况。
+
+```js
+setTimeout(() => console.log("setTimeout"))
+
+async function main() {
+  console.log("before resovle")
+  await Promise.resolve();
+  console.log("after resovle")
+}
+main()
+console.log("global console");
+```
+
+async函数体内，在await之前的代码都是同步执行的，可以理解为给Promise构造函数内传入的代码，await之后的所有代码都是在Promise.then中的回调，会被推入到微任务队列中。
+
+> before resovle
+> 
+> global console
+> 
+> after resovle
+> 
+> setTimeout
+
+
+
+最后我们整理下浏览器端哪些方法的回调会被推入到宏任务和微任务队列中：
+
+宏任务：I/O， setTimeout,，setInterval，requestAnimationFrame
+
+微任务：Promise.then， catch， finally，await(后)
+
+
+
 该部分的内容相对比较抽象，希望大家结合更多的资料去理解。这部分完全理解后，详细你对JavaScript的执行过程有更深的了解。
 
 
