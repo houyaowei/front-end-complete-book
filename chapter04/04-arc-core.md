@@ -56,8 +56,6 @@ export default class Context {
 }
 ```
 
- 
-
 在transitionTo方法中改变当前状态，参数为实例化的子状态类。
 
 再看下State的实现及其SlightLightClass的实现，为了篇幅考虑，我们在这里只贴出部分的代码，完整的代码参考[https://github.com/houyaowei/front-end-complete-book/tree/master/chapter04/code/4.1DesignPattern/State](https://github.com/houyaowei/front-end-complete-book/tree/master/chapter04/code/4.1DesignPattern/State)。
@@ -76,8 +74,6 @@ export default abstract class State {
 
 }
 ```
-
-
 
 > 请注意，如果对TypeScript的抽象类语法还不是很理解的话可以参考官网的class部分。
 
@@ -102,8 +98,6 @@ export default class SlighLightClass extends State {
 }
 ```
 
-
-
 我们来测试下：
 
 ```ts
@@ -118,8 +112,6 @@ context.close();
 context.setSlighLight();
 context.setHightLight();
 ```
-
-
 
 结果如下：
 
@@ -177,8 +169,6 @@ interface Strategy {
 }
 ```
 
-
-
 再实现Sort方法的策略实现（这里我们不讨论sort方法的缺陷）
 
 ```ts
@@ -192,8 +182,6 @@ class StrategyAImpl implements Strategy {
 }
 ```
 
-
-
 接下来看看reverse方法的策略实现
 
 ```ts
@@ -205,8 +193,6 @@ class StrategyBImpl implements Strategy {
     }
 }
 ```
-
-
 
 你也许已经发现了，如果我们想实现数组的其他策略，只需要实现对应的接口即可。即能在不扩展类的情况下向用户提供能改变其行为的方法。
 
@@ -237,8 +223,6 @@ public executeStrategy() {
 }
 ```
 
-
-
 我们来测试一下，看效果是怎么样的，先假定Context类中的数组是如下形式的：
 
 ```ts
@@ -252,8 +236,6 @@ const context = new Context(new StrategyB());
 
 context.executeStrategy();
 ```
-
-
 
 效果如下：
 
@@ -311,8 +293,6 @@ export default interface Target {
 }
 ```
 
-
-
 play方法需要两个参数，类型和文件名。因为我们要根据文件类型做适配，所有这个参数很有必要。
 
 播放接口要支持最常见的音乐文件格式（如Mp3），当然也要支持更丰富的格式，至少可以看个视频吧，体验立马不一样了啊。
@@ -328,8 +308,6 @@ export default interface AdvanceTarget {
 
 }
 ```
-
-
 
 实现两个具体的播放类，一个播放VLC格式的，一个播放Mp4格式的。
 
@@ -351,8 +329,6 @@ export default class VlcPlayer implements AdvancePlayer {
 }
 ```
 
-
-
 ```ts
 export default class Mp4Player implements AdvancePlayer {
 
@@ -366,8 +342,6 @@ export default class Mp4Player implements AdvancePlayer {
 
 }
 ```
-
-
 
 是时候实现适配器类的时候，以便更好解释适配器是如何架起两种接口的。
 
@@ -399,8 +373,6 @@ public play(type: string, fileName: string): void {
 }
 ```
 
-
-
 适配器类中持有高级接口的引用，根据文件类型初始化相应的类。所以在play方法就有了相应的实例，可以调用具体的方法。
 
 现在，我们初始化好了适配器，主角播放器也该上场了，是到播放音乐的时候。
@@ -421,8 +393,6 @@ class Player implements Target {
 
 }
 ```
-
-
 
 下面我们进行下测试，
 
@@ -502,8 +472,6 @@ export default class Seller {
 }
 ```
 
-
-
 customers属性维护着所有订阅者，数组中的 每个元素都是Customer对象，我们从模拟对象出发，抽象出该对象：
 
 ```ts
@@ -535,8 +503,6 @@ export default class Customer {
 }
 ```
 
-
-
 看了商家的模型后，来看下观察者模式的模型：
 
 ```ts
@@ -567,8 +533,6 @@ export default class Observer {
 }
 ```
 
-
-
 上面的代码中，是从OOP的实现方式出发进行设计。已经有了观察者模式所需要的两个主要元素：主题（商家）和观察者（各位客户），一旦数据改变，新的数据就会以某种形式推送到观察者的手上。
 
 现在我们来测试下这几段代码：
@@ -584,8 +548,6 @@ console.log(os.getAllCustomers().length);
 
 os.fire();
 ```
-
-
 
 得到的结果如下：
 
@@ -623,8 +585,6 @@ interface Subject {
 }
 ```
 
- 
-
 实现类
 
 ```ts
@@ -635,8 +595,6 @@ class RealSubject implements Subject {
 
 }
 ```
-
-
 
 代理类
 
@@ -675,8 +633,6 @@ class Proxy implements Subject {
 }
 ```
 
-
-
 帮忙传话需要征得当事人的同意(checkPromission)，还是个靠谱的朋友(chcekIsGoodFriend)。这两个条件具备了，这事儿就会靠谱很多。
 
 现在我们测试下：
@@ -688,8 +644,6 @@ let subject : Subject = new Proxy(realSubject);
 
 subject.proposal();
 ```
-
-
 
 请自行检测啊，看某位朋友靠不靠谱，同意还是不同意。
 
@@ -719,8 +673,6 @@ interface Shape {
 }
 ```
 
-
-
 然后实现两个类实现该接口：
 
 ```ts
@@ -740,8 +692,6 @@ class RectangleShape implements Shape {
 }
 ```
 
-
-
 接下来定义装饰类的基类
 
 ```ts
@@ -759,8 +709,6 @@ class ShapeDecorator implements Shape {
 
 }
 ```
-
-
 
 protected属性保存着Shape对象的引用，调用draw方法，就调用该对象的该方法。接下来定义扩展后的装饰类。
 
@@ -791,8 +739,6 @@ class GreenShapeDecorator extends ShapeDecorator {
 
 }
 ```
-
-
 
 万事俱备只欠东风，下面进行下测试：
 
@@ -898,8 +844,6 @@ function getName(person){
 }
 ```
 
-
-
 访问的基本过程是这样的：首先获取隐藏类的地址，然后根据属性值查找偏移值，计算出属性的地址。不过遗憾的是，这个过程是比较耗时的。那么是否可以使用缓存机制呢？答案是肯定的，这套缓存机制叫做内联缓存(inline-cache)，主要思想就是将使用之前查找的结果缓存起来，避免方法和属性被存取时出现的因哈希表查找带来的问题。
 
 上面的getName方法中，为了查找name属性，如果未缓存，则退回到前面说的通过查找哈希表的方法查找。否则直接读取缓存。
@@ -921,8 +865,6 @@ var person = {
 }
 ```
 
-
-
 ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/stackAndHeap.png)
 
 上面是变量在内存分配空间的宏观观察，具体的实现细节对我们来说还是个黑盒。不急，接下来我们就会详细介绍下具体的过程。
@@ -932,8 +874,6 @@ var person = {
 ```js
 var obj ={};
 ```
-
-
 
 ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/jsobject-1.png)
 
@@ -949,8 +889,6 @@ obj.name="houyw";
 obj.age =23;
 ```
 
-
-
 ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/jsobject-2.png)
 
 name和age属性默认存储到对象的内部属性中。再添加两个数字属性：
@@ -961,9 +899,7 @@ obj[0]="aaa";
 obj[1] = "bbb";
 ```
 
-
-
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/jsobject-3.png)
+![](./images/jsobject-3.png)
 
 ##### 4.2.4 内存管理
 
@@ -975,7 +911,7 @@ V8的内存划分如下：
 
 - 堆：管理JavaScript使用的数据、生成的代码、哈希表等。为方便实现垃圾回收，堆被分为三个部分：
   
-  ![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/js-gc.png)
+  ![](./images/js-gc.png)
   
   需要说明的是年轻分代，主要是为新创建的对象分配的内存，新创建的对象很容易被回收，为了方便垃圾回收，使用了复制的形式，将年轻分代分成两半，一般用来分配，另一半在回收的时候负责将之前负责保留的对象复制过来。对年老分代，主要是将年老分代的对象、指针等数据在使用内存较少时进行回收。而对于大对象空间来说，主要是用来为哪些需要较多内存的大对象分配的，需要注意的是每个页面只分配一个对象。
 
@@ -983,7 +919,267 @@ V8使用了精简整理的算法，用来标记那些还有引用关系的对象
 
 那么垃圾回收机制是怎么判断对象是否存活呢？如何检查对象的生死，是通过客户机或者程序代码是否可以触达此对象。可触达性(Reachability)还可以这么理解：另一个对象是否可以获得它，如果可以的话，该对象所需的内存会被保留。
 
+#### 
+
 #### 4.3 宏任务和微任务
+
+我们都知道JavaScript是单线程语言，单线程意味着，JavaScript代码执行的时候，都只能一个主线程来处理所有的任务。
+
+单线程是有必要的，最主要的原因是最初也是最主要的执行环境---浏览器。我们面对的是各种各样的操作DOM、操作CSS。如果是多线程执行环境，很难保证在频繁操作的情况下保证一致性，退一步讲，即使保证了一致性，那么对性能也会有比较大的影响。
+
+后来，为了实现多线程，引入了webworker,但是该技术的使用却有诸多限制：
+
+1、新线程都受主线程的完全控制，不能独立执行，只能是隶属于主线程的子线程，
+
+2、子线程并没有操作I/O的权限
+
+尽管js是单线程的，单也是“非阻塞”的，js是怎么实现的呢？其实就是由和本小结相关联的event loop(在这里我们主要讨论浏览器版的实现)实现。
+
+脚本执行的时候 ，js引擎会解析代码，并将其中同步执行的代码依次加入到执行栈中，从头开始执行。如果当前执行的是一个方法，那么js会向执行栈中添加这个方法的执行环境，然后进入这个执行环境继续执行其中的代码。当这个执行环境中的代码 执行完毕并返回结果后，js会退出这个执行环境并把这个执行环境销毁，回到上一个方法的执行环境。这个过程反复进行，直到执行栈中的代码全部执行完毕。
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/stack.png)
+
+上面也提到了，执行栈中存放的是同步代码。那么当异步代码执行时情况又是怎样的呢？既然是非阻塞式的，那么又是通过什么机制保证的呢？这里不得不提到事件队列(Task Queue)。
+
+熟悉JavaScript的都知道，对于异步请求，js引擎可能并不会及时返还结果，而是将这个事件挂起，继续执行执行栈的其他方法。当异步请求返还结果时，js引擎会将这个事件推入到另一个队列，叫做事件队列。放入该队列的时间并不会立即执行，而是要等到执行栈中无可执行，主线程处于空闲状态时，主线程会去查找事件队列是否有任务。如果有，主线程会取出第一位的事件，并把事件对应的回调函数放入到执行栈中，然后执行。如此反复，就形成了
+
+无限执行的过程。这个过程就被称为"事件循环(Event Loop)"。
+
+有了上面的介绍，就更有利于我们去介绍宏任务和微任务。
+
+上面我们介绍过对异步请求，js引擎才会把这个事件推入到事件队列。看似和宏任务、微任务没有什么关系。实际上，js引擎会根据异步事件的类型，把对应的异步事件推到对应的宏任务队列或者微任务队列中。当主线程空闲时，主线程先会查看微任务队列中是否有事件，如果有就取出一条运行，如果没有，就从宏任务队列中取出一条执行。依次反复。
+
+现在，我们总结一下：**同一次事件循环中，微任务的执行优先级会高于宏任务**。
+
+下面我们通过代码实例来看下代码的执行情况，总结一下代码在哪种情况下是会被推入微任务队列，哪种情况下会被推入宏任务队列。
+
+ 我们先看个例子：
+
+```js
+console.log("console-1");
+
+setTimeout(() => {
+  console.log("settimeout-1");
+  Promise
+    .resolve()
+    .then(() => {
+      console.log("promise-1")
+    });
+});
+
+new Promise((resolve, reject) => {
+  console.log("promise-2")
+  resolve("promise-2-resolve")
+}).then((data) => {
+  console.log(data);
+})
+
+setTimeout(() => {
+  console.log("settimeout-2");
+})
+
+console.log("console-2");
+```
+
+我们先在浏览器中运行下看下执行结果：
+
+> console-1
+> promise-2
+> console-2
+> promise-2-resolve
+> settimeout-1
+> promise-1
+> settimeout-2
+
+我们看下执行过程，首先执行全局的代码:
+
+```js
+console.log("console-1");
+```
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-1.png)
+
+控制台打印：
+
+ console-1
+
+
+
+第二步执行，
+
+```js
+setTimeout(() => {
+ //我们把这里命名为callback1
+ console.log("settimeout-1");
+ Promise
+ .resolve()
+ .then(() => {
+ console.log("promise-1")
+ });
+});
+```
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-2.png)
+
+因为setTimeout会被认为是宏任务，所以会被加入到宏任务队列。打印结果仍然是：
+
+> console-1
+
+
+
+第3步：
+
+```js
+new Promise((resolve, reject) => {
+ console.log("promise-2")
+ resolve("promise-2-resolve")
+}).then((data) => {
+//这里定义为callback2
+ console.log(data);
+})
+```
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-3.png)
+
+Promise的构造函数是同步执行的，会立即执行。而then中的回调函数被认为是微任务，所以会被加入到微任务队列中。打印出结果：
+
+> console-1
+> promise-2
+
+
+
+第4步：
+
+```js
+setTimeout(() => {
+   //这里定义为callback3
+  console.log("settimeout-2");
+});
+```
+
+setTimeout中回调函数继续被推到宏任务。
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-4.png)
+
+打印结果：
+
+> console-1
+> promise-2
+
+
+
+第5步：
+
+```js
+console.log("console-2");
+```
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-5.png)
+
+打印结果：
+
+> console-1
+> promise-2
+> 
+> console-2
+
+
+
+第6步：全局代码已执行完毕，现在到了js引擎从微任务队列中取出一个微任务执行。
+
+```js
+console.log(data);
+```
+
+执行then中的回调函数，数据为resolve后的值：
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-6.png)
+
+打印结果：
+
+> console-1
+> 
+>  promise-2
+> console-2
+> promise-2-resolve
+
+
+
+第7步：微任务队列中只有一个任务，执行完后，后从宏任务队列中取出一个任务(callback1)执行。
+
+```js
+console.log("settimeout-1");
+Promise
+ .resolve()
+ .then(() => {
+ //这里定义为callback4
+ console.log("promise-1")
+ });
+```
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-7.png)
+
+打印结果：
+
+> console-1
+> 
+> promise-2
+> 
+> console-2
+> 
+> promise-2-resolve
+> 
+> settimeout-1
+
+执行完同步任务后，又遇到另一个Promise，异步执行完又在微任务队列中加入一条任务。
+
+
+
+第8步：微任务队列中有任务，继续从该队列中取
+
+```js
+console.log("promise-1")
+```
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-8.png)
+
+执行结果：
+
+> console-1
+> 
+> promise-2
+> 
+> console-2
+> 
+> promise-2-resolve
+> 
+> settimeout-1
+> 
+> promise-1
+
+
+
+第9步：从宏任务取一个任务执行
+
+```js
+console.log("settimeout-2");
+```
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-9.png)
+
+执行结果：
+
+> console-1
+> promise-2
+> console-2
+> promise-2-resolve
+> settimeout-1
+> promise-1
+> settimeout-2
+
+该部分的内容相对比较抽象，希望大家结合更多的资料去理解。这部分完全理解后，详细你对JavaScript的执行过程有更深的了解。
+
+
 
 #### 4.4 异步加载规范
 
@@ -1005,8 +1201,6 @@ RequireJS 想成为浏览器端的模块加载器，同时也想成为 Rhino / N
 define(id?, dependencies?, factory);
 ```
 
-
-
 该方法接受3个参数，？表示可选项，定义模块时可以不用指定。第一个参数表示该模块的ID，第二个参数dependencies表示该模块所依赖的模块，该参数是一个数组，表示可以依赖多个。第三个factory是一个函数（也可以是对象），既然是函数，就可以有参数，那么参数是怎么传递进来的呢？这时候我们再想起来dependencies这个参数了，依赖的声明顺序和该工厂函数参数的声明顺序保持一致，如下面的实例代码：
 
 ```js
@@ -1018,8 +1212,6 @@ define([ 'service', 'jquery' ], function (service, $) {
 })
 ```
 
-
-
 依赖模块service和jquery在工厂方法执行前完成依赖注入，即依赖前置。
 
 下面我们看下完整的例子，我们以AMD规范的requirejs实现为例，我们先在HTML文件中加入：
@@ -1027,9 +1219,6 @@ define([ 'service', 'jquery' ], function (service, $) {
 ```js
 <script data-main="js/main" src="js/libs/require.js"></script>
 ```
-
-
-
 
 data-main属性指定工程文件入口，在main.js中配置基础路径和进行模块声明：
 
@@ -1055,8 +1244,6 @@ requirejs(['message'], function (msg) {
 })
 ```
 
-
-
 再message模块中引入依赖模块service和jquery，
 
 ```js
@@ -1073,8 +1260,6 @@ define(['service', 'jquery'], function (service, $) {
 })
 ```
 
-
-
 service代码如下：
 
 ```js
@@ -1088,8 +1273,6 @@ define(function () {
 
 })
 ```
-
-
 
 详细的代码请参考代码实例。
 
@@ -1109,8 +1292,6 @@ Seajs 则专注于 Web 浏览器，同时通过 Node 扩展的方式可以在 No
 > 
 > require书写规范[https://github.com/seajs/seajs/issues/259](https://github.com/seajs/seajs/issues/259)
 
-
-
 seajs官方：[https://github.com/seajs/seajs](https://github.com/seajs/seajs)，是cmd规范实现。规范部分不做详细的介绍，我们通过一个例子来说明：
 
 和一般引入js文件的方法导入seajs支持,
@@ -1118,8 +1299,6 @@ seajs官方：[https://github.com/seajs/seajs](https://github.com/seajs/seajs)�
 ```js
 <script src="./js/libs/sea.js"></script>
 ```
-
-
 
 > alias:当模块标识很长时，可以用这个简化，让文件的真实路径与调用标识分开。
 > 
@@ -1143,8 +1322,6 @@ seajs.config({
 seajs.use("./js/main.js");
 ```
 
-
-
 使用seajs.use方法在页面中加载任意模块， base指定seajs的基础路径，该属性结合alias中模块路径配置一起指向某一模块，这里需要注意的是路径的解析方法:
 
 (1)相对标识
@@ -1158,8 +1335,6 @@ seajs.use("./js/main.js");
 (3)普通路径
 
 在某个模块中引入模块 require('http://example.com/modules/a') , 普通路径的解析规则，会相对当前页面来解析。
-
-
 
 继续回到js/main.js中，引入message模块：
 
@@ -1188,8 +1363,6 @@ define(function (require, exports, module) {
 })
 ```
 
-
-
 > 在seajs引入jquery模块需要做简单点改造，因为jquery遵循amd规范，所以需要做简单的改造，改造方式如下：
 > 
 > define(function(){
@@ -1201,8 +1374,6 @@ define(function (require, exports, module) {
 > });
 
 完整的代码请参考源码部分。
-
-
 
 ##### 4.4.3 Umd
 
@@ -1307,10 +1478,6 @@ czn, module name:module-B
 
 > 需要注意的是，ES6module输出的模块是引用，原始值发生变化，import加载的值也会跟着变。
 
-
-
-
-
 ##### 4.4.5 Commonjs
 
 CommonJS(官网：[http://www.commonjs.org/](http://www.commonjs.org/)) 是以在浏览器环境之外构建 JavaScript 生态系统为目标而产生的项目，比如在服务器和桌面环境(nw.js, electron)中。前身叫做Serverjs，是由Mozilla的工程师Kevin Dangoor 在2009年1月创建的，在2009年正式更名为commonjs。
@@ -1318,8 +1485,6 @@ CommonJS(官网：[http://www.commonjs.org/](http://www.commonjs.org/)) 是以�
 CommonJS 规范是为了解决 JavaScript 的作用域问题而产生，可以使每个模块在它自身的命名空间中执行。该规范的主要内容是，模块必须通过 module.exports 导出对外的变量或接口,通过 require() 来运行时加载其他模块的输出到当前模块中。
 
 > 扩展阅读：Google group [https://groups.google.com/forum/#!forum/commonjs](https://groups.google.com/forum/#!forum/commonjs)
-
-
 
 下面看一个简单点例子：
 
@@ -1349,6 +1514,261 @@ console.log(square(4));
 > 另一个需要注意点，commonjs模块输出到是值得拷贝，模块内部的变化不会影响到已经导出的值。
 
 #### 4.5 函数式编程入门
+
+函数式编程是一种编程范式，也就是说提供一种如何编写程序的方法论，主要思想是把运算过程尽量写成一系列嵌套的函数调用。常见的编程范式有命令式编程、函数式编程、面向对象编程、指令式编程等不同点编程范型。
+
+在JavaScript中，函数作为一等公民，可以在任何地方被定义，无论是函数内还是函数外，还可以被赋值给一个变量，可以作为参数传递，也可以作为一个返回值返回。
+
+##### 4.5.1引子
+
+我们先通过两个简单的例子引入函数式编程，先看第一个：
+
+想给数组中的每个元素进行平方计算
+
+```js
+let array = [1,2,3,4,5,6]
+
+for(let i =0, iLen = array.length; i <iLen; i++){
+  array[i] = Math.pow(array[i],2)
+}
+```
+
+这是一个典型的命令式编程等例子，要一步一步说明该怎么实现功能。这样的写法显得有点过时了，我们进行下简单的改造：
+
+```js
+[1,2,3,4,5,6].map(num => Math.pow(num,2))
+```
+
+使用map函数，代码一方面逻辑简化了不少，另一方面也引入了函数式编程。
+
+结合上面的例子我们先总结一下：
+
+> **命令式编程**具体告诉计算机怎么干活。
+> 
+> **声明式编程**是将程序的描述与求值分离，关注如何用表达式描述程序逻辑。
+
+我们再看一个对变量进行加一例子，引入函数式编程的第二个特性：
+
+```js
+let counter = 0;
+
+function increment(){
+    return ++counter
+}
+```
+
+这个increate方法是有一定的缺陷，你也许发现了，该方法对其他作用域有副作用(side-effect)，影响到其他作用域变量的值。所以得进行适当得改造。
+
+```js
+let increment = counter => ++counter
+```
+
+改造后，函数内修改能影响到的也只是传入的参数，避免了副作用。
+
+需要知道 的是，改造后代increate函数是一个纯函数，纯函数有以下个性：
+
+1、函数返回值仅取决于输入参数。
+2、不能造成超出作用域外的状态变化。
+
+以上两个例子介绍了函数式编程的两个基本特性：声明式、纯函数行。函数式编程旨在帮你编写干净的、模块化的、可测试的并且简洁的代码，提高代码的无状态性和不变性。遵循以下原则：
+
+   声明式(Declarative)
+   纯函数(Pure Function)
+   数据不可变性(Immutablity)
+
+##### 4.5.2 函数式编程的好处
+
+函数式编程到底有什么好处呢，为什么变得越来越流行？总结一下有这几个好处：
+
+1、把任务分解成简单的函数。
+
+假设我们要在页面上根据学号显示学生的姓名、年级。拿到题目后，脑子里立刻产生的代码可能是这样的:
+
+```js
+function showStudent(stuNum){
+  //stub,假设有这么一个store，可以根据学号获得学生对象。
+  var student = store.get(stuNum);
+  if(student){
+    document.querySelector("${target}").innerHTML = '${student.name},${student.grade}'
+  }
+}
+showStudent（'011526'）
+```
+
+这个函数从功能上看是没有问题的，能够满足功能要求。但还是有几个问题比较突出，第一就是代码是强耦合的，测试变得变得比较复杂；第二是代码无法复用。这与函数编程的组合思想相冲突，所以，还是得先给它动个"手术"，
+
+```js
+var find = curry(function(store,stuNum){
+  var student = store.get(stuNum);
+  if(student != null){
+    return student;
+  }
+});
+
+var objToString = function(student){
+  return `${student.name},${student.grade}`
+}
+
+var append = curry(function(target,info){
+  document.querySelector(target).innerHTML = info;
+});
+
+var showStudent= compose(append("target_id", objToString,find(store)));
+
+showStudent('222')
+```
+
+这时候你可能会想，Curry函数和compose函数是张的什么样子呢，先不用着急。我们在稍后介绍的函数式编程基础部分就详细介绍这两个方法。上面"手术后"的代码变化较大，由刚开始的一个函数变成了4个，各个函数的职责也更加清楚，find方法负责从持久化对象中获得学生对象，objToString方法负责输出学生信息，append方法负责把信息添加到目标对象上，compose方法是负责把各个方法组合起来。
+
+> 友情提示：职责单一不仅是函数式编程的重要特点，也是软件设计SOLID中非常重要的一个原则。
+
+2、接近自然语言，方便理解
+
+函数式编程的自由度比较高，可以实现接近自然语言的代码，比如我们要计算一个数学表达式 (2+4)*15+ 72的值，翻译成代码语句可能要编程这样的：
+
+```js
+add(multiply(sum(2,4), 15))
+```
+
+这样的实现方式是不是更容易理解？
+
+3、更容易的代码管理
+
+函数式编程的原则之一是纯函数，状态不受外部因素影响，也不会改变外部状态。只要是传入的参数相同，得到的结果也一定是相同的（幂等）。所以每一个函数都是独立的，测试也变得很轻松。
+
+##### 4.5.3 函数式编程基础
+
+上面看了函数式编程的诸多好处，那么我们怎么才能编写出好的函数式代码呢，下面就这个问题我们详细看下函数式编程的基础。
+
+1、高阶函数（HOF,higher-order function）
+
+在数学和计算机科学中，高阶函数至少要满足下列一个条件：
+
+> 1、接受一个或多个函数作为输入
+> 
+> 2、返回一个函数
+
+我们先写一个过滤器的高阶函数：
+
+```js
+const filter = (predicate, xs) => xs.filter(predicate)
+```
+
+再增加一个类型判断辅助函数：
+
+```js
+
+const is = (type) => (x) => Object(x) instanceof type
+```
+
+测试一下：
+
+```js
+filter(is(Number), [0, '1', 2, null,"name","33"])
+```
+
+输出[0, 2]，这是我们想要的结果。
+
+2、柯里化(Currying)
+
+ 柯里化是将多个参数的函数(多元函数) 转换为 一元函数的过程。每当函数被调用时，它仅仅接收一个参数并且返回带有一个参数的函数，直到所有的参数传递完成。
+
+我们先定义一个柯里化求值函数 curriedSum，
+
+```js
+ const curriedSum = (a) => (b) => a + b
+```
+
+我们简单看下这个函数的执行过程，第一次调用：
+
+```
+curriedSum(16)
+```
+
+返回
+
+```js
+(b) => 16 + b
+```
+
+继续调用
+
+```js
+curriedSum(16)(24)
+```
+
+最后得到结果：40
+
+3、闭包(Closure)
+
+闭包 是指有权访问另一个函数作用域中的变量的函数。闭包形成的最常见的方式就是在一个函数内创建另一个函数，通过另一个函数访问这个函数的局部变量。
+
+总体来说，闭包有3个特性：  
+（1）函数嵌套  
+（2）内部函数可以引用外部函数的参数、变量和函数表达式  
+（3）闭包不会被垃圾回收机制回收，常驻内存
+
+先声明一个简单的闭包形式：
+
+```js
+function init() {
+  var name = '首席coder'; 
+  var innerCount = 0;
+  function displayName() { 
+    innerCount++;
+    alert(name);    
+  }
+  function getCount(){
+    alert(innerCount)
+  }
+  displayName(); 
+  displayName();   
+  getCount(); //2
+}
+```
+
+方法displayName声明在init方法内形成闭包。通过两次调用displayName方法将innerCount增加，通过显示的值可以看出，闭包涉及的变量会常驻内存，不会被释放。所以说闭包数量过多会导致内存泄漏。
+
+4、函数组合(Function Composition)
+
+函数组合是函数式编程中很重要的组成部分，函数式编程崇尚细粒度的函数实现，细粒度实现后，然后呢？怎么把这些函数组织起来有效的工作？
+
+这就是函数的组合功能，先看下函数组合的雏形吧：
+
+```js
+const compose = (f, g) => (a) => f(g(a)) 
+```
+
+compose中接收两个函数(为了简单起见，我们不对参数进行类型校验，默认为函数类型)作为参数，对传进来的参数先有g函数进行运算，再把运算结果作为f函数的入参继续运算。
+
+有了组合函数，我们还需要定义规则，说明要一个什么样的功能，比如说把数字四舍五入并转换为字符串，这里需要两个方法，一个是Math的round方法，一个是toString方法，有了“作料”就可以“开火”了。把这两个整合成一个方法floorAndToString 
+
+```js
+const floorAndToString = compose((val) => val.toString(), Math.round)
+```
+
+等不及了，还是先测试下：
+
+```js
+floorAndToString(121.212121) // '121'
+floorAndToString(121.512121) // '122'
+```
+
+顺利通过测试。到现在函数式编程最重要的原则都已介绍，回头再看4.5.2中优化后的代码，是不是简单多了，也比较容易理解了。
+
+5、其他原则
+
+函数式编程还有其他的原则，由于篇幅问题就不做详细介绍了，在这里这是简单列举各个原则，各位读者可以自行查阅:
+
+    幂等 (Idempotent)
+
+    偏应用函数 (Partial Application)
+
+    断言 (Predicate)
+
+    自动柯里化 (Auto Currying)
+
+> 附上笔者整理的帖子：http://www.houyuewei.cn/2018/08/23/js-func-program-term
 
 #### 4.6 实践
 
