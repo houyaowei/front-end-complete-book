@@ -1003,8 +1003,6 @@ console.log("console-1");
 
  console-1
 
-
-
 第二步执行，
 
 ```js
@@ -1025,8 +1023,6 @@ setTimeout(() => {
 
 > console-1
 
-
-
 第3步：
 
 ```js
@@ -1046,8 +1042,6 @@ Promise的构造函数是同步执行的，会立即执行。而then中的回调
 > console-1
 > promise-2
 
-
-
 第4步：
 
 ```js
@@ -1066,8 +1060,6 @@ setTimeout中回调函数继续被推到宏任务。
 > console-1
 > promise-2
 
-
-
 第5步：
 
 ```js
@@ -1082,8 +1074,6 @@ console.log("console-2");
 > promise-2
 > 
 > console-2
-
-
 
 第6步：全局代码已执行完毕，现在到了js引擎从微任务队列中取出一个微任务执行。
 
@@ -1102,8 +1092,6 @@ console.log(data);
 >  promise-2
 > console-2
 > promise-2-resolve
-
-
 
 第7步：微任务队列中只有一个任务，执行完后，后从宏任务队列中取出一个任务(callback1)执行。
 
@@ -1133,8 +1121,6 @@ Promise
 
 执行完同步任务后，又遇到另一个Promise，异步执行完又在微任务队列中加入一条任务。
 
-
-
 第8步：微任务队列中有任务，继续从该队列中取
 
 ```js
@@ -1157,8 +1143,6 @@ console.log("promise-1")
 > 
 > promise-1
 
-
-
 第9步：从宏任务取一个任务执行
 
 ```js
@@ -1176,8 +1160,6 @@ console.log("settimeout-2");
 > settimeout-1
 > promise-1
 > settimeout-2
-
-
 
 我们再看一个例子是关于async/await的，该特性已经被广泛应用，所以有必要看下它的执行情况。
 
@@ -1203,19 +1185,13 @@ async函数体内，在await之前的代码都是同步执行的，可以理解�
 > 
 > setTimeout
 
-
-
 最后我们整理下浏览器端哪些方法的回调会被推入到宏任务和微任务队列中：
 
 宏任务：I/O， setTimeout,，setInterval，requestAnimationFrame
 
 微任务：Promise.then， catch， finally，await(后)
 
-
-
 该部分的内容相对比较抽象，希望大家结合更多的资料去理解。这部分完全理解后，详细你对JavaScript的执行过程有更深的了解。
-
-
 
 #### 4.4 异步加载规范
 
@@ -1549,6 +1525,8 @@ console.log(square(4));
 
 > 另一个需要注意点，commonjs模块输出到是值得拷贝，模块内部的变化不会影响到已经导出的值。
 
+#### 
+
 #### 4.5 函数式编程入门
 
 函数式编程是一种编程范式，也就是说提供一种如何编写程序的方法论，主要思想是把运算过程尽量写成一系列嵌套的函数调用。常见的编程范式有命令式编程、函数式编程、面向对象编程、指令式编程等不同点编程范型。
@@ -1806,8 +1784,272 @@ floorAndToString(121.512121) // '122'
 
 > 附上笔者整理的帖子：http://www.houyuewei.cn/2018/08/23/js-func-program-term
 
-#### 4.6 实践
+#### 
 
-  4.6.1 v-dom原理剖析
+#### 4.6 实践：状态原理解析
 
-  4.6.2 状态原理解析
+ 前端技术的发展日新月异，开发社区里流行这么一句话“前端圈没三个月就会有新的技术出现”，虽说有点夸张，但是从侧面说明了前端的变化之快。前端也经过几年的沉淀，逐渐形成了React，Vue，angular为领袖的三大开发框架和各自的全家桶，带来了全新的开发体验。
+
+随着页面复杂度的升级，对应的localstorage，vuex，redux，mobx等数据存储和管理方案也渐渐复现。所以对状态管理的原理进行一定的了解还是很有必要的，了解基本原理也方便理解其他的管理库。
+
+现在我们以一个简单的例子，一步一步来解析下state到底是怎么回事，具体是怎么工作的？
+
+先看下基本的原理图：
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/state-1.png)
+
+我们已完整的单向数据流模型进行说明，数据流向有单向(如vuex、redux,)和双向(mobx)之分，和双向相比单向数据流更具有可维护性的特点，所以以此模型进行说明。
+
+事件默认都是从UI页面进行发起，dispatch一个action，也就是说在单数据流的模型中，状态的改变都是以触发action作为入口条件，由action中commit一个mutation更新state中的数据，状态改变自动更新页面。
+
+
+
+阐述完状态的基本原理后，我们计划实现一个这样的页面（数据不持久化）
+
+![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/state-2.png)
+
+已完成任务部分(List组件)和右侧完成任务(count组件)情况分别对应两个组件。
+
+
+
+第一步先看下View组件，先定义一个component的基类，
+
+```js
+export default class Component {
+  constructor(props = {}) {
+  
+    // 继承该类的组件应该实现该方法，用来渲染组件
+    this.render = this.render || function() {};
+
+    if (props.store instanceof Store) {
+      props.store.events.subscribe("stateChange", () => self.render());
+    }
+
+    //如果element元素，就把改元素设置为元素挂载节点
+    if (props.hasOwnProperty("element")) {
+      this.element = props.element;
+    }
+  }
+}
+```
+
+我们约定各子组件要实现render方法，在render方法中实现DOM结构。this.element指定DOM结构的挂载位置。为了实现页面的自动更新，子组件借助发布/订阅模式订阅stateChange事件。store中当state中的数据更新时，会发布该事件，子组件收到通知后重新渲染。该行为类似React中的setState中的效果。
+
+再看一下组件的具体实现，Count.js：
+
+```js
+import Component from "../lib/component.js";
+import store from "../store/index.js";
+import _ from "../lib/utils.js";
+
+export default class Count extends Component {
+  constructor() {
+    super({
+      store,
+      element: _.$(".js-count") //获得dom节点
+    });
+  }
+
+  render() {
+    let emoji = store.state.items.length > 0 ? "🙌" : "😢";
+
+    this.element.innerHTML = `
+            <small>你今天已完成</small>
+            <span>${store.state.items.length}</span>
+            <small>条任务 ${emoji}</small>
+        `;
+  }
+}
+```
+
+子组件中通过调用父组件的构造函数完成事件订阅。
+
+```js
+export default class PubSub {
+  constructor() {
+    this.events = {};
+  }
+
+  /**
+   * 订阅事件，并注册回调方法
+   */
+  subscribe(event, callback) {
+    let self = this;
+
+    if (!self.events.hasOwnProperty(event)) {
+      self.events[event] = [];
+    }
+
+    return self.events[event].push(callback);
+  }
+}
+```
+
+下面梳理下store的情况，store由action,mutation和state三部分组成，acation用来标识每个请求，也是触发state变化的唯一因素。mutation类似于事件，每个mutation都有一个事件类型和回调函数，这个回调函数是进行状态改变的地方，接收state和payload作为参数。
+
+```js
+export default new Store({
+    actions,
+    mutations,
+    state
+});
+```
+
+store.js
+
+```js
+export default class Store {
+  constructor(params) {
+    let self = this;
+    //定义actions,mutations和state，
+    //在初始化中，需要把action和mutation都初始化进来
+    self.actions = {};
+    self.mutations = {};
+    self.state = {};
+
+    // A status enum to set during actions and mutations
+    self.status = "resting";
+
+    // 初始化发布-订阅模型
+    self.events = new PubSub();
+
+    //如果传入actions，就使用传入的actions
+    if (params.hasOwnProperty("actions")) {
+      self.actions = params.actions;
+    }
+
+    if (params.hasOwnProperty("mutations")) {
+      self.mutations = params.mutations;
+    }
+
+    //对state的值设置拦截
+    self.state = new Proxy(params.state || {}, {
+      set: function(state, key, value) {
+        state[key] = value;
+        // 发布 stateChange通知
+        self.events.publish("stateChange", self.state);
+
+        return true;
+      }
+    });
+  }
+  }
+```
+
+把store中的state设置成全局state数据模型的代理，为什么要这么做呢？因为前面已经提高，我们要让state扮演成状态机的角色，state变引起页面的渲染，此时Proxy倒是一个很好的选择。
+
+> 对Proxy还不是很熟悉 的同学可以参考https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+
+
+
+我们看Proxy的set钩子里，state变化，就会发布stateChange通知各个子组件。
+
+
+
+store又是怎么分发action的呢？我们来探究一下，看下store中定义的dispatch函数，接受type类型和数据对象
+
+```js
+dispatch(actionKey, payload) {
+
+    // 校验action是否存在
+    if (typeof self.actions[actionKey] !== "function") {
+      console.error(`Action "${actionKey} doesn't exist.`);
+      return false;
+    }
+
+    // 分组显示action 信息
+    console.groupCollapsed(`ACTION: ${actionKey}`);
+
+    // 设置action，说明我们正在dispatch一个action
+    self.status = "action";
+
+    //调用action
+    self.actions[actionKey](self, payload);
+
+    // Close our console group to keep things nice and neat
+    console.groupEnd();
+
+    return true;
+  }
+```
+
+在view组件中，通过
+
+```js
+store.dispatch(types.ADDITEM, value);
+```
+
+派发action，需要为每个action指定类型，使用该字段用来区别是什么类型的action。所有的action因为在store初始化的时候已经注入，所以只需要根据action type来判断对应的action是否存在。
+
+action.js
+
+```js
+export default {
+  addItem(context, payload) {
+    context.commit(types.ADDITEM, payload);
+  },
+  clearItem(context, payload) {
+    context.commit(types.CLEARITEM, payload);
+  }
+};
+
+```
+
+如果找到对应的action，那么立即执行。我们注意到
+
+```js
+self.actions[actionKey](self, payload);
+```
+
+action的执行需要把self传进来，所以action中方法的第一个参数还是指向store。所以store继续commit
+
+```js
+commit(mutationKey, payload) {
+
+    // 校验mutation是否存在
+    if (typeof .mutations[mutationKey] !== "function") {
+      console.log(`Mutation "${mutationKey}" doesn't exist`);
+      return false;
+    }
+    ...
+    // 创建一个新的state，并将新的值附在state上
+    let newState = this.mutations[mutationKey](this.state, payload);
+
+    // 替换旧的state值
+    this.state = Object.assign(this.state, newState);
+
+    return true;
+  }
+```
+
+对应commit中mutationKey，是从action顺延下来的。和action的处理过程相似，对应的mutation也是初始化加载，需要根据key值处理对应的mutation。
+
+mutation.js
+
+```js
+export default {
+    addItem(state, payload) {
+        state.items.push(payload);
+        
+        return state;
+    },
+    clearItem(state, payload) {
+        state.items.splice(payload.index, 1);
+        
+        return state;
+    }
+};
+
+```
+
+来了，来了，它来了。state带着口罩风风火火的来了。对应addItem类型的mutation，在state数组中push一条记录。到这里，你可能也已恍然大悟，state的状态机原来是这么工作的，Proxy的set钩子原来是这么被触发的，子组件原来是在这种情况下重新工作的。
+
+一切都变得顺理成章了。现在可以启动下示例代码或者按照这个思路重新实现一遍，看看效果是怎么样的。
+
+
+
+
+
+
+
+
