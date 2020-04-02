@@ -18,13 +18,13 @@
 
 比如说某某牌电灯,按一下按钮打开弱光, 按两下按钮打开强光, 按三下按钮关闭灯光。在我们的想象中，基本的模型应该是如下描述
 
-<img src="./images/4-1-2.png">
+![](images/4-1-2.png)
 
 状态模式允许对象在内部状态改变时，改变其行为，从对象的角度看好像进行了改变。实际开发中，某处文字可能和模型中的一字段进行关联，根据某一个状态显示不同的内容，这时候状态模式可能是你需要的（当然 switch-case, if-else可以继续）。
 
 状态模式中有几个角色，分别是Context，State，各个子状态的实现。Context中保存了Client端的操作接口，同时也保存子状态的实现，代表着当前状态。抽象类State声明了子状态应该实现的各个方法。
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/state.jpg)
+![](images/state.jpg)
 
 先看下Context的实现
 
@@ -152,6 +152,8 @@ Context: transition to ColseClass
 状态模式封装了转换规则，并枚举了可能的状态。将所有的与某个状态有关的行为放到一个类中，所有可以方便地增加状态。
 
 状态模式的使用必然会增加系统类和对象的个数。 状态模式的结构与实现都较为复杂，如果使用不当将导致程序结构和代码的混乱。 状态模式对"开闭原则"的支持并不太好，对于可以切换状态的状态模式，增加新的状态类需要修改那些负责状态转换的源代码，否则无法切换到新增状态，而且修改某个状态类的行为也需修改对应类的源码。
+
+
 
 #### 4.1.2策略模式
 
@@ -283,7 +285,7 @@ result: cao->hou->ss
 > 
 > [https://zh.wikipedia.org/wiki/%E8%A7%86%E9%A2%91%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F](https://zh.wikipedia.org/wiki/%E8%A7%86%E9%A2%91%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F)
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/adapter.jpg)
+![](images/adapter.jpg)
 
 我们先定义一个通用的播放接口
 
@@ -437,7 +439,7 @@ sorry,type wma is not support
 
 下面我们看下基本的模型：
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/4-1-1.png)
+![](images/4-1-1.png)
 
 在上面的模型中可以看出，商家维护着和各位客户的引用关系，通过观察者添加、解除引用关系，就好比说，某天某客户不再中意这款电脑，商家就再无引用这份关系了。
 
@@ -575,7 +577,7 @@ I am houyw， I have got message from seller
 
 我们的例子以一个求婚为原型进行说明，一位男士想向他女朋友求婚，但由于各种原因不好意思说出口，就想请他的好朋友（办大事得找个靠谱的朋友）帮忙转达意思。
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/proxy.jpg)
+![](images/proxy.jpg)
 
 先看下接口
 
@@ -661,7 +663,7 @@ subject.proposal();
 
 下面我们通过一个简单的示例进行说明：
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/decorator.jpg)
+![](images/decorator.jpg)
 
 在接口中，定义一个基本draw方法
 
@@ -796,13 +798,13 @@ V8是Webkit的子集。关于这个由来，我们需要简单介绍下二次浏
 
 我们先看下Webkit的大致架构图：
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/webkit-arch.jpg)
+![](images/webkit-arch.jpg)
 
 webkit一个比较显著的特征就是它支持不同的浏览器，甚至微软的Edge也加入到了这个阵营。虚线部分表示该模块在不同浏览器中使用的webkit内核实现可能是不一样的。实线部分标记的模块表示它们基本上是共享的。
 
 webkit中默认js引擎指的是JS Core,而在Chromium中则是如雷贯耳的V8。什么是JavaScript引擎，就是能够将JavaScript代码处理并执行的运行环境。渲染引擎提供了渲染网页的功能，渲染引擎主要包含HTML解析器、css解释器、布局和JavaScript引擎。
 
-![](/Users/eason/Library/Application Support/marktext/images/2020-03-13-23-11-24-image.png)
+![](images/render.png)
 
 - HTML解析器：主要负责解释HTML元素，将HTML元素解析成DOM。
 
@@ -814,7 +816,7 @@ webkit中默认js引擎指的是JS Core,而在Chromium中则是如雷贯耳的V8
 
 上面的表述还是比较抽象，我们是用一张图来描述下网页是怎么呈现到客户眼前的
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/webkit-render.png)
+![](images/webkit-render.png)
 
 > 虚线表示渲染过程中，该阶段可能依赖其他模块。比如在网页的下载过程中，需要使用到网络和存储。
 
@@ -826,7 +828,7 @@ webkit中默认js引擎指的是JS Core,而在Chromium中则是如雷贯耳的V8
 
 隐藏类将对象分为不同的组，在同一个组的对象如果有相同的属性名和属性值的情况下，会将这些属性名和对应的偏移位置保存到一个隐藏类中。这样介绍还是比较抽象，下面通过一个简单的例子解释：
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/obj.png)
+![](images/obj.png)
 
 创建了两个对象p1,p2, 他们有相同的属性name和age.在v8中，它们被“安排”到同一个组（即隐藏类中），并且这些属性有相同的偏移值。这样p1和p2可以共享这个类型信息。访问这些属性时就根据隐藏类的偏移值就可以知道它们的值继而访问。如果你再给某一个对象运行时添加属性时，比如加入一下代码：
 
@@ -865,7 +867,7 @@ var person = {
 }
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/stackAndHeap.png)
+![](images/stackAndHeap.png)
 
 上面是变量在内存分配空间的宏观观察，具体的实现细节对我们来说还是个黑盒。不急，接下来我们就会详细介绍下具体的过程。
 
@@ -875,7 +877,7 @@ var person = {
 var obj ={};
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/jsobject-1.png)
+![](images/jsobject-1.png)
 
 > V8使用map结构来描述对象。map可以理解为像table一样的描述结构。
 
@@ -889,7 +891,7 @@ obj.name="houyw";
 obj.age =23;
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/jsobject-2.png)
+![](images/jsobject-2.png)
 
 name和age属性默认存储到对象的内部属性中。再添加两个数字属性：
 
@@ -937,7 +939,7 @@ V8使用了精简整理的算法，用来标记那些还有引用关系的对象
 
 脚本执行的时候 ，js引擎会解析代码，并将其中同步执行的代码依次加入到执行栈中，从头开始执行。如果当前执行的是一个方法，那么js会向执行栈中添加这个方法的执行环境，然后进入这个执行环境继续执行其中的代码。当这个执行环境中的代码 执行完毕并返回结果后，js会退出这个执行环境并把这个执行环境销毁，回到上一个方法的执行环境。这个过程反复进行，直到执行栈中的代码全部执行完毕。
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/stack.png)
+![](images/stack.png)
 
 上面也提到了，执行栈中存放的是同步代码。那么当异步代码执行时情况又是怎样的呢？既然是非阻塞式的，那么又是通过什么机制保证的呢？这里不得不提到事件队列(Task Queue)。
 
@@ -997,7 +999,7 @@ console.log("console-2");
 console.log("console-1");
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-1.png)
+![](images/task-1.png)
 
 控制台打印：
 
@@ -1017,7 +1019,7 @@ setTimeout(() => {
 });
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-2.png)
+![](images/task-2.png)
 
 因为setTimeout会被认为是宏任务，所以会被加入到宏任务队列。打印结果仍然是：
 
@@ -1035,7 +1037,7 @@ new Promise((resolve, reject) => {
 })
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-3.png)
+![](images/task-3.png)
 
 Promise的构造函数是同步执行的，会立即执行。而then中的回调函数被认为是微任务，所以会被加入到微任务队列中。打印出结果：
 
@@ -1053,7 +1055,7 @@ setTimeout(() => {
 
 setTimeout中回调函数继续被推到宏任务。
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-4.png)
+![](images/task-4.png)
 
 打印结果：
 
@@ -1066,7 +1068,7 @@ setTimeout中回调函数继续被推到宏任务。
 console.log("console-2");
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-5.png)
+![](images/task-5.png)
 
 打印结果：
 
@@ -1083,7 +1085,7 @@ console.log(data);
 
 执行then中的回调函数，数据为resolve后的值：
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-6.png)
+![](images/task-6.png)
 
 打印结果：
 
@@ -1105,7 +1107,7 @@ Promise
  });
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-7.png)
+![](images/task-7.png)
 
 打印结果：
 
@@ -1127,7 +1129,7 @@ Promise
 console.log("promise-1")
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-8.png)
+![](images/task-8.png)
 
 执行结果：
 
@@ -1149,7 +1151,7 @@ console.log("promise-1")
 console.log("settimeout-2");
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/task-9.png)
+![](images/task-9.png)
 
 执行结果：
 
@@ -1451,7 +1453,7 @@ export default name = "module-A";
 </script>
 ```
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/ES6-1.png)
+![](images/ES6-1.png)
 
 可以在浏览器（Chrome,Safari,Opera, Firefox）正常执行。
 
@@ -1796,7 +1798,7 @@ floorAndToString(121.512121) // '122'
 
 先看下基本的原理图：
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/state-1.png)
+![](images/state-1.png)
 
 我们已完整的单向数据流模型进行说明，数据流向有单向(如vuex、redux,)和双向(mobx)之分，和双向相比单向数据流更具有可维护性的特点，所以以此模型进行说明。
 
@@ -1806,7 +1808,7 @@ floorAndToString(121.512121) // '122'
 
 阐述完状态的基本原理后，我们计划实现一个这样的页面（数据不持久化）
 
-![](/Users/eason/Desktop/github/front-end-complete-book/chapter04/images/state-2.png)
+![](images/state-2.png)
 
 已完成任务部分(List组件)和右侧完成任务(count组件)情况分别对应两个组件。
 
