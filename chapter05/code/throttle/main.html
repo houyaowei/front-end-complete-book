@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>函数防抖和节流测试</title>
+	<script type="text/javascript" src="throttle.js"></script>
+	<style type="text/css">
+		.target {
+			margin: 0 auto;
+			border: 1px solid red;
+			width: 260px;
+			height: 200px;
+			line-height: 200px;
+			color: red;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<div class="target">
+		请将光标移到这个元素上进行测试
+	</div>	
+	
+	<script type="text/javascript">
+		let target = document.querySelector(".target");
+		
+		target.onmouseover = throttle(function(){
+			console.log('throttle')
+		},2000);
+	</script>
+</body>
+</html>

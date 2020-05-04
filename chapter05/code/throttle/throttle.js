@@ -3,7 +3,10 @@
  time: 间隔时间
 */
 function throttle (func,time) {
+
+	//记录上次执行的时间
 	let precious = 0;
+	
 	return function(){
 		let _this = this;
 		let now = Date.now();
