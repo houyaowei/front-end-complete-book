@@ -504,9 +504,305 @@ js代码优化大的环节来看，主要概括为几个方面：js文件加载�
 
 其实从IE8、Firefox3.5，Chrome2和Safari4都已经开始支持js文件的并行下载，执行一个script标签并不会阻塞其他script标签。JavaScript 下载过程仍然会阻塞其他资源的下载，比如样式文件和图片，尽管下载过程相互独立，但是页面还是要等到js代码完全下载并执行完才能继续。
 
-script标签有两个扩展属性：defer和async。`defer`是“渲染完再执行”，`async`是“下载完就执行”。
+script标签有两个扩展属性：defer(HTML4引入)和async(HTML5引入)。
+
+- defer：延迟加载脚本，在文档完成解析完成开始执行，并且在DOMContentLoaded事件之前执行完成。
+- async：异步加载脚本，下载完毕后再执行，在window的load事件之前执行完成
+
+再总结一下：`defer`是“渲染完再执行”，`async`是“下载完就执行”。
+
+```js
+<script type="text/javascript" src="./async/async.js" async></script>
+<script type="text/javascript" src="./async/defer.js" defer></script>
+<script type="text/javascript">
+		console.log('normal');
+		window.addEventListener("load", function () {
+			console.log('onload')
+		})
+		document.addEventListener("DOMContentLoaded", function () {
+			console.log('DOMContentLoaded')
+		})
+</script>
+```
+
+在async.js 打印简单的一句：
+
+```js
+console.log('async');
+```
+
+在defer.js中同样打印一句：
+
+```js
+console.log('defer')
+```
+
+打印结果
+
+```js
+normal 
+async 
+defer 
+DOMContentLoaded 
+onload
+```
+
+除了上面的异步加载外，还可以使用IntersectionObserver api进行懒加载,该api虽然还处在草案阶段，但是Edge,Chrome, Firefox,opera,safari都已经支持，所以值得期待下它的效果。
+
+> 针对不支持IE的情况下，w3c也有Polyfill支持，https://github.com/w3c/IntersectionObserver/tree/master/polyfill
+
+IntersectionObserver接口提供了一种异步观察目标元素与祖先元素或顶级文档[viewport](https://developer.mozilla.org/en-US/docs/Glossary/viewport)的交集中的变化的方法。祖先元素与视窗viewport被称为根(root)。举个栗子，我们希望某些静态资源（比如图片），只有在进入视口时才加载，以节省带宽，提高网页性能。
+
+下面我们以一个图片懒加载为例，图片元素只有在进入到视图范围内才加载。
+
+先在视图范围外定义3张图片
+
+```html
+<div class="images">
+		<img data-src="http://c1.cdn.goumin.com/cms/picture/day_150330/20150330_3a00f37.jpg" width="200" height="200"><br>
+		<img data-src="http://sxsimg.xiaoyuanzhao.com/ED/8E/ED15BF75072C255BF0164D3A62EC9F8E.jpg" width="200" height="200"><br>
+		<img data-src="http://img45.nipic.com/20130617/208505_110521049329_1.jpg" width="200" height="200">
+</div>
+```
+
+IntersectionObserver以new的形式声明对象，接收两个参数callback和options，
+
+```js
+const io = new IntersectionObserver(callback, options)
+io.observe(DOM)
+```
+
+现在看下图片加载是怎么实现的，
+
+```js
+const imgList = Array.from(document.getElementsByTagName("img"))
+
+var io = new IntersectionObserver((entries) =>{
+  entries.forEach(item => {
+    // isIntersecting是一个Boolean值，判断目标元素当前是否可见
+    if (item.isIntersecting) {
+      item.target.src = item.target.dataset.src
+      // 图片加载后即停止监听该元素
+      io.unobserve(item.target)
+    }
+  })
+}, {
+  root: document.querySelector('.images')
+});
+
+imgList.forEach(img => io.observe(img))
+```
 
 
+
+、js文件缓存
+
+文件缓存策略，我们在5.2章节进行了详细的介绍，这里不在赘述。下面我们介绍领一种缓存文件的方式：service worker。这个也是PWA的核心，在第六章中，我们将详细介绍PWA。
+
+Service worker是由事件驱动的,具有生命周期，并且独立于浏览器的主线程。可以拦截处理页面的所有网络请求(fetch)，可以访问cache和indexDB，支持推送，并且可以让开发者自己控制管理缓存的内容以及版本，为离线弱网环境下的 web 的运行提供了可能。
+
+service worker有几个基本特征：
+
+- 无法操作DOM
+
+- 只能使用HTTPS以及localhost
+
+- 拦截全站请求
+
+- 与主线程独立不会被阻塞（不要再应用加载时注册sw）
+
+- 完全异步，无法使用XHR和localStorage
+
+- 一旦被 install，就永远存在，除非被 uninstall或者dev模式手动删除
+
+- 独立上下文
+
+- 响应推送
+
+- 后台同步
+
+我们先建一个基本的web页面main.html，并建立对应的主文件main.js, serviceWorker文件sw.js，用来做XHR请求的json文件。
+
+<img src="./images/sw-1.png" />
+
+
+
+在main.js中注册serviceWorker,
+
+```js
+if ("serviceWorker" in navigator) {
+	navigator.serviceWorker.register("./sw.js").then(cb => {
+		console.log('service worker register successfully:', cb.scope);
+	  if (cb.installing) {
+          serviceWorker = cb.installing;
+          document.querySelector('.result').innerHTML = 'installing';
+      } else if (cb.waiting) {
+          serviceWorker = cb.waiting;
+          document.querySelector('.result').innerHTML = 'waiting';
+      } else if (cb.active) {
+          serviceWorker = cb.active;
+          document.querySelector('.result').innerHTML = 'active';
+      }
+	}).catch(error => {
+		console.log('register error:',error)
+	});
+}
+```
+
+使用特性检测浏览器是否支持serviceworker。接下来在service woker文件中定义缓存的文件。
+
+```js
+const PRECACHE = 'precache-v1';
+const RUNTIME = 'runtime';
+
+const PRECACHE_URLS = [
+  'main.html',
+  './', // Alias for index.html
+  'style.css',
+  'main.js'
+];
+
+//缓存文件
+self.addEventListener('install', event => {
+	console.log('install');
+  event.waitUntil(
+    caches.open(PRECACHE)
+      .then(cache => cache.addAll(PRECACHE_URLS))
+      .then(self.skipWaiting())
+  );
+});
+```
+
+PRECACHE_URLS数组定义需要缓存的文件列表。在这个例子中，我们把main.html, main.js和style.css进行。
+
+上面的代码中，我们通过caches.open打开我们指定的cache文件名，然后我们调用cache.addAll并传入我们的文件数组。这是通过一连串promise（caches.open 和 cache.addAll）完成的。event.waitUntil拿到一个promise并使用它来获得安装耗费的时间以及是否安装成功。
+
+如果所有的文件都被缓存成功了，那么service worker就安装成功了。如果任何一个文件下载失败，那么安装步骤就会失败。这个方式允许你依赖于你自己指定的所有资源，但是这意味着你需要非常谨慎地决定哪些文件需要在安装步骤中被缓存。指定了太多的文件的话，就会增加安装失败率。。
+
+缓存的文件可以在 Chrome Dev tool 的 Application选项中看到
+
+<img src="./images/sw-2.png" />
+
+或者刷新页面时，显示来自service worker。
+
+<img src="./images/sw-3.png" />
+
+
+
+3、js代码细节优化
+
+- 减少回流(重排)和重绘
+
+  在render线程在渲染树的基础上渲染颜色、背景色等。 当渲染树中的一部分(或全部)因为元素的规模尺寸，布局，可见性(这里可见性特指visibility: hidden, 这样不改变元素位置,在真是DOM结构中依然存在、只是对可见性的操作，而display:none对元素隐藏后在DOM结构中是不存在的)等改变而需要重新构建，这时浏览器需要重新计算元素的几何属性(很显然文档流中的其他属性也会跟着受影响)。这就称为回流。每个页面至少需要一次回流，就是在页面第一次加载的时候。
+
+  当渲染中的一些元素需要更新属性，而这些属性只是影响元素的外观，风格，而不会影响元素的几何属性，比如color、background-color。这个操作称为重绘。从描述可以发现，回流必将引起重绘，而重绘不一定会引起回流。因为回流比重绘做的事情更多，带来的开销更大。
+
+  要避免回流与重绘的发生，最直接的做法是避免掉可能会引发回流与重绘的 DOM 操作。下面先看看如何规避回流：
+
+  
+
+  ##### 操作DOM的几何属性
+
+  操作DOM的几何属性，会引发“多米诺”效应，所有和该元素相关的元素都会受到影响。这些元素的几何属性重新计算，试想一下这是多大量的计算。
+
+  元素的几何属性通常包含：height、width、margin、padding，left，border等等。属性太多了，不方便一一列举，完全可以通过调试工具看到各元素的影响。
+
+  
+
+  ##### 改变DOM结构
+
+  这里涉及的操作主要就是增加、修改、删除节点。
+
+  
+
+  ##### 获得一些特殊的值
+
+  当我们用到像client* （top, left,width,height）, offset*， scroll*属性和getComputedStyle方法时，也会触发回流。因为这些属性都是通过即时计算得到的，
+
+  
+
+  现在我们看下该如果避免回流和重绘。
+
+  ##### 缓存计算的部分，避免频繁改动
+
+  先看一个反例
+
+  ```js
+  <div id="target"></div>
+  <script>
+    const el = document.querySelector('#target');
+    for(let i=0; i< 20; i++) {
+        el.style.top  = el.offsetTop  + 10 + "px";
+        el.style.left = el.offsetLeft + 10 + "px";
+    }
+  </script>
+  ```
+
+  这个例子是非常糟糕的，每次循环都会触发回流。现在我们进行简单的优化，先缓存目标属性，使用js计算变化的部分，最后再将结果附到DOM上，
+
+  ```js
+  let el = document.querySelector('#target') 
+  let offLeft = el.offsetLeft, offTop = el.offsetTop;
+  for(let i=0; i<20; i++) {
+    offLeft += 10;
+    offTop += 10;
+  }
+  // 将结果附到目标元素上
+  el.style.left = offLeft + "px"
+  el.style.top = offTop  + "px"
+  ```
+
+  ##### 使用classList合并属性
+
+  如果你要像这样操作元素的多个样式，
+
+  ```js
+  let container = document.querySelector('.container')
+  container.style.width = '100px'
+  container.style.height = '200px'
+  container.style.border = '10px solid red'
+  container.style.color = '#fff'
+  ```
+
+  这种情况下，可以把这些属性定义成一个样式，然后通过classList加入
+
+  ```js
+  <style>
+      .container {
+        width: 100px;
+        height: 200px;
+        border: 10px solid red;
+        color: #fff;
+      }
+  </style>
+  let container = document.querySelect('.container')
+  container.classList.add('container')
+  ```
+
+  这种方法需要注意的是，如果你现在的系统还在视频IE6-IE9，那么很遗憾，该属性还不能支持。
+
+  
+
+  ##### 将元素离线处理
+
+  刚才我们讲过，如果元素设置为display:none 后，该元素都从当前的文档流“抽离”，从这个角度出发，我们也使用这个方法作为优化的一个手段。
+
+  ```js
+  let container = document.querySelector('.container')
+  container.style.display = 'none'
+  //样式处理
+  container.style.display = 'block'
+  ```
+
+- 节流和防抖
+
+  在有些场景下，回调方法会反复执行多次，比如说窗口的resize时间，滚动条的scroll事件，键盘的keydown、keyup事件，反复执行的结果是导致大量的计算从而引发页面卡顿，这不是我们想要的结果。为了应付这种场景，节流(throttle)和防抖(debounce)就诞生了。
+
+  
+
+  ##### 节流(throttle)：当持续触发事件时，保证一定时间段内只调用一次事件处理函数。
+
+  
 
 5.3.3 webpack优化
 

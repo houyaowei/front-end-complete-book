@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<script type="text/javascript" src="./async/async.js" async></script>
+	<script type="text/javascript" src="./async/defer.js" defer></script>
+	<script type="text/javascript">
+		console.log('normal');
+		window.addEventListener("load", function () {
+			console.log('onload')
+		})
+		document.addEventListener("DOMContentLoaded", function () {
+			console.log('DOMContentLoaded')
+		})
+	</script>
+
+</body>
+</html>

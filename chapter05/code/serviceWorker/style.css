@@ -1,0 +1,15 @@
+.container {
+	display: none;
+	margin: 0 auto;
+	text-align: center;
+	height: 100px;
+	line-height: 100px;
+	width: 300px;
+	font-size: 20px;
+	border: 1px solid red;
+}
+
+.result {
+	color: red;
+	font-size: 20px;
+}
