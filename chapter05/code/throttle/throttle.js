@@ -3,7 +3,9 @@
  time: 间隔时间
 */
 function throttle (func,time) {
-
+	if(typeof func !== 'function') {
+      throw new TypeError('we need a function');
+   }
 	//记录上次执行的时间
 	let precious = 0;
 	

@@ -796,18 +796,17 @@ PRECACHE_URLS数组定义需要缓存的文件列表。在这个例子中，我�
 
 - ##### 节流和防抖
 
-  在有些场景下，回调方法会反复执行多次，比如说窗口的resize时间，滚动条的scroll事件，键盘的keydown、keyup事件，反复执行的结果是导致大量的计算从而引发页面卡顿，这不是我们想要的结果。为了应付这种场景，节流(throttle)和防抖(debounce)就诞生了。
+  在有些场景下，回调方法会反复执行多次，比如说窗口的resize时间，滚动条的scroll事件，键盘的keydown、keyup事件，鼠标的mouseover，mousemove事件等，这些反复执行的结果是导致大量的计算从而引发页面卡顿，这不是我们想要的结果。为了应付这种场景，节流(throttle)和防抖(debounce)就诞生了。
 
-  节流(throttle)：当持续触发事件时，保证一定时间段内只调用一次事件处理函数。笔者有看到过这样的帖子，说节流有两种实现方式，时间戳和定时器。从任务的划分来看，setTimeout的执行时放到宏任务队列的，有一个需要注意的是，微任务队列中的有更高的优先级，要等到微任务队列中的所有任务执行完才会调度宏任务队列中的任务执行，详细的处理过程可以移步到第四章“宏任务和微任务”部分。所以说定时器模式笔者不推荐使用。
-
-  我们我们使用时间戳的方式进行实现：
+  节流(throttle)：当持续触发事件时，保证一定时间段内只调用一次事件处理函数。
 
   ```js
   function throttle (func,time) {
-  
+  	if(typeof func !== 'function') {
+       throw new TypeError('need a function');
+    }
   	//记录上次执行的时间
   	let precious = 0;
-  	
   	return function(){
   		let _this = this;
   		let now = Date.now();
@@ -819,7 +818,96 @@ PRECACHE_URLS数组定义需要缓存的文件列表。在这个例子中，我�
   }
   ```
 
+  有了上面的实现原型，我们做下简单的测试，
+
+  ```js
+  <div class="target">
+  		请将光标移到这个元素上进行测试
+  	</div>	
+  	<script type="text/javascript">
+  		let target = document.querySelector(".target");
+  		target.onmouseover = throttle(function(){
+  			console.log('throttle')
+  		},2000);
+  	</script>
+  ```
+
+  该方法会初次执行一次，然后没隔两秒执行以下。
+
   
+
+  函数防抖（debounce）：当持续触发事件时，一定时间段内没有再触发事件，事件处理函数才会执行一次，如果设定的时间到来之前，又一次触发了事件，就重新开始延时。
+
+  ```js
+  function debounce (func,time) {
+    if(typeof func !== 'function') {
+      throw new TypeError('need a function');
+    }
+  	let timeId = null;
+  	return function(){
+  		let _this = this;
+  		clearTimeout(timeId);
+  		timeId = setTimeout(() => {
+  			func.apply(_this, arguments)
+  		}, time);
+  	}
+  }
+  ```
+
+  - webworker介入数据密集型
+
+    js是单线程语言，无法同时运行多个脚本，所有的代码都是按照“先到先得”的原则使用CPU。这种单线程带来了很大的不便，不能充分发挥CPU的性能。webworker为js创建了多线程环境，运行主线程创建多线程，把一些运算分配给这些子线程去处理，降低了主线程的压力。也使得主线程和子线程之间互不干扰，等子线程完成任务后，再把运算结果通知给主线程。
+
+    使用webworker创建的子线程是常驻内存，不被主线程打断，所以使用时应该小心。
+
+    场景一：后台数值计算
+
+    主文件main.js
+
+    ```js
+    
+    let worker = new Worker("./webworker.js");
+    
+    worker.postMessage({
+    	status: 0
+    })
+    
+    worker.onmessage = function (event) {
+    	document.querySelector(".calc").innerHTML = event.data;
+    	worker.terminate();
+    }
+    ```
+
+    使用 Worker()构造函数创建一个新的工作线程，返回一个代表此线程本身的线程对象。使用该对象的postMessage方法为子线程传递参数，使用onmessage监听子线程传递过来的消息。子线程和主线程通信也是由这两个方法实现。
+
+    
+
+    下面详细看下Webworker.js的详细实现
+
+    ```js
+    onmessage = function (event) {
+    	console.log(event)
+    	let status = event.data.status;
+    	if (status == 0) {
+    		startToCalc();
+    	}
+    }
+    function startToCalc(){
+    	let t1 = new Date().getTime();
+    	let arr = [22,41,208,1,39,30,16,45,107,54,23,20,10,43,57];
+    	let total = arr.reduce(function (total,item) {
+    		return total + item;
+    	}, 0);
+    	let t2 = new Date().getTime(); 
+    	console.log('t1:' ,t2);
+    
+    	postMessage("活干完了！所有值的和为：" + total+ ", 耗时：" + (t2-t1)+"毫秒")
+    }
+    ```
+
+    场景二：
+
+
 
 5.3.3 webpack优化
 
