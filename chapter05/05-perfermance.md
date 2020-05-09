@@ -860,10 +860,18 @@ PRECACHE_URLS数组定义需要缓存的文件列表。在这个例子中，我�
 
     使用webworker创建的子线程是常驻内存，不被主线程打断，所以使用时应该小心。
 
+    webworker有专有线程(Dedicated Worker)和共享线程(Shared Worker),专有线程是需要给Worker的构造函数指定一个指向JavaScript文件的URL，专用线程在运行的过程中会在后台使用 MessagePort 对象，而 MessagePort 对象支持 HTML5 中多线程提供的所有功能，例如：可以发送和接受结构化数据（JSON 等），传输二进制数据，并且支持在不同端口中传输数据等。
+
+    为了在页面主程序接收从专用线程传递过来的消息，我们需要使用工作线程的 onmessage 事件处理器，当然也可以使用addEventListener.
+
+    共享线程可以由两种方式来定义：一是通过指向 JavaScript 脚本资源的 URL 来创建，二是通过显式的名称。当由显式的使用名称时，由创建这个共享线程的第一个 URL 会被用来作为这个共享线程的 JavaScript 脚本资源 URL。通过这样一种方式，它允许同域中的多个应用程序使用同一个提供公共服务的共享线程，从而不需要所有的应用程序都去与这个提供公共服务的 URL 保持联系。
+
+    
+    
     场景一：后台数值计算
-
+    
     主文件main.js
-
+    
     ```js
     
     let worker = new Worker("./webworker.js");
@@ -871,19 +879,19 @@ PRECACHE_URLS数组定义需要缓存的文件列表。在这个例子中，我�
     worker.postMessage({
     	status: 0
     })
-    
+
     worker.onmessage = function (event) {
-    	document.querySelector(".calc").innerHTML = event.data;
+	document.querySelector(".calc").innerHTML = event.data;
     	worker.terminate();
-    }
+}
     ```
 
     使用 Worker()构造函数创建一个新的工作线程，返回一个代表此线程本身的线程对象。使用该对象的postMessage方法为子线程传递参数，使用onmessage监听子线程传递过来的消息。子线程和主线程通信也是由这两个方法实现。
-
     
-
+    
+    
     下面详细看下Webworker.js的详细实现
-
+    
     ```js
     onmessage = function (event) {
     	console.log(event)
@@ -898,18 +906,54 @@ PRECACHE_URLS数组定义需要缓存的文件列表。在这个例子中，我�
     	let total = arr.reduce(function (total,item) {
     		return total + item;
     	}, 0);
-    	let t2 = new Date().getTime(); 
+	let t2 = new Date().getTime(); 
     	console.log('t1:' ,t2);
     
     	postMessage("活干完了！所有值的和为：" + total+ ", 耗时：" + (t2-t1)+"毫秒")
     }
     ```
-
-    场景二：
+    
+    场景二：共享线程进行通信
+    
+    main.js
+    
+    ```js
+    let worker = new SharedWorker("./webworker.js","myWorker");
+    let logObj = document.querySelector(".log");
+    
+    // worker.port.onmessage = function(e) { 
+    //   document.querySelector(".log").innerHTML =   e.data;
+    // }
+    //我们改用addEventListener
+    worker.port.addEventListener("message", (e) => {
+    	logObj.innerHTML += "\n" + e.data;
+    },false)
+    
+    //如果是用的addEventListener,使用start方法启动是必须的
+    worker.port.start();
+    worker.port.postMessage('ping');
+    ```
+    
+    webworker.js
+    
+    ```js
+    onconnect = function(e) {
+      let port = e.ports[0];
+      port.postMessage('Hello, shared web worker!');
+      port.onmessage = function(e) {
+      	 port.postMessage('pong'); 
+       //e.target.postMessage('pong'); //这样也可以工作
+      }
+    }
+    ```
+    
+    HTML5 Web Worker 的多线程特性为基于 Web 系统开发的程序人员提供了强大的并发程序设计功能，它允许开发人员设计开发出性能和交互更好的富客户端应用程序。
 
 
 
 5.3.3 webpack优化
+
+webpack是现在
 
 5.3.4  http2.0
 
