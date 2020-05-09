@@ -953,7 +953,79 @@ PRECACHE_URLS数组定义需要缓存的文件列表。在这个例子中，我�
 
 5.3.3 webpack优化
 
-webpack是现在
+webpack是现在最流行的编译、打包工具，也是现在工程化的标配。但是随着系统功能的日益增加，webpack在构建、打包过程中也会变得越来越慢，构建体积变大的原因。在本小结中我们就webpack在日常开发中涉及优化方面进行详细的描述。
+
+- 基本优化方式
+
+1、减少文件的匹配范围
+
+   在rules中配置exclude,减少loader的搜索范围。
+
+```js
+ module: {
+        rules: [
+            {
+                test: /\.js$/,
+                use: 'babel-loader',
+                exclude: /node_modules/,
+                include: path.resolve(__dirname, 'src') //指定要处理的目录
+            }
+        ]
+    }
+```
+
+2、缓存loader的结果
+
+提高babel的编译速度可以很大程度提高开发的体验，否则，热更新启动更新了5分钟，恐怕你早就崩溃了。所以缓存babel-loader的结果可以帮到你，该配置默认将转译的结果缓存到文件系统中。配置cacheDirectory 选项，将 babel-loader 提速至少两倍。
+
+```js
+rules: [
+        {
+            test: /\.js$/,
+            use: 'babel-loader?cacheDirectory', 
+            exclude: /node_modules/
+        }
+    ]
+```
+
+3、优化模块配置
+
+首先是配置模块路径的查找，resolve.modules配置模块库（即 node_modules）所在的位置，在文件里 引入 `import React  from 'react'` ,默认会从当前目录中向上寻找，直到跟目录中的 node_modules 目录下。这是默认的配置。为了加速文件的查找，可以把src的目录在这里配置。
+
+```js
+resolve: {
+    modules: [ 
+        path.resolve('src'),// 优化模块查找路径
+        path.resolve('node_modules') // 指定node_modules所在位置，当导入第三方模块时直接从这个路径下搜索
+    ]
+}
+```
+
+假设有大量的模块是在`src/components`下，在其他组件里引用这个目录下的组件时包含类似"../../../src/components/button"的配置，把modules配置成 [ "src/components", "node_modules"]，就可以使用比较短的 `import 'button'`了。当然也可以在alias中配置短路径
+
+```js
+alias: {
+  "@util": path.resolve(__dirname, 'src/utilities/')
+}
+```
+
+在resolve配置项中还有一个比较常用的就是extension, 当引入模块时不带文件后缀 webpack会根据此配置自动解析确定的文件后缀。所以当引入文件时，尽量带上文件后缀，该配置项中文件扩展名也尽量的说，减少文件的查找事件，还有就是频率高的扩展名尽量往前放。
+
+4、配置parse
+
+在有些场景下，希望有些文件不被babel 转换，比如说systemjs,这是一个动态模块加载器，加载ES模块，这种类型的库我们是不希望被翻译的。所以需要在webpack的配置文件中进行配置
+
+```js
+rules: [
+      {
+        parser: {
+          System: false
+        }
+      }
+  ]
+```
+
+
 
 5.3.4  http2.0
 
