@@ -1048,6 +1048,123 @@ rules: [
 
 在日常开发中，会用到很多的第三方库，比如说echarts,hightcharts,lodash,underscore等，这些库相对来说比较稳定，也比较成熟了。针对这些情况，我们可以把这些库提前打包，是很好的选择。
 
+下面看下具体的实现，首先新建一个webpack.dll.js文件，定义如下内容：
+
+```js
+module.exports = {
+  entry: {
+    react: ["react", "react-dom"],
+  },
+  output: {
+    library: "react",
+    filename: "[name].dll.js",
+  },
+  plugins: [
+    new webpack.DllPlugin({
+      name: "react",
+      path: path.resolve(__dirname, "dist/manifest.json"),
+    }),
+  ],
+};
+```
+
+在entry和output中分别定义入口，和生成文件名字，这里生成文件名和entry文件名字保持一致。DllPlugin和DllReferencePlugin 都是webpack的内置插件，所以并不需要再额外安装npm包。
+
+配置完成后，在package.json中增加运行脚本并运行在dist目录下生成dll文件和manifest.json文件。
+
+```js
+"build:dll": "webpack --config webpack.dll.js --mode=development",
+```
+
+这些完成后，我们需要在webpack.dev.config.js中增加 DllReferencePlugin 配置。
+
+```js
+plugins:[
+    new HTMLWebpachPlugin({
+      title: "hc-portal-fe",
+      template: "./src/index.html",
+    }),
+    new webpack.DllReferencePlugin({
+      manifest: path.resolve(__dirname, 'dist/manifest.json')
+    }),
+  ]
+```
+
+需要将manifest 指向生成的manifest.json文件。到这里你可能会任务ok了，其实不然，还有一个关键配置需要做，这个配置就是在html文件中引入该dll文件，并且要放到bundle文件的前面，因为bundle文件是要依赖该dll文件的。一般来说，开发和打包的HTML文件是两套，这是为了区别环境做一些区别配置，所以dll文件引入不要影响到上线打包。
+
+7、使用ParallelUglifyPlugin压缩代码
+
+webpack默认提供了UglifyJS插件来压缩JS代码，但是它使用的是单线程压缩代码，如果说多个js文件需要被压缩，那么势必会被消耗大量的时间。所以ParallelUglifyPlugin插件就应运而生，这个插件会开启多个子线程，把对多个文件压缩的工作派发给子线程去做，但是每个子线程还是通过UglifyJS去压缩代码。无非就是变成了并行处理。
+
+```js
+// 声明
+const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
+module.exports = {
+  plugins: [
+    new ParallelUglifyPlugin({
+      uglifyJS: {
+        output: {
+          //是否紧凑输出，如果为true，即会保留空格和制表符
+          beautify: false,
+           //是否保留注释
+          comments: false
+        },
+        compress: {
+          //是否在UglifyJS删除没有用到的代码时输出警告信息
+          warnings: false,
+          //是否删除代码中所有的console语句
+          drop_console: true,
+          //是否内嵌虽然已经定义了，但是只用到一次的变量
+          collapse_vars: true,
+           //是否提取出现了多次但是没有定义成变量去引用的静态值
+          reduce_vars: true
+        }
+      }
+    }),
+  ]
+}
+```
+
+8、提取公共代码
+
+业务增加后，代码体积也可能直线上升，同样也会包含大量重复的代码，所以需要把公共的代码提取成单独的chunk，chunk是webpack根据功能拆分出来的，在webpack中，有这几种情况会被打成单独的chunk
+
+- webpack中entry配置
+- 通过import规范动态导入的模块（https://github.com/tc39/proposal-dynamic-import）
+- 通过splitChunks拆分出来的代码
+
+这部分中点看下splitChunk的配置
+
+```js
+splitChunks: {
+      chunks: "all",
+      maxAsyncRequests: 5,
+      maxInitialRequests: 3,
+      cacheGroups: {
+        vendor: {
+          chunks: "all",
+          test: path.resolve(__dirname, "../node_modules"),
+          name: "duplication-[hash:5]",
+          enforce: true,
+        },
+      },
+    },
+```
+
+chunks: 表示哪些代码需要优化，有三个可选值：initial(初始块)、async(按需加载块)、all(全部块)，默认为async
+
+minSize: 表示在压缩前的最小模块大小，默认为30000
+
+minChunks: 表示被引用次数，默认为1
+
+maxAsyncRequests: 按需加载时候最大的并行请求数，默认为5
+
+maxInitialRequests: 一个入口最大的并行请求数，默认为3
+
+name: 拆分出来块的名字，默认由块名和hash值自动生成
+
+cacheGroups: 缓存组。
+
 
 
 
