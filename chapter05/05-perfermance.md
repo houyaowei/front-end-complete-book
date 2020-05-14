@@ -1138,6 +1138,8 @@ module.exports = {
 ```js
 splitChunks: {
       chunks: "all",
+      minSize: 30000,
+      maxSize: 0,
       maxAsyncRequests: 5,
       maxInitialRequests: 3,
       cacheGroups: {
@@ -1151,21 +1153,145 @@ splitChunks: {
     },
 ```
 
-chunks: 表示哪些代码需要优化，有三个可选值：initial(初始块)、async(按需加载块)、all(全部块)，默认为async
+chunks: 表示从哪些chunks里面抽取代码，有三个可选值：initial、async、all，默认为async
 
-minSize: 表示在压缩前的最小模块大小，默认为30000
+minSize: 表示抽取出来的文件在压缩前的最小大小，默认为30000
+
+maxSize: 表示抽取出来的文件在压缩前的最大大小，默认为 0，表示不限制最大大小
 
 minChunks: 表示被引用次数，默认为1
 
 maxAsyncRequests: 按需加载时候最大的并行请求数，默认为5
 
-maxInitialRequests: 一个入口最大的并行请求数，默认为3
+maxInitialRequests: 最大的初始化加载次数，默认为3
 
 name: 拆分出来块的名字，默认由块名和hash值自动生成
 
 cacheGroups: 缓存组。
 
+9、抽取css
 
+将CSS提取为独立的文件的插件，对每个包含css的js文件都会创建一个CSS文件，支持按需加载css和sourceMap
+
+```js
+plugins: [
+    new MiniCssExtractPlugin({ filename: "styles.[hash].css" }),
+]
+```
+
+10、在开发环境中配置webpack-bundle-analyzer性能分析
+
+通过使用webpack-bundle-analyzer以图形化的方式看到项目各模块的大小，可以根据自己的优化目标进行按需优化，非常直观。
+
+```js
+plugins: [
+    new BundleAnalyzerPlugin({
+      statsFilename: "../analysis/stats.json",
+      analyzerMode: "disable",
+      generateStatsFile: true,
+      statsOptions: { source: false },
+    })
+]
+```
+
+```
+  //配置有：server，static或 disabled。
+  //server：分析器将启动HTTP服务器显示
+  //static: 会生成带有报告的单个HTML文件。
+  //disabled: 配合generateStatsFile=true 来生成stats.json文件。
+  analyzerMode: 'disabled',
+  //server模式下服务IP配置
+  analyzerHost: '127.0.0.1',
+  //server模式下的端口
+  analyzerPort: 8888, 
+  //static模式下生成的文件
+  reportFilename: 'report.html',
+  //默认浏览器中自动打开报告
+  openAnalyzer: true,
+  generateStatsFile: false, 
+  //配置stats.json文件的路径和文件名
+  statsFilename: 'stats.json',
+  logLevel: 'info' // 日志级别。'信息'，'警告'，'错误'或'沉默'。
+```
+
+在package.json文件中配置启动命令：
+
+```js
+"report": "webpack-bundle-analyzer --port 8888 stats.json文件的路径"
+```
+
+执行后你会看到一个类似的页面，鼠标悬停各组件展示各个组件的大小，Gzip大小，文件路径。
+
+<img src="./images/webpack-1.png" style="zoom:67%;" />
+
+11、推荐使用ES module
+
+当使用ES modules时，webpack可以自动启用tree-shaking, tree-shaking是指bundle 转换器遍历整个依赖树，检查有哪些依赖项，并删除未使用的。
+
+12、图片优化
+
+一般的工程打包后，图片体积会占到总工程的60%(以亲历的工程为例)左右，图片虽然不会像js那样阻塞页面的渲染，但是也会占大量的带宽。在webpack配置中，可以借助url-loader,svg-url-loader和image-webpack-loader进行优化。
+
+url-loader将较小的静态文件内联到应用程序中。 如果不配置，该loader将获取一个传递进来的文件，将其放在bundle文件的同级目录，然后返回该文件的url。
+
+```js
+rules: [
+      {
+        test: /\.(jpe?g|png|gif)$/,
+        loader: 'url-loader',
+        options: {
+          // 小于10kB的图片内联
+          limit: 10 * 1024,
+        },
+      },
+],
+```
+
+在页面中，可以使用下面的命令导入图片
+
+```js
+import imageUrl from './image.png';
+```
+
+如果这张图片小于10K，那么图片会被转换为Base64。如果大于10K，loader会被创建一个新的文件。
+
+svg-url-loader和url-loader比较相似，在这里附下代码：
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.svg$/,
+        loader: 'svg-url-loader',
+        options: {
+          //意思同url-loader
+          limit: 10 * 1024,
+          //是否删除URL中的引号
+          noquotes: true,
+        },
+      },
+    ],
+  },
+};
+```
+
+Image-webpack-loader在加载过程中会压缩文件，适用于JPG,PNG,GIF和svg文件。该插件并不会把图片内联到文件中，所有需要配合url-loader和svg-url-loader
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/,
+        loader: 'image-webpack-loader',
+				//在其他loader执行后执行
+        enforce: 'pre',
+      },
+    ],
+  },
+};
+```
 
 
 
