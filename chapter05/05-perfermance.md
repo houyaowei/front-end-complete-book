@@ -1295,7 +1295,149 @@ module.exports = {
 
 
 
-5.3.4  http2.0
+5.3.4  使用HTTP/2
+
+HTTP/2 在经历了18个草稿后于2015年5月发布了正式版，该协议是从 SPDY 演变而来，SPDY协议当初是由Google开发的一个实验性协议，在2009年发布，主要解决HTTP/1.1版本中的对头阻塞，低效的TCP利用，臃肿的消息头部，受限的优先级设置等问题，经过内部测试，页面加载速度最多提高了近55%。到2012年，这个协议得到了Chrome，Firefox和Opera的的支持，最终HTTP-WG(Http Working Group) 在这年的年初吸收SPDY的经验，把HTTP/2提上了日程。W3C向社会征集HTTP/2的建议，HTTP-WG经过内部讨论，决定把SPDY规范作为制定标准的基础。
+
+现在大部分浏览器都已经支持了该协议
+
+<img src="./images/http2-2.png" />
+
+HTTP/2可以让我们构建出更快，更简单的，更健壮的web应用，通过支持请求和响应的多路复用来减少延迟，通过压缩HTTP首部字段降低协议开销。
+
+HTTP/2没有改变HTTP的语义，也就是说HTTP方法、状态码，首部字段等核心概念一如既往。不同的是HTTP/2修改了格式化数据的方式，采用二进制分帧层进行数据交换。HTTP/2大致分为两部分：
+
+- 分帧层：HTTP/2多路复用能力的核心
+- HTTP层：传统的HTTP及数据相关的部分
+
+**二进制分帧**
+
+应用层(HTTP/2)和传输层(TCP or UDP)之间增加一个二进制分帧层，这个是提高HTTP/2性能的关键，
+
+<img src="./images/http2-1.jpg" />
+
+基于二进制的HTTP/2可以让帧的使用变得更加便捷。在HTTP1.1基于文本的协议中，对帧的开始和结束识别起来都是相当的麻烦。HTTP/2将传输的信息分割为更小的信息和帧，便于使用透明的方式进行处理，也更加安全。
+
+HTT/2所有的通信都是在一个TCP连接的基础上完成的。为了更好理解HTTP/2,就必须了解帧、流和信息这几个基本概念。
+
+- 流：已建立的连接上的双向字节流，是连接中的虚拟通道，承载着双向信息交换。
+- 帧：HTTP/2通信的基本单位，承载了header，payload等
+- 消息：通信的以系列数据帧，由一个或者多个帧组成。
+
+
+
+**首部压缩**
+
+HTTP1.1并不支持首部压缩，在SDPY中加入了该特性的支持。在HTTP/2的协议中，并没有采用SPDY的DEFLATE算法，而是采用了专门用作首部压缩的HPACK算法。
+
+HTTP每次通讯（请求和响应）都会携带首部信息用于描述资源属性。而HTTP2.0在客户端和服务端之间使用首部表来跟踪和存储之前发送的键值对。对于相同的数据，不再重新通过每次请求和响应发送。每个新的首部键值对要么追加到当前表的末尾，要么替换表中之前的值。首部表在HTTP2.0的链接存续期内始终存在，由客户端和服务端共同渐进的更新。
+
+首部表在HTTP/2使用了首部压缩的技术。使报头更紧凑，更快速传输，有利于移动网络环境。减少了每次通讯的数据量，使网络拥塞状态得以改善。
+
+**多路复用**
+
+在HTTP1.1中，浏览器客户端在同一时间，针对同一域名下的请求有一定数量的限制。超过限制数目的请求会被阻塞。所以HTTP2.0中的多路复用优化了这一性能。
+
+基于二进制分帧层，HTTP2.0可以在共享TCP链接的基础上同时发送请求和响应。HTTP消息被分解为独立的帧，而不破坏消息本身的语义，交错发出去，在另一端根据流标识符和首部将他们重新组装起来。
+
+<img src="./images/http2-3.png"/>
+
+多路复用带来的好处：
+
+1. 可以并行交错的发送请求和响应，这些请求和响应之间互不影响
+
+2. 只使用一个链接即可并行发送多个请求和响应
+
+3. 消除不必要的延迟，从而减少页面加载的时间
+
+4. 不必再为绕过HTTP1.x限制而多做很多工作
+
+   
+
+**请求优先级**
+
+每个流包含一个优先级，告诉对端哪个流更重要。当资源有限时，服务器会根据优先级选择发送哪些流。
+
+借助PRIORITY帧，客户端同样可以告知服务器当前的流依赖于哪些流。该功能让客户端建立一个优先级的树，所有依赖其他流的流都要等到被依赖的流完成后才会执行。
+
+当然，优先级和依赖关系都可以在传输的过程中动态的改变。
+
+**服务器推送**
+
+在HTTP/2中，服务器有被称为缓存推送，主要的思想是：当客户端请求A资源时，而服务器知道它很可能也需要B资源的情况下，服务器在发送A资源之前，主动把资源B也推送给客户端。
+
+
 
 5.3.5 websocket
+
+websocket是唯一一个能通过TCP连接实现双向通信的机制，目的是提供一个简单的接口，能够在客户端和服务器之间实现基于消息的双向通信，可以是文本、也可以是二进制数据。
+
+WebSocket 对象提供了一组 API，用于创建和管理 WebSocket 连接，以及通过连接发送和接收数据。
+
+```js
+var ws = new WebSocket('wss://example.com/socket'); 
+// 创建安全WebSocket 连接（wss）
+ws.onerror = function (error) {} 
+ws.onclose = function () {} 
+ws.onopen = function () { 
+  // 向服务端发送消息
+  ws.send("Connection established. Nice to meet you"); 
+}
+
+ws.onmessage = function(msg) { 
+  if(msg.data instanceof Blob) { 
+		//处理二进制信息
+    processBlob(msg.data);
+  } else {
+    processText(msg.data); 
+		//处理文本信息
+  }
+}
+```
+
+ WebSocket支持文本和二进制数据传输，浏览器如果接收到文本数据，会将其转换为DOMString 对象，如果是二进制数据或Blob 对象，可直接将其转交给应用或将其转化为ArrayBuffer，由应用对其进行进一步处理。从内部看，协议只关注消息的两个信息：净荷长度和类型（前者是一个可变长度字段），据以区别UTF-8 数据和二进制数据。示例如下：
+
+```js
+var wss = new WebSocket('wss://example.com/socket');
+ws.binaryType = "arraybuffer"; 
+// 接收数据
+wss.onmessage = function(msg) {
+  if(msg.data instanceof ArrayBuffer) {
+    processArrayBuffer(msg.data);
+  } else {
+    processText(msg.data);
+  }
+}
+// 发送数据
+ws.onopen = function () {
+  socket.send("Hello server!"); 
+  socket.send(JSON.stringify({'msg': 'payload'}));
+
+  var buffer = new ArrayBuffer(128);
+  socket.send(buffer);
+
+  var intview = new Uint32Array(buffer);
+  socket.send(intview);
+
+  var blob = new Blob([buffer]);
+  socket.send(blob); 
+}
+```
+
+对于将要传输的二进制数据，开发者可以决定以何种方式处理，可以更好的处理数据流，Blob 对象一般用来表示一个不可变文件对象或原始数据，如果你不需要修改它或者不需要把它切分成更小的块，那这种格式是理想的；如果你还需要再处理接收到的二进制数据，那么选择ArrayBuffer 应该更合适。
+
+WebSocket 中的send( ) 方法是异步的：提供的数据会在客户端排队，而函数则立即返回。在传输大文件时，不要因为回调已经执行，就错误地以为数据已经发送出去了，数据很可能还在排队。要监控在浏览器中排队的数据量，可以查询套接字的bufferedAmount 属性：
+
+```js
+var ws = new WebSocket('wss://example.com/socket');
+
+ws.onopen = function () {
+  subscribeToApplicationUpdates(function(evt) { 
+    if (ws.bufferedAmount == 0) 
+    ws.send(evt.data); 
+  });
+};
+```
+
+前面的例子是向服务器发送应用数据，所有WebSocket 消息都会按照它们在客户端排队的次序逐个发送。因此，大量排队的消息，甚至一个大消息，都可能导致排在它后面的消息延迟——队首阻塞！为解决这个问题，应用可以将大消息切分成小块，通过监控bufferedAmount 的值来避免队首阻塞。甚至还可以实现自己的优先队列，而不是盲目都把它们送到套接字上排队。要实现最优化传输，应用必须关心任意时刻在套接字上排队的是什么消息！
 
