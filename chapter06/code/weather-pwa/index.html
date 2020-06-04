@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Weather PWA</title>
+    <meta name="description" content="weather pwa" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="manifest" href="./weather.manifest" />
+    <script src="./app.js" defer></script>
+    <script src="./jquery.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <p>
+        <a class="logo"> weather PWA</a>
+      </p>
+    </header>
+    <main>
+      <section style="display: flex;">
+        <label>请选择城市：</label>
+        <select id="city">
+          <option value="101110101">西安</option>
+          <option value="101020100">上海</option>
+          <option value="101210101">杭州</option>
+          <option value="101180501">平顶山</option>
+          <option value="101180505">叶县</option>
+        </select>
+        <button id="notifications">发送通知</button>
+      </section>
+
+      <section id="content">
+        <section>
+          <div>
+            <p>西安</p>
+            <p>天气: 晴</p>
+          </div>
+        </section>
+      </section>
+    </main>
+    <footer>
+      <p>
+        https://github.com/houyaowei/front-end-complete-book
+      </p>
+    </footer>
+  </body>
+</html>
