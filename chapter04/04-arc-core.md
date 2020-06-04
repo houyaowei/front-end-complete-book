@@ -1813,27 +1813,27 @@ floorAndToString(121.512121) // '122'
 
 随着页面复杂度的升级，对应的localstorage、vuex、redux和mobx等数据存储和管理方案也渐渐复现。所以对状态管理的原理进行一定的了解还是很有必要的，了解基本原理也方便理解其他的管理库。
 
-下面通过一个简单的例子，一步一步来解析下state到底是怎么回事，它是如何工作的？
+下面通过一个简单的例子，一步一步解析一下state是如何工作的。
 
-先看下基本的原理图：
+基本的原理图如图4-14所示。
 
 ![](images/state-1.png)
 
-我们已完整的单向数据流模型进行说明，数据流向有单向(如vuex、redux,)和双向(mobx)之分，和双向相比单向数据流更具有可维护性的特点，所以以此模型进行说明。
+数据流向有单向（如vuex、redux）和双向（mobx）之分，与双向数据流相比，单向数据流更具可维护性，所以以此模型进行说明。
 
-事件默认都是从UI页面进行发起，dispatch一个action，也就是说在单数据流的模型中，状态的改变都是以触发action作为入口条件，由action中commit一个mutation更新state中的数据，状态改变自动更新页面。
+事件默认都是从UI页面开始发起的，dispatch一个action，也就是说，在单向数据流模型中，状态的改变都是以触发action作为入口条件的，在action中commit（提交）一个mutation来更新state中的数据，状态改变会自动更新页面。
 
 
 
-阐述完状态的基本原理后，我们计划实现一个这样的页面（数据不持久化）
+阐述完状态的基本原理后，下面实现一个如图4-15所示的页面（数据不持久化）。
 
 ![](images/state-2.png)
 
-已完成任务部分(List组件)和右侧完成任务(count组件)情况分别对应两个组件。
+已完成任务部分（List组件）和右侧（未）完成任务（count组件）部分分别对应两个组件。
 
 
 
-第一步先看下View组件，先定义一个component的基类，
+先来看View组件，定义一个component的基类：
 
 ```js
 export default class Component {
@@ -1846,7 +1846,7 @@ export default class Component {
       props.store.events.subscribe("stateChange", () => self.render());
     }
 
-    //如果element元素，就把改元素设置为元素挂载节点
+    //如果element（用中文）元素，就把该元素设置为元素挂载节点
     if (props.hasOwnProperty("element")) {
       this.element = props.element;
     }
@@ -1854,9 +1854,9 @@ export default class Component {
 }
 ```
 
-我们约定各子组件要实现render方法，在render方法中实现DOM结构。this.element指定DOM结构的挂载位置。为了实现页面的自动更新，子组件借助发布/订阅模式订阅stateChange事件。store中当state中的数据更新时，会发布该事件，子组件收到通知后重新渲染。该行为类似React中的setState中的效果。
+我们约定各子组件要实现的render方法，然后在render方法中实现DOM结构。this.element指定DOM结构的挂载位置。为了实现页面的自动更新，子组件借助发布/订阅模式订阅stateChange事件。在store中，当state中的数据更新时，会发布该事件，子组件收到通知后会重新渲染。该行为类似React中的setState中的效果。
 
-再看一下组件的具体实现，Count.js：
+再看一下组件的具体实现，Count.js（大小写确认一下，代码中没看到？）：
 
 ```js
 import Component from "../lib/component.js";
@@ -1883,7 +1883,7 @@ export default class Count extends Component {
 }
 ```
 
-子组件中通过调用父组件的构造函数完成事件订阅。
+子组件中通过调用父组件的构造函数完成了事件订阅。
 
 ```js
 export default class PubSub {
@@ -1906,7 +1906,7 @@ export default class PubSub {
 }
 ```
 
-下面梳理下store的情况，store由action,mutation和state三部分组成，acation用来标识每个请求，也是触发state变化的唯一因素。mutation类似于事件，每个mutation都有一个事件类型和回调函数，这个回调函数是进行状态改变的地方，接收state和payload作为参数。
+下面梳理一下store的情况，store由action、mutation和state三部分组成。action用来标识每个请求，它是触发state变化的唯一因素。mutation类似于事件，每个mutation都有一个事件类型和回调函数，这个回调函数是进行状态改变的地方，可接收state和payload作为参数。
 
 ```js
 export default new Store({
@@ -1922,7 +1922,7 @@ store.js
 export default class Store {
   constructor(params) {
     let self = this;
-    //定义actions,mutations和state，
+    //定义actions（这里有s，上面的没有，是否需要统一）、mutations和state
     //在初始化中，需要把action和mutation都初始化进来
     self.actions = {};
     self.mutations = {};
@@ -1931,7 +1931,7 @@ export default class Store {
     // A status enum to set during actions and mutations
     self.status = "resting";
 
-    // 初始化发布-订阅模型
+    // 初始化发布——订阅模型
     self.events = new PubSub();
 
     //如果传入actions，就使用传入的actions
@@ -1957,34 +1957,34 @@ export default class Store {
   }
 ```
 
-把store中的state设置成全局state数据模型的代理，为什么要这么做呢？因为前面已经提高，我们要让state扮演成状态机的角色，state变引起页面的渲染，此时Proxy倒是一个很好的选择。
+把store中的state设置成全局state数据模型的代理，这是因为我们要让state扮成状态机的角色，state的变化引发页面的渲染，此时Proxy是一个很好的选择。
 
-> 对Proxy还不是很熟悉 的同学可以参考https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
-
-
-
-我们看Proxy的set钩子里，state变化，就会发布stateChange通知各个子组件。
+> 对Proxy不是很熟悉的读者可以参见链接<4-15>。https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
 
 
 
-store又是怎么分发action的呢？我们来探究一下，看下store中定义的dispatch函数，接受type类型和数据对象
+在Proxy的set钩子里，一旦state发生变化，就会发布stateChange通知各个子组件。
+
+
+
+store又是如何分发action的呢？我们来探究一下，看看store中定义的dispatch函数，它可接收type类型和数据对象：
 
 ```js
 dispatch(actionKey, payload) {
 
-    // 校验action是否存在
+    // 校验action（注意是否为actions）是否存在
     if (typeof self.actions[actionKey] !== "function") {
       console.error(`Action "${actionKey} doesn't exist.`);
       return false;
     }
 
-    // 分组显示action 信息
+    // 分组显示action信息
     console.groupCollapsed(`ACTION: ${actionKey}`);
 
-    // 设置action，说明我们正在dispatch一个action
+    // 设置action，说明我们正在dispatch（中译文）一个action
     self.status = "action";
 
-    //调用action
+    //调用actions
     self.actions[actionKey](self, payload);
 
     // Close our console group to keep things nice and neat
@@ -1994,13 +1994,13 @@ dispatch(actionKey, payload) {
   }
 ```
 
-在view组件中，通过
+在view组件中，通过下面的代码
 
 ```js
 store.dispatch(types.ADDITEM, value);
 ```
 
-派发action，需要为每个action指定类型，使用该字段用来区别是什么类型的action。所有的action因为在store初始化的时候已经注入，所以只需要根据action type来判断对应的action是否存在。
+派发action，这里需要为每个action指定类型，使用该字段为区分是什么类型的action。因为所有的action在store初始化时已经注入，所以只需根据action type来判断对应的action是否存在即可。
 
 action.js
 
@@ -2066,6 +2066,13 @@ export default {
 state带对应addItem类型的mutation，在state数组中push一条记录。至此，我们就了解了state的状态机是如何工作的，Proxy的set钩子是如何被触发的，子组件是在何种情况下重新工作的。
 
 一切都变得顺理成章。现在可以启动一下示例代码或者按照这个思路重新实现一遍，看看效果是怎样的。
+
+
+ps：在后续编写中，注意：
+1.英文大小写前后一致，与代码中的也要一致。
+2.给图加上图号，外链也要顺一下号。
+3.过于口语的部分建议删掉。
+4.写的非常工整啦，特别赞一下。
 
 
 
