@@ -1191,7 +1191,7 @@ main()
 console.log("global console");
 ```
 
-在async函数体内，await之前的代码都是同步执行的，可以理解为给Promise构造函数内传入的代码，await之后的所有代码都是在Promise.then中的回调，会被推入到微任务队列中。  看到这里啦 标记一下。
+在async函数体内，在await之前的代码都是同步执行的，可以理解为是给Promise构造函数传入的代码。在await之后的所有代码都是在Promise.then中的回调，会被推入微任务队列中。 
 
 > before resovle
 > 
@@ -1201,35 +1201,35 @@ console.log("global console");
 > 
 > setTimeout
 
-最后我们整理下浏览器端哪些方法的回调会被推入到宏任务和微任务队列中：
+总结，在浏览器端，会被推入宏任务和微任务队列中的方法的回调如下：
 
-宏任务：I/O， setTimeout,，setInterval，requestAnimationFrame
+宏任务：I/O、setTimeout、setInterval和requestAnimationFrame。
 
-微任务：Promise.then， catch， finally，await(后)
+微任务：Promise.then、catch、 finally和await(后)。
 
-该部分的内容相对比较抽象，希望大家结合更多的资料去理解。这部分完全理解后，详细你对JavaScript的执行过程有更深的了解。
+该部分的内容相对比较抽象，希望读者可以结合更多的资料加深理解，以便更深入地了解JavaScript的执行过程。
 
 #### 4.4 异步加载规范
 
-前端的模块化的热度一致没有退，因为模块化可以有更好代码约定，方便依赖关系的管理，规范前端开发规范，提高代码的可复用性。更重要的是模块化是前端工程化的重要因素，工程化是一种较高层次思维，而不是具体的某一项技术。所谓的前端工程化是把前端项目作为一个完整的工程进行分析、组织、构建、优化，在相应的过程中进行优化配置，达到项目结构清晰、边界清晰，各开发人员分工明确、配合默契、提高开发效率的目的。
+模块化的热度一直未退，这是因为模块化可以有更好的代码约定，方便依赖关系的管理，规范前端开发规范，提高代码的可复用性，更重要的是，模块化是前端工程化的重要因素。工程化不是具体的某一项技术，而是一种较高的层次思维。前端工程化就是把前端项目作为一个完整的工程进行分析、组织、构建、优化，在相应的过程中进行优化配置，达到项目结构清晰、边界清晰，各开发人员分工明确、配合默契、提高开发效率的目的。
 
-模块化的贯彻执行离不开相应的约定，即规范。这个是能够进行模块化工作的重中之重，孟子说的“不以规矩不能成为方圆”也是这个道理。
+模块化的贯彻执行离不开相应的约定，即规范。这是能够进行模块化工作的重中之重，正所谓“不以规矩，不能成方圆”。
 
-下面，我们看下目前流行的前端模块规范：Amd，Cmd,ES6 module和CommonJS.
+下面介绍目前流行的前端模块规范：Amd，Cmd,ES6 module和CommonJS。
 
 ##### 4.4.1 Amd和requirejs
 
-amd(Asynchronous Module Definition，规范地址：[https://github.com/amdjs/amdjs-api/wiki/AMD](https://github.com/amdjs/amdjs-api/wiki/AMD))，中文翻译为异步模块定义。该规范通过define方法定义模块，通过require方法加载模块。
+amd(Asynchronous Module Definition，异步模块定义）规范地址见链接<4-4>[https://github.com/amdjs/amdjs-api/wiki/AMD](https://github.com/amdjs/amdjs-api/wiki/AMD)。该规范通过define方法定义模块，通过require方法加载模块。
 
-RequireJS 想成为浏览器端的模块加载器，同时也想成为 Rhino / Node 等环境的模块加载器。。
+RequireJS 既想成为浏览器端的模块加载器，也想成为 Rhino/Node 等环境的模块加载器。
 
-我们先看下define的api定义:
+首先看一下define的API定义：
 
 ```js
 define(id?, dependencies?, factory);
 ```
 
-该方法接受3个参数，？表示可选项，定义模块时可以不用指定。第一个参数表示该模块的ID，第二个参数dependencies表示该模块所依赖的模块，该参数是一个数组，表示可以依赖多个。第三个factory是一个函数（也可以是对象），既然是函数，就可以有参数，那么参数是怎么传递进来的呢？这时候我们再想起来dependencies这个参数了，依赖的声明顺序和该工厂函数参数的声明顺序保持一致，如下面的实例代码：
+该方法接受3个参数，？表示可选项，定义模块时可以不用指定。第一个参数id表示该模块的ID；第二个参数dependencies表示该模块所依赖的模块，该参数是一个数组，表示可以依赖多个模块；第三个参数factory是一个函数（也可以是对象），既然是函数，就可以有参数，那么参数是如何传递进来的呢？这时就需要看dependencies这个参数了，依赖模块的声明顺序和factory函数参数的声明顺序一致，示例代码如下：
 
 ```js
 define([ 'service', 'jquery' ], function (service, $) {
@@ -1242,13 +1242,13 @@ define([ 'service', 'jquery' ], function (service, $) {
 
 依赖模块service和jquery在工厂方法执行前完成依赖注入，即依赖前置。
 
-下面我们看下完整的例子，我们以AMD规范的requirejs实现为例，我们先在HTML文件中加入：
+下面看一下完整的例子，以AMD规范的requirejs实现为例，首先在HTML文件中加入如下代码：
 
 ```js
 <script data-main="js/main" src="js/libs/require.js"></script>
 ```
 
-data-main属性指定工程文件入口，在main.js中配置基础路径和进行模块声明：
+data-main属性用于指定工程文件入口，在main.js中配置基础路径并进行模块声明：
 
 ```js
 requirejs.config({
@@ -1272,7 +1272,7 @@ requirejs(['message'], function (msg) {
 })
 ```
 
-再message模块中引入依赖模块service和jquery，
+在message模块中引入依赖模块service和jquery：
 
 ```js
 define(['service', 'jquery'], function (service, $) {
@@ -1302,37 +1302,39 @@ define(function () {
 })
 ```
 
-详细的代码请参考代码实例。
+详细代码请参考本书的代码示例。
 
-##### 4.4.2 cmd和seajs
+##### 4.4.2  cmd和seajs
 
-requirejs在声明依赖的模块时会在第一之间加载并执行。cmd（ Common Module Definition，通用模块定义,规范地址：[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)）是另一种模块加载方案，和amd稍有不同，不同点主要体现在：amd推崇依赖前置，提前执行。cmd是就近依赖，延迟执行。
+requirejs在声明依赖的模块时会第一时间加载并执行。cmd（Common Module Definition，通用模块定义）规范地址见链接<4-5>[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)），它是另一种模块加载方案，和amd的不同之处在于：amd推崇依赖前置，提前执行。cmd是就近依赖，延迟执行。
 
-Seajs 则专注于 Web 浏览器，同时通过 Node 扩展的方式可以在 Node 环境中运行。
+seajs则专注于Web浏览器，同时可以通过Node扩展的方式在Node环境中运行。
 
 > 扩展阅读：
 > 
-> seajs与requirejs的不同[https://github.com/seajs/seajs/issues/277](https://github.com/seajs/seajs/issues/277)，
+> seajs与requirejs的不同参见链接<4-6>。[https://github.com/seajs/seajs/issues/277](https://github.com/seajs/seajs/issues/277)
 > 
-> seajs和requirejs对比[https://www.douban.com/note/283566440/](https://www.douban.com/note/283566440/)，
+> seajs和requirejs对比参见链接<4-7>。[https://www.douban.com/note/283566440/](https://www.douban.com/note/283566440/)
 > 
-> seajs规范文档[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)
+> seajs规范文档参见链接<4-8>。[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)
 > 
-> require书写规范[https://github.com/seajs/seajs/issues/259](https://github.com/seajs/seajs/issues/259)
+> require书写规范参见链接<4-9>。[https://github.com/seajs/seajs/issues/259](https://github.com/seajs/seajs/issues/259)
 
-seajs官方：[https://github.com/seajs/seajs](https://github.com/seajs/seajs)，是cmd规范实现。规范部分不做详细的介绍，我们通过一个例子来说明：
+seajs官方文档参见链接<4-10>，[https://github.com/seajs/seajs](https://github.com/seajs/seajs)
 
-和一般引入js文件的方法导入seajs支持,
+seajs是cmd规范的实现，这里对规范部分不做详细的介绍，下面通过一个例子来说明。
+
+用一般引入js文件的方法导入对seajs的支持：
 
 ```js
 <script src="./js/libs/sea.js"></script>
 ```
 
-> alias:当模块标识很长时，可以用这个简化，让文件的真实路径与调用标识分开。
+> alias：当模块标识很长时，可以用这个简化，让文件的真实路径与调用标识分开。
 > 
-> paths: 当目录比较深，或需要跨目录调用模块时，可以使用 `paths` 来简化
+> paths：当目录比较深，或需要跨目录调用模块时，可以使用 `paths` 来简化。
 
-下面对seajs做基本都配置，并声明模块
+下面对seajs做基本的配置，并声明模块：
 
 ```js
 seajs.config({
@@ -1350,19 +1352,19 @@ seajs.config({
 seajs.use("./js/main.js");
 ```
 
-使用seajs.use方法在页面中加载任意模块， base指定seajs的基础路径，该属性结合alias中模块路径配置一起指向某一模块，这里需要注意的是路径的解析方法:
+使用seajs.use方法在页面中加载任意模块时， base指定seajs的基础路径，该属性结合alias中的模块路径配置一起指向某一模块，这里需要注意路径的解析方法。
 
 (1)相对标识
 
- 在http://example.com/modules/a.js 中 require('./b')引入b模块，那么解析后的路径为: http://example.com/modules/b.js
+ 在http://example.com/modules/a.js 的require模块中('./b')引入b模块后（ps:这句看不懂），解析后的路径为 http://example.com/modules/b.js。
 
 (2)顶级标识
 
-顶级标识**不以点（"."）或斜线（"/"）开始**， 会相对 SeaJS 的 base 路径来解析。假如base路径http://example.com/modules/libs/ ，在某模块中require('jquery/query-3.4.1')引入jquery模块，解析后的路径为 http://example.com/modules/libs/jquery/jquery-3.4.1.js
+顶级标识**不以点（"."）或斜线（"/"）开始**， 会相对seajs的base路径来解析。假如base路径为http://example.com/modules/libs/ ，则在某模块的require('jquery/query-3.4.1')模块中引入jquery模块后，解析后的路径为 http://example.com/modules/libs/jquery/jquery-3.4.1.js。
 
 (3)普通路径
 
-在某个模块中引入模块 require('http://example.com/modules/a') , 普通路径的解析规则，会相对当前页面来解析。
+在某个模块中引入模块require('http://example.com/modules/a') 后，根据普通路径的解析规则，会相对当前页面进行解析。
 
 继续回到js/main.js中，引入message模块：
 
@@ -1374,7 +1376,7 @@ define(function (require, exports, module) {
 })
 ```
 
-message模块中serivce模块和jquery模块，
+message模块中的serivce模块和jquery模块如下：
 
 ```js
 define(function (require, exports, module) {
@@ -1391,7 +1393,7 @@ define(function (require, exports, module) {
 })
 ```
 
-> 在seajs引入jquery模块需要做简单点改造，因为jquery遵循amd规范，所以需要做简单的改造，改造方式如下：
+> 在seajs中引入jquery模块时需要进行简单的改造，因为jquery遵循amd规范，改造方式如下：
 > 
 > define(function(){
 > 
@@ -1401,11 +1403,11 @@ define(function (require, exports, module) {
 > 
 > });
 
-完整的代码请参考源码部分。
+完整的代码请参考源代码部分。（这个和上面的本书代码都在哪里提供？）
 
 ##### 4.4.3 Umd
 
-兼容AMD和commonJS规范的同时，还兼容全局引用的方式, 规范地址：[https://github.com/umdjs/umd](https://github.com/umdjs/umd)  ， 常用写法如下：
+兼容amd和CommonJS规范的同时，还兼容全局引用的方式, 规范地址参见链接<4-11>[https://github.com/umdjs/umd](https://github.com/umdjs/umd)，常用写法如下：
 
 `
 
@@ -1418,7 +1420,7 @@ define(function (require, exports, module) {
   //Node, CommonJS支持       
   module.exports = factory(require('jquery'));
  } else {        
-    //浏览器全局变量(root 即 window)        
+    //浏览器全局变量（root即window）     
     root.returnExports = factory(root.jQuery);
  }}(window, function ($) {       
     function myFunc(){};
@@ -1431,11 +1433,11 @@ define(function (require, exports, module) {
 
 ##### 4.4.4 ES6 module
 
-ES6在语言标准的层面上引入了module，应该也更加规范。Es6 module编译时加载需要的模块，使用export或者export.default暴露出方法、类、变量，使用import导入需要的模块。
+ES6在语言标准的层面上引入了module，因而更加规范。ES6 module首先在编译时加载需要的模块，使用export方法或者export.default方法暴露出方法、类、变量等，然后使用import方法导入需要的模块。
 
-下面我们看个例子：
+下面看一个例子。
 
-我们定义3个模块，moduleA, moduleB和moduleC, 其中moduleA作为主模块，在浏览器以module的方式导入。
+定义3个模块：moduleA, moduleB和moduleC。其中，moduleA为主模块，在浏览器中以module的方式导入。
 
 ```js
  import name, { msg, person } from "./moduleA.js";
@@ -1456,7 +1458,7 @@ export { obj as person };
 export default name = "module-A";
 ```
 
- 可以把这些数据输出到页面上看看是否能被正确导入，
+ 可以把这些数据输出到页面上，看看能否能被正确导入，如图4-13所示。（图号需要顺一下哈哈）
 
 ```js
 <script type="module">
@@ -1469,9 +1471,9 @@ export default name = "module-A";
 
 ![](images/ES6-1.png)
 
-可以在浏览器（Chrome,Safari,Opera, Firefox）正常执行。
+（谁）可以在浏览器Chrome、Safari、Opera或Firefox中正常执行。
 
-另外，import方法返回Promise对象，所以也可以写成这样的：
+另外，import方法会返回Promise对象，因而也可以写成如下所示样式（这句没改好）：
 
 ```js
 if (true) {
@@ -1489,13 +1491,13 @@ Promise.all([import("./moduleB.js"), import("./moduleC.js")]).then(
 );
 ```
 
-moduleC模块中的代码较简单，
+moduleC模块中的代码较为简单，具体如下：
 
 ```js
 export default name = "module-C";
 ```
 
-刷新浏览器，可以输出：
+刷新浏览器，可以输出如下代码：
 
 `
 
@@ -1504,17 +1506,17 @@ czn, module name:module-B
 
 `
 
-> 需要注意的是，ES6module输出的模块是引用，原始值发生变化，import加载的值也会跟着变。
+> 需要注意的是，ES6 module输出的模块是引用的，即当原始值发生变化时，import加载的值也会跟着改变。
 
-##### 4.4.5 Commonjs
+##### 4.4.5 CommonJS规范
 
-CommonJS(官网：[http://www.commonjs.org/](http://www.commonjs.org/)) 是以在浏览器环境之外构建 JavaScript 生态系统为目标而产生的项目，比如在服务器和桌面环境(nw.js, electron)中。前身叫做Serverjs，是由Mozilla的工程师Kevin Dangoor 在2009年1月创建的，在2009年正式更名为commonjs。
+CommonJS规范(官网参见链接<4-12>[http://www.commonjs.org/](http://www.commonjs.org/)) 是以在浏览器环境之外构建 JavaScript 生态系统为目标而产生的项目，比如在服务器和桌面环境(nw.js, electron)中。CommonJS的前身叫作Serverjs，是由Mozilla的工程师Kevin Dangoor于2009年1月创建的，同年正式更名为CommonJS。
 
-CommonJS 规范是为了解决 JavaScript 的作用域问题而产生，可以使每个模块在它自身的命名空间中执行。该规范的主要内容是，模块必须通过 module.exports 导出对外的变量或接口,通过 require() 来运行时加载其他模块的输出到当前模块中。
+CommonJS规范是为了解决JavaScript的作用域问题而产生的，它可以使每个模块在它自身的命名空间中执行。该规范的主要内容是，模块必须通过module.exports导出对外的变量或接口，通过require方法在运行时加载其他模块的输出到当前模块中。
 
-> 扩展阅读：Google group [https://groups.google.com/forum/#!forum/commonjs](https://groups.google.com/forum/#!forum/commonjs)
+> 扩展阅读：Google group参见链接<4-13> [https://groups.google.com/forum/#!forum/commonjs](https://groups.google.com/forum/#!forum/commonjs)
 
-下面看一个简单点例子：
+下面看一个简单点的例子：
 
 ```js
 module.exports = function(num) {
@@ -1526,34 +1528,34 @@ module.exports = function(num) {
 };
 ```
 
-该模块中暴露一个方法，计算一个数字的平方，在主文件引入这个模块
+该模块中暴露了一个方法，即计算一个数字的平方，在主文件引入这个模块：
 
 ```js
 var square = require("./moduleA");
 console.log(square(4));
 ```
 
-> 补充一个知识点，exports和module.exports的关系：
+> exports和module.exports的关系如下：
 > 
-> 1. module.exports 初始值为一个空对象 ；
-> 2. exports 是指向的 module.exports 的引用；
-> 3. require() 返回的是 module.exports；
+> 1. module.exports的初始值为一个空对象；
+> 2. exports是指向 module.exports的引用；
+> 3. require方法返回的是module.exports。
 
-> 另一个需要注意点，commonjs模块输出到是值得拷贝，模块内部的变化不会影响到已经导出的值。
+> 另外需要注意的是，CommonJS模块输出的是值的拷贝，模块内部的变化不会影响已经导出的值。
 
 #### 
 
 #### 4.5 函数式编程入门
 
-函数式编程是一种编程范式，也就是说提供一种如何编写程序的方法论，主要思想是把运算过程尽量写成一系列嵌套的函数调用。常见的编程范式有命令式编程、函数式编程、面向对象编程、指令式编程等不同点编程范型。
+函数式编程是一种编程范式，它提供一种如何编写程序的方法论，主要思想是把运算过程尽量写成一系列嵌套的函数并进行调用。常见的编程范式有命令式编程、函数式编程、面向对象编程、指令式编程等。
 
-在JavaScript中，函数作为一等公民，可以在任何地方被定义，无论是函数内还是函数外，还可以被赋值给一个变量，可以作为参数传递，也可以作为一个返回值返回。
+在JavaScript中，函数作为一等公民可以在任何地方被定义，无论是在函数内还是在函数外。除此之外，它既可以被赋值给一个变量，也可以作为参数传递，或者作为一个返回值返回。
 
-##### 4.5.1引子
+##### 4.5.1引子  看到这里了
 
-我们先通过两个简单的例子引入函数式编程，先看第一个：
+下面通过两个简单的例子引入函数式编程。
 
-想给数组中的每个元素进行平方计算
+1.对数组中的每个元素进行平方计算
 
 ```js
 let array = [1,2,3,4,5,6]
@@ -1563,7 +1565,7 @@ for(let i =0, iLen = array.length; i <iLen; i++){
 }
 ```
 
-这是一个典型的命令式编程等例子，要一步一步说明该怎么实现功能。这样的写法显得有点过时了，我们进行下简单的改造：
+这是一个典型的命令式编程的例子，要一步一步说明该怎么实现功能。这样的写法显得有点过时了，我们进行下简单的改造：
 
 ```js
 [1,2,3,4,5,6].map(num => Math.pow(num,2))
