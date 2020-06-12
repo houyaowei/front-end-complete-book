@@ -1,17 +1,37 @@
 /**
  * 主文件入口
  */
-function buildCard(data) {}
-document.getElementById("city").addEventListener("change", (e) => {
-    let url = `https://www.tianqiapi.com/free/week?appid=68134783&appsecret=PblyiX1y&cityid=${e.target.value}`;
-    console.log(url);
-    $.getJSON(url).then((res) => {
-        console.log(res);
-      });
-  });
+const placeMapping = {
+    "101110101" : "西安",
+    "101020100": "上海",
+    "101210101": "杭州",
+    "101180501" : "平顶山",
+    "101180505" : "叶县"
+}
+let currentPlace = null;
 
-// let content = "";
-// document.getElementById("content").innerHTML = content;
+function buildCard(data) {
+    let arr =[];
+    data.forEach(function (item,index) {
+        arr.push(`<ul class="b">
+        <li>${item.date}</li>
+        <li>${item.wea}</li>
+        <li>最高温度：${item.tem_day}</li>
+        <li>最低温度：${item.tem_night}</li>
+        <li>${item.win}：${item.win_speed}</li>
+        </ul>`)
+    })
+    return arr.join("")
+}
+document.getElementById("city").addEventListener("change", (e) => {
+    document.getElementById("target").innerHTML = placeMapping[document.getElementById("city").value];
+
+    let url = `https://www.tianqiapi.com/free/week?appid=68134783&appsecret=PblyiX1y&cityid=${e.target.value}`;
+    $.getJSON(url).then((res) => {
+        currentPlace = res;
+        document.getElementsByClassName("weather")[0].innerHTML = buildCard(res.data)
+      })
+  });
 
 // Registering Service Worker
 if ("serviceWorker" in navigator) {
@@ -22,23 +42,20 @@ let button = document.getElementById("notifications");
 button.addEventListener("click", function (e) {
   Notification.requestPermission().then(function (result) {
       if (result === "granted") {
-        randomNotification();
+        sendNotification();
       }
     });
 });
 
 //Notification
-function randomNotification() {
-  let randomItem = Math.floor(Math.random());
-  let notifTitle = games[randomItem].name;
-  let notifBody = "Created by .";
-  let notifImg = "data/img/.jpg";
+function sendNotification() {
+
+  let notifTitle = `天气已更新`;
+  let notifBody = `更新时间 ${currentPlace.update_time}`;
   let options = {
     body: notifBody,
-    icon: notifImg
   };
   let notif = new Notification(notifTitle, options);
-  setTimeout(randomNotification, 30000);
 }
 
 // Progressive loading images
