@@ -1,4 +1,3 @@
-// self.importScripts("data/games.js");
 
 // Files to cache
 var cacheName = "weather-pwa-v1";
@@ -36,6 +35,22 @@ self.addEventListener("fetch", function (e) {
             cache.put(e.request, response.clone());
             return response;
           });
+        })
+      );
+    })
+  );
+});
+
+self.addEventListener('activate', function(event) {
+  console.log("sw activate")
+  var cacheWhitelist = ['weather-pwa-v1'];
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
         })
       );
     })
