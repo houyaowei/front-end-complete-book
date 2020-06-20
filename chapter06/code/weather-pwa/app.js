@@ -16,8 +16,8 @@ function buildCard(data) {
         arr.push(`<ul class="b">
         <li>${item.date}</li>
         <li>${item.wea}</li>
-        <li>最高温度：${item.tem_day}</li>
-        <li>最低温度：${item.tem_night}</li>
+        <li>最高温度：${item.tem_day}℃</li>
+        <li>最低温度：${item.tem_night}℃</li>
         <li>${item.win}：${item.win_speed}</li>
         </ul>`)
     })
@@ -27,15 +27,19 @@ document.getElementById("city").addEventListener("change", (e) => {
     document.getElementById("target").innerHTML = placeMapping[document.getElementById("city").value];
 
     let url = `https://www.tianqiapi.com/free/week?appid=68134783&appsecret=PblyiX1y&cityid=${e.target.value}`;
-    $.getJSON(url).then((res) => {
+    fetch(url).then((res) => {
+        return res.json()
+      }).then(res => {
         currentPlace = res;
         document.getElementsByClassName("weather")[0].innerHTML = buildCard(res.data)
-      })
-  });
+    })
+});
 
 // Registering Service Worker
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js");
+  navigator.serviceWorker.register("./sw.js").then(res => {
+      console.log('Registration succeeded. Scope is ' + res.scope);
+  });
 }
 
 let button = document.getElementById("notifications");
@@ -51,7 +55,7 @@ button.addEventListener("click", function (e) {
 function sendNotification() {
 
   let notifTitle = `天气已更新`;
-  let notifBody = `更新时间 ${currentPlace.update_time}`;
+  let notifBody = `地点：${currentPlace.city}， 更新时间 ${currentPlace.update_time}`;
   let options = {
     body: notifBody,
   };

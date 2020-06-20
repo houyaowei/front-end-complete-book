@@ -136,7 +136,191 @@ PWA主要由web app manifest, service worker和notification组成。Web app mani
 
   
 
-  有了上面的理论，接下来，我们将以一个天气预报的例子来系统梳理下一个简单PWA应用的开发过程。
+  有了上面的理论，接下来，我们将以一个天气预报的例子来系统梳理下一个简单PWA应用的开发过程。在开始之前，我们还需要准备三样东西：
 
+  1、UI 外壳 
 
+  用户界面所需要的最小化的HTML，CSS和JavaScript文件，详细的请参考源码部分。ajax请求为了简单起见，借用下fetch库。
 
+  
+
+  2、城市代码
+
+  中国气象局提供了一组API方便查询各城市、自治区、直辖市的代码。具体方法是这样的，首先使用`http://www.weather.com.cn/data/city3jdata/china.html`查询省会的代码，根据某一省会代码，比如说陕西的代码是10111，调用接口
+
+  `http://www.weather.com.cn/data/city3jdata/provshi/10111.html` 获取城市列表，以西安01为例，那么西安市的城市代码即为1011101(省会代码+城市代码)。如果想进一步获得西安下属各区的代码，可以调用接口`http://www.weather.com.cn/data/city3jdata/station/1011101.html`，最终的城市代码是由西安市代码和某区代码联合组成。
+
+  
+
+  3、天气接口
+
+  由易客云提供免费的天气API接口，但是前提是你需要注册一个账号。登录控制台获取APPID和APPSecret，这两项配置需要在查询天气的URL中指定。
+
+现在我们先看下要实现一个什么样的功能，该页面的功能比较简单，选择框选择相应的城市，通过易客云提供的API查询所选城市近7天的天气情况，点击"发送通知"按钮发送通知，界面如下图所示：
+
+> 注意：本实例代码没有
+
+![sw-04](./images/sw-04.png)
+
+我们先通过上面中国气象局提供的API，查出几个城市的城市代码，西安 (101110101),上海(101020100), 杭州(101210101)等, 构造下拉框：
+
+```html
+<section >
+  <label>请选择城市：</label>
+  <select id="city">
+    <option value="101110101">西安</option>
+    <option value="101020100">上海</option>
+    <option value="101210101">杭州</option>
+  </select>
+  <button id="notifications">发送通知</button>
+ </section>
+```
+
+我们还是先看下工程的目录结构
+
+![sw-05](./images/sw-05.png)
+
+在项目开始，我们先配置下manifest文件、js入口文件和html。先定义weather.manifest文件，这个文件名并没有什么约束，也就是说不一定非要以manifest结尾。文件建好后并输入以下内容：
+
+```json
+{
+    "name": "weather PWA",
+    "short_name": "weather",
+    "description": "show some places weather",
+    "icons": [
+        {
+            "src": "./favicon.ico",
+            "sizes": "16x16",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "./index.html",
+    "display": "fullscreen",
+    "theme_color": "#B12A34",
+    "background_color": "#B12A34"
+}
+```
+
+在index.html 的header中加入以下，使manifest文件生效。
+
+```js
+<link rel="manifest" href="./weather.manifest" />
+```
+
+该例子业务部分的入口文件是app.js，主要实现业务逻辑、注册sw、发送通知等。
+
+首先，项目启动自动注册sw：
+
+```js
+// Registering Service Worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js").then(res => {
+      console.log('Registration succeeded. Scope is ' + res.scope);
+  });
+}
+```
+
+有一个特别要注意是 sw文件的路径问题。在这个例子中，sw文件被放在这个域的根目录下，这意味着 service worker是跟网站同源的。换句话说，这个 service worker 将会拦截到该域下的所有 的fetch 事件。比如 service worker文件被注册到/example/sw.js ，那么 service worker 只能收到 /example/ 路径下的 fetch 事件，这时就需要在注册sw文件时指定scope属性。
+
+```js
+navigator.serviceWorker.register('/example/sw.js', { scope: '/example/' })
+```
+
+在sw中，首先需要指定文件缓存版本号和需要缓存的文件：
+
+```js
+var cacheName = "weather-pwa-v1";
+var appShellFiles = [
+  "./index.html",
+  "./app.js",
+  "./style.css",
+  "./jquery.js",
+  "./favicon.ico",
+  "./img/bg.png"
+];
+```
+
+sw文件被注册后，会执行绑定的install事件，install事件一般是被用来填充你的浏览器的离线缓存能力。为了实现缓存能力，我们使用sw的新的标志性的全局Cache API。 主要有三个API：
+
+open:  打开一个Cache 对象
+
+match: 返回一个promise对象，resolve的结果是跟cache对象中匹配的第一个已经缓存的请求
+
+addAll: 把指定的文件添加到指定cache对象
+
+put：同时抓取一个请求及其响应，并将其添加到给定的cache
+
+> Cache API: https://developer.mozilla.org/zh-CN/docs/Web/API/Cache
+
+```js
+// Installing Service Worker
+self.addEventListener("install", function (e) {
+  e.waitUntil(
+    caches.open(cacheName).then(function (cache) {
+      console.log("[Service Worker] Caching all: app shell and content");
+      return cache.addAll(appShellFiles);
+    })
+  );
+});
+```
+
+事件上接了一个ExtendableEvent.waitUntil()方法, 这样做的目的是确保sw不会在waitUntil()里面的代码执行完毕之前完成安装。
+
+```js
+self.addEventListener("fetch", function (e) {
+  e.respondWith(
+    caches.match(e.request).then(function (r) {
+      console.log("[Service Worker] Fetching resource: " + e.request.url);
+      return (
+        r ||
+        fetch(e.request).then(function (response) {
+          return caches.open(cacheName).then(function (cache) {
+            console.log(
+              "[Service Worker] Caching new resource: " + e.request.url
+            );
+            cache.put(e.request, response.clone());
+            return response;
+          });
+        })
+      );
+    })
+  );
+});
+```
+
+在fetch的事件监听器中，先匹配每个请求，如果在cache对象中能匹配到已经缓存的请求，就返回已缓存的内容，否则就重新发起请求，并将缓存的结果继续放入cache。
+
+到这里，PWA核心部分已经配置完成，现在开始select框选择地区查询天气信息，
+
+```js
+document.getElementById("city").addEventListener("change", (e) => {
+  //天气API
+  let url = `https://www.tianqiapi.com/free/weekappid=68134783&appsecret=PblyiX1y&cityid=${e.target.value}`;
+fetch(url).then((res) => {
+   return res.json()
+}).then(res => {
+    currentPlace = res;
+      document.getElementsByClassName("weather")[0].innerHTML = buildCard(res.data)
+   })
+});
+```
+
+是时候来看看效果了，初始化加载页面资源情况如下图。
+
+![sw-06](./images/sw-06.png)
+
+从资源加载情况来看，文件是从站点加载并进行缓存。现在我们刷新下页面
+
+![sw-07](./images/sw-07.png)
+
+从size的情况来看，这些文件都是来自Service Worker缓存。
+
+在select框中选择"杭州"，来看下数据请求的情况
+
+![sw-08](./images/sw-08.png)
+
+数据来自网络，并且数据正常返回，正常展示。接着，继续刷新页面
+
+![sw-09](./images/sw-09.png)
+
+数据来自sw,并且正确返回。
