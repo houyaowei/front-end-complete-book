@@ -442,7 +442,20 @@ iframe实现可以让子应用独立开发、部署，然后方便地接入到�
   };
   ```
 
-  定义后提供
+  定义三方包后，还需要定义一个方法，它需要有这么一种能力，工程启动动态创建script标签，并把上面的配置写入，比如方法名就叫做insertNewImportMap 吧,参数即为上面定义的配置对象。
+
+  ```js
+  function insertNewImportMap(mapJson) {
+    const scriptObj = document.createElement("script");
+    scriptObj.type = "systemjs-importmap";
+    scriptObj.innerHTML = JSON.stringify(mapJson);
+  
+    const allImportMaps = document.querySelectorAll('script[type="systemjs-importmap"]');
+    allImportMaps[allImportMaps.length - 1].insertAdjacentElement("afterEnd", scriptObj);
+  }
+  ```
+
+  
 
   
 
