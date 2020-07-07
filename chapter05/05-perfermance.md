@@ -1,32 +1,32 @@
-#### 第五章 性能优化指南
+#### 第5章 性能优化指南
 
-性能优化是前端开发里非常重要的一部分。为了实现资源的快速加载，各个前端开发团队都是使用浑身解数争取更好的用户体验。本章我们着重从浏览器运行机制出发，介绍浏览器缓存相关机制，让大家明白各个优化点的背后的原理，形成系统的知识点。
+性能优化是前端开发中非常重要的部分。为了实现资源的快速加载，各个前端开发团队都使用浑身解数争取更好的用户体验。本章我们着重从浏览器运行机制出发，介绍浏览器缓存相关机制，让读者明白各个优化点背后的原理，形成系统的知识点。
 
-到目前为止由于大部分的主流浏览器都向webkit靠拢，Edge已由Chromium开发并已发布81.0.416.53版本，之前的IE6到IE11版本都是Trident内核。Firefox浏览器使用的是Gecko内核。Safari也是有最初的webkit内核升级到了webkit2。Opera也追随到到了webkit阵营，抛弃了Presto，于2013年4月采用Google发布的Blink内核(Blink是Google在webkit基础上为了分离组件而建立的新的分支)。所以还是以webkit作为主线进行介绍。
+到目前为止由于大部分的主流浏览器都向webkit靠拢，Edge已由Chromium开发并已发布81.0.416.53版本，IE6到IE11版本都是Trident内核。Firefox浏览器使用的是Gecko内核。Safari也是由最初的webkit内核升级到了webkit2。Opera也追随到到了webkit阵营，抛弃了Presto，于2013年4月采用Google发布的Blink内核(Blink是Google在webkit基础上为了分离组件而建立的新的分支)。所以还是以webkit作为主线进行介绍。
 
 本章包含如下内容：
 
-1、浏览器的运行机制
+1.浏览器的运行机制
 
-2、浏览器的缓存机制
+2.浏览器的缓存机制
 
-3、性能分析涉及各模块解释
+3.性能分析涉及各模块解释
 
-4、从具体细节出发介绍优化策略
+4.从具体细节出发介绍优化策略
 
 ##### 5.1 浏览器运行机制
 
-浏览器背后的运行机制非常复杂，是由多个进程协作完成。  为了更好的说明浏览器的运行机制，我们从一道经典的面试题开始：
+浏览器背后的运行机制非常复杂，是由多个进程协作完成的。 为了更好的说明浏览器的运行机制，我们从一道经典的面试题开始：
 
 从地址栏输入URL到页面加载完成，中间都经历了什么？
 
-正式介绍前，我们需要先看下Chrome的多进程架构，有助于更形象地说明这个过程。
+在正式介绍前，我们需要先来看一下Chrome的多进程架构，有助于更形象地说明这个过程。
 
-> 关于进程和线程的wikipedia解释：用户下达运行程序的命令后，就会产生进程。同一程序可产生多个进程（一对多关系），以允许同时有多位用户运行同一程序，却不会相冲突。
+> 关于进程和线程的维基百科解释：用户下达运行程序的命令后，就会产生进程。同一程序可以产生多个进程（一对多关系），即允许同时有多位用户运行同一程序，却不会冲突。
 > 
-> 进程需要一些资源才能完成工作，如[CPU](https://zh.wikipedia.org/wiki/CPU "CPU")使用时间、[存储器](https://zh.wikipedia.org/wiki/%E8%A8%98%E6%86%B6%E9%AB%94 "存储器")、文件以及[I/O](https://zh.wikipedia.org/wiki/I/O "I/O")设备，且为依序逐一进行，也就是每个CPU核心任何时间内仅能运行一项进程。
+> 进程需要一些资源才能完成工作，如[CPU](https://zh.wikipedia.org/wiki/CPU "CPU")使用时间、[存储器](https://zh.wikipedia.org/wiki/%E8%A8%98%E6%86%B6%E9%AB%94 "存储器")、文件以及[I/O](https://zh.wikipedia.org/wiki/I/O "I/O")设备，且为依序逐一进行，也就是说，每个CPU核心在任意时间内仅能运行一项进程。
 > 
-> 进程与线程的区别：进程是计算机管理运行程序的一种方式，一个进程下可包含一个或者多个线程。线程可以理解为子进程。一个进程可以有很多线程，每条线程并行执行不同的任务，并且同一进程中的多条线程将共享该进程中的全部系统资源。
+> 进程与线程的区别：进程是计算机管理运行程序的一种方式，一个进程下可能包含一个或者多个线程。线程可以理解为子进程。一个进程可以有多条线程，每条线程并行执行不同的任务，并且同一进程中的多条线程将共享该进程中的全部系统资源。
 
 Chrome是多进程的，两个进程之间可以通过IPC(Inter Process Communication)的方式进行通信，顶层由一个Browser process用来协调浏览器的其他进程。
 
@@ -34,47 +34,47 @@ Chrome是多进程的，两个进程之间可以通过IPC(Inter Process Communic
 
 具体来说，Chrome的主要进程及其职责如下：
 
-Browser Process：负责包括地址栏，书签栏，前进后退按钮等的工作；负责处理浏览器的一些不可见的底层操作，比如网络请求和文件访问。
+- Browser Process：负责包括地址栏、书签栏（菜单栏？），以及前进或后退按钮等工作；负责处理浏览器的一些不可见的底层操作，比如网络请求和文件访问等。
 
-Renderer Process：主要负责一个 tab 内关于网页渲染的所有事情。
+- Renderer Process：主要负责一个Tab内（这是啥意思？）关于网页渲染的所有事情。
 
-Plugin Process：管理一个网页用到的所有插件，比如说逐渐被淘汰的flash。
+- Plugin Process：管理一个网页用到的所有插件，比如逐渐被淘汰的Flash插件等。
 
-GPU Process：处理 GPU 相关的任务。
+- GPU Process：处理GPU相关的任务。
 
-从上面各个进程的职责上来看，Browser Process主要协调Tab之外的工作，它并且又对这些工作进行了细粒度的划分，其主要是使用不同的线程进行处理：
+从上面各个进程的职责来看，Browser Process主要协调Tab之外的工作，并且它对这些工作进行了细粒度的划分，主要是使用不同的线程进行处理：
 
-- UI 线程 ： 控制浏览器上的按钮及输入项等。
+- UI线程： 控制浏览器上的按钮及输入项等。
 
-- network 线程: 处理网络请求，从网上获取数据。
+- network线程: 处理网络请求，从网上获取数据。
 
-- storage 线程: 控制文件等的访问；
+- storage线程: 控制文件等的访问。
   
-  现在，我们回到上面那个面试题。当在地址栏中输入网址敲回车键后到看到整个页面大概分成这几步。
+  现在，我们回到上面那个面试题：在地址栏中输入网址并单击“Enter”键后到看到整个页面大概分成如下几步。
 
 **处理用户输入**
 
-先由UI线程判断用户输入的是一个网址还是一个要查询的关键字。因为Chrome中地址栏同时也是一个输入框。UI线程去解析内容并判断是需要把输入的内容交给查询引擎呢还是要导航到你需要的网站。
+先由UI线程判断用户输入的是一个网址还是一个要查询的关键字。因为Chrome中的地址栏同时也是一个输入框。UI线程去解析内容并判断是需要把输入的内容交给查询引擎，还是要导航到需要的网站。
 
 **开始导航**
 
-敲击回车键，UI 线程 通知 network 线程 获取网页内容，并控制 tab 上的 spinner 展现，表示正在努力加载中。
+单击“Enter”键，UI线程通知network线程获取网页内容，并控制Tab上的spinner展现，表示正在努力加载中。
 
-network 线程 会执行 DNS 查询，随后为请求建立 TLS 连接。
+network线程会执行DNS查询，随后为请求建立TLS连接。
 
-> DNS(运行在UDP协议上)是互联网上域名和IP地址相互映射的分布式数据库，有了DNS，用户不用在记住每个域名的IP地址就可以上网。比如当在地址栏输入http://developer.mozilla.org ，DNS服务器就可以解析该主机名得到IP地址，该过程就叫做域名解析。
+> DNS(运行在UDP上)是互联网上域名和IP地址相互映射的分布式数据库，有了DNS，用户无须记住每个域名的IP地址就可以上网。比如，当在地址栏中输入http://developer.mozilla.org时，DNS服务器就可以解析该主机名得到IP地址，该过程就叫作域名解析。
 > 
-> 主机到IP地址的映射一般是两种方式：静态映射和动态映射。区别在于：静态映射方式是每台设备上分别配置映射关系，各自维护各自的，只能独享；动态映射是建立一套DNS系统，只需要在该系统上配置映射关系，各域名解析都用这套系统，达到共享的目的。
+> 主机到IP地址的映射一般有两种方式：静态映射和动态映射。区别在于：静态映射是在每台设备上分别配置映射关系，各自维护，只能独享；动态映射是建立一套DNS系统，并在该系统上配置映射关系，各域名解析都用这套系统，达到共享的目的。
 
-如果network线程接收到了301状态码重定向请求头 ，那么network线程会通知UI线程 "服务器要求重定向"，随后就加载新的URL。
+如果network线程接收了301状态码重定向请求头，那么network线程会通知UI线程 "服务器要求重定向"，随后加载新的URL。
 
 **读取响应体**
 
-一旦服务器返回内容，network 线程会读取响应主体中的MIME类型信息，"Content-Type"字段说明返回内容的格式，"Content-Length"描述响应主体的内容长度。
+一旦服务器返回内容，network线程会读取响应主体中的MIME类型信息，"Content-Type"字段说明返回内容的格式，"Content-Length"描述响应主体的内容长度。
 
-网页的MIME的类型信息为"test/html"。下一步把这些数据传递给 renderer process，如果是 压缩文件或者其它文件，会把相关数据传输给下载管理器。
+网页的MIME类型信息为"test/html"。接下来把这些数据传递给renderer process，如果是压缩文件或者其他文件，会把相关数据传输给下载管理器。
 
-[Safe Browsing](https://link.zhihu.com/?target=https%3A//safebrowsing.google.com/) 检查也会在此时触发，如果域名或者请求内容匹配到已知的恶意站点，network线程会展示一个警告页。此外 [CORB](https://link.zhihu.com/?target=https%3A//www.chromium.org/Home/chromium-security/corb-for-developers) (Cross Origin Read Blocking)检测也会触发,确保敏感数据不会被传递给渲染进程。
+[Safe Browsing](https://link.zhihu.com/?target=https%3A//safebrowsing.google.com/) 检查也会在此时触发，如果域名或者请求内容匹配到已知的恶意站点，则network线程会显示一个警告页。此外， [CORB](https://link.zhihu.com/?target=https%3A//www.chromium.org/Home/chromium-security/corb-for-developers) (Cross Origin Read Blocking)检测也会触发,确保敏感数据不会被传递给渲染进程。
 
 > Safe Browsing: https://safebrowsing.google.com/
 > 
@@ -82,7 +82,7 @@ network 线程 会执行 DNS 查询，随后为请求建立 TLS 连接。
 
 **查找渲染进程（renderer process）**
 
- 当上述所有检查完成，并且通过安全检查，network 线程确信浏览器可以导航到请求的页面，network线程就会通知 UI 线程数据已经就绪，这时UI 线程会查找到一个renderer process 进行网页渲染。其实，为了能快速响应，UI线程会预查找和启动一个渲染线程，如果可以访问，该渲染进程继续。如果有重定向，准备好的线程就会废弃而重启一个线程。
+ 当上述所有检查完成，并且通过安全检查后，network线程确信浏览器可以导航到请求的页面，就会通知UI线程数据已经就绪，这时UI线程会查找一个Renderer Process进行网页渲染。其实，为了能快速响应，UI线程会预查找和启动一个渲染线程，如果可以访问，则该渲染进程继续。如果有重定向，则准备好的线程就会废弃并重启一个线程。
 
 **确认导航**
 
@@ -96,39 +96,39 @@ network 线程 会执行 DNS 查询，随后为请求建立 TLS 连接。
 
 一旦导航被确认，renderer process 会加载资源并渲染页面，渲染流程是怎么工作的，这里先不展开了，后面我们将重点介绍渲染流程。当 renderer process 渲染完所有的页面，并且触发了所有帧的onload事件，会到 Browser process发送 IPC 信号， UI 线程停止展示 tab 中的 spinner。
 
-当输入另一个URL加载新页面的时候，上面的加载流程当然会重新执行，当出现新的导航请求时，Browser Process 需要通知 renderer Process 进行相关的检查，对相关事件进行处理，毕竟所以代码的执行都是有renderer process来完成的。
+当输入另一个URL加载新页面时，上面的加载流程会重新执行； 当出现新的导航请求时，Browser Process会通知Renderer Process进行相关检查，并对相关事件进行处理，毕竟所有代码的执行都是由Renderer Process来完成的。
 
-如果通过js代码(window.location="http://xxx.com")导航到新站点的时候,renderer process会首先检查beforeunload事件，导航请求由 renderer process 传递给 Browser process。
+当通过js代码(window.location="http://xxx.com")导航到新站点时，Renderer Process会首先检查beforeunload事件，导航请求由Renderer Process传递给Browser Process。
 
 > Google官网关于页面生命周期的帖子：https://developers.google.com/web/updates/2018/07/page-lifecycle-api
 
 **关于service worker**
 
-有些页面注册有 Service Worker，可以通过该方案实现网络代理，让开发者对本地缓存及判断何时从网络上获取信息有了更多的控制权，如果 Service Worker 设置为从本地 cache 中拿数据，那就没必要从网上从新请求了。
+如果页面注册了Service Worker，则可以通过该方案实现网络代理，让开发者对本地缓存及判断何时从网络上获取信息有更多的控制权(这句主成分拎出来是不是不通，比如开发者对本地缓存有更多的控制权)。如果Service Worker设置为从本地cache中获取数据，那么就没必要从网上重新请求了。
 
-值得注意的是 service worker 也是运行在renderer process中的代码，但是上述流程有少许的不同。
+值得注意的是，Service Worker也是运行在Renderer Process中的代码，但是上述流程有少许的不同。
 
-当有 Service Worker 被注册时，其作用域会被保存，当有导航时，network线程会在注册过的 Service Worker 的作用域中查找相关域名，如果存在对应的存在，UI线程会查找一个renderer process来处理相关代码，Service Worker 可能会从 cache 中加载数据，终止对网络的请求，也可能从网上请求新的数据。 
+当Service Worker被注册时，其作用域会被保存，当有导航时，network线程会在注册过的Service Worker的作用域中查找相关域名，如果存在对应的存在，则UI线程会查找一个Renderer Process来处理相关代码，Service Worker既可能只从cache中加载数据，终止对网络的请求，也可能从网络上请求新的数据。 
 
-看了上面浏览器渲染的基本过程，其工作的复杂性可见一斑。在上面的几个流程中，和web开发紧密相关的就是渲染进程了。下面我们会重点看下渲染进程(renderer process)是怎么工作的。
+上述是浏览器渲染的基本过程，其工作的复杂性可见一斑。在上述流程中，与Web开发紧密相关的是渲染进程。下面重点介绍渲染进程(renderer process)是如何工作的。
 
-前面提到过，渲染进程负责 Tab页内的所有事情，其职责是转换 HTML，CSS 和javascript代码， 为用户可交互的 web 页面。渲染进程中主要包含以下线程：
+前面提到过，渲染进程负责Tab页内的所有事情，其职责是把HTML、CSS 和JavaScript代码转换为可与用户交互的Web页面。渲染进程中主要包含以下线程：
 
-主线程Main thread：处理用户输入的大部分代码。
+- 主线程（Main Thread）：处理用户输入的大部分代码。
 
-工作线程 Worker thread：如果使用web worker或者service worker, 该线程负责处理一部分的js代码。
+- 工作线程（Worker Thread）：如果使用Web Worker或者Service Worker, 则该线程负责处理一部分的js代码。
 
-排版线程 Compositor thread
+- 排版线程（Compositor Thread）：补内容？
 
-4、光栅线程 Raster thread
+- 光栅线程（Raster Thread）:补内容？
 
-后面我们会逐步详细介绍这几个线程，还是先重点介绍渲染进程。
+后面会详细介绍这几个线程，下面重点介绍渲染进程。
 
-1、构建DOM树
+1.构建DOM树
 
-导航到确认信息收到后，渲染进程开始接受字符串HTML文档数据，主线程也开始把字符串解析成DOM(Document Object Modal)，解析方法也是由HTML官方规范提供了一览表(https://html.spec.whatwg.org/)。
+导航到确认信息收到后，渲染进程开始接收字符串HTML文档数据，主线程也开始把字符串解析成DOM(Document Object Modal)，解析方法也是由HTML官方规范提供了一览表(https://html.spec.whatwg.org/)。
 
-2、加载子资源
+2.加载子资源
 
 网页中常常包含诸如image，CSS和JavaScript，这些资源通常从网上下载或者cache中获取。主进程可以在构建 DOM 的过程中逐个加载各个资源，但为了加速访问， preload scanner 也会同时运行。如果 html 中存在<img>``<link>` 等标签，preload scanner 会把这些请求传递给 Browser process 中的 network thread 进行相关资源的下载。
 
