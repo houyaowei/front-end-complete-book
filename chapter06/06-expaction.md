@@ -473,7 +473,7 @@ iframe实现可以让子应用独立开发、部署，然后方便地接入到�
   
   ![mf-05](./images/mf-05.png)
   
-  实现一个js跳转方法
+  实现一个js跳转的方法，该参数值有个比较重要的作用，就是在注册子应用时，需要一个检测是否激活某个子应用的方法，检测方法如果返回true，single-spa会激活该应用并挂载到相应的节点，如果为false则会unmount这个应用。我们稍后注册子应用时实现这个方法。
   
   ```js
   function pushToState(target) {
@@ -481,9 +481,85 @@ iframe实现可以让子应用独立开发、部署，然后方便地接入到�
   }
   ```
   
+  在前面我们介绍过，前端的模块开发需要遵循几个规范，最常见的有AMD,CMD,UMD,commonjs，也更加通用。我们现在想一个问题，有了遵循这些规范开发的模块，我们应该已某种方式加载这种规范的实现。在本书的4-4章节中，我们详细地介绍过这四种规范的具体实现，如果有需要可以移步到那里。
+  
+  在微前端的开发中，官方提供了一个叫做Systemjs的通用模块加载器，可以运行在服务端和浏览器端。有了这个工具可以注册子应用了，single-spa官网提供了一个叫做registerApplication的API来进行子应用注册。
+  
+  我们先注册4个应用，并提供活动监测函数，函数实现如下：
+  
+  ```js
+  export function prefix(location, ...prefixes) {
+    return prefixes.some(prefix => location.href.indexOf(`${location.origin}/${prefix}`) !== -1);;
+  }
+  export function app1React(location) {
+    return prefix(location, "reactApp");
+  }
+  export function app2Vue(location) {
+    return prefix(location, "vueApp");
+  }
+  export function n1App(location) {
+    return prefix(location, "a1App");
+  }
+  export function n7App(location) {
+    return prefix(location, "a7App");
+  }
+  ```
   
   
-  在页面入口
+  
+  注册应用代码
+  
+  ```js
+  import * as isActive from "./activityFns";
+  singleSpa.registerApplication("reactApp", () => SystemJS.import ("@portal/reactApp"), isActive.app1React);
+  singleSpa.registerApplication("vueApp", () => SystemJS.import ("@portal/vueApp"), isActive.app2Vue);
+  singleSpa.registerApplication("a1App", () => SystemJS.import ("@portal/a1App"), isActive.n1App);
+  singleSpa.registerApplication("a7App", () => SystemJS.import ("@portal/a7App"), isActive.n7App);
+  ```
+  
+  调用该API注册后，single-spa会在数组中暂存这些应用,如下图源码所示，并把应用状态设置成NOT_LOADED。
+  
+  ```js
+  apps.push({
+      loadErrorTime: null,
+      name: appName,
+      loadImpl,
+      activeWhen: activityFn,
+      status: NOT_LOADED,
+      parcels: {},
+      devtools: {
+        overlays: {
+          options: {},
+          selectors: [],
+        }
+      },
+      customProps
+    });
+  ```
+  
+  接下来需要调用start方法来启动应用并根据当前URL判断要加载哪些应用，activeWhen保存的即为咱们定义的应用活动监测函数。
+  
+  ```js
+  //app.helper.js
+  export function shouldBeActive(app) {
+    try {
+      return app.activeWhen(window.location);
+    } catch (err) {
+      handleAppError(err, app);
+      app.status = SKIP_BECAUSE_BROKEN;
+    }
+  }
+  ```
+  
+  试想，当我们切换应用时，single-spa是以什么样的方式呢，在这里做下简单的介绍。single-spa在路由层做了一层拦截。
+  
+  ```js
+  //navigation-events.js
+  window.addEventListener('hashchange', urlReroute);
+  window.addEventListener('popstate', urlReroute);
+  ```
+  
+  hashchange事件监听的是
   
   
   
