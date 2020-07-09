@@ -551,7 +551,11 @@ iframe实现可以让子应用独立开发、部署，然后方便地接入到�
   }
   ```
   
-  试想，当我们切换应用时，single-spa是以什么样的方式呢，在这里做下简单的介绍。single-spa在路由层做了一层拦截。
+  试想，当我们切换应用时，single-spa是以什么样的方式呢，在这里做下简单的介绍。single-spa在路由层做了一层拦截，使用注册全局监听的方式。
+  
+  > 当然也可以通过window.onhashchange= function(){}的方式订阅。
+  
+  
   
   ```js
   //navigation-events.js
@@ -559,9 +563,27 @@ iframe实现可以让子应用独立开发、部署，然后方便地接入到�
   window.addEventListener('popstate', urlReroute);
   ```
   
-  hashchange事件监听的是
+  hashchange事件监听的是URL中锚点的变化，该变化也会导致历史记录栈的变化，常见的改变网页锚点的变化有以下几种方式：
+  
+  1、直接改变浏览器的地址，在后面拼接或者改变 #hash值。
+  
+  2、通过API修改 location.href或location.hash的值
+  
+  3、点击带有锚点的链接
+  
+  4、点击浏览器的前进、后退按钮
   
   
   
+  对于pushState,有了前面的介绍再介绍这个会稍微容易一些。和该API相关的主要有replaceState API和onpopstate事件。pushState是在浏览器的历史记录栈中压入一条新的记录，然后把当前指针就移到这条新的条目上并且激活它，然后改变浏览器的地址。replaceState的用法和pushState一致，只不过它不会历史记录栈中增加新的条目。onpopstate事件的触发比较有特定：
   
+  1、有history.pushState或者history.replaceState不触发该事件。
+  
+  2、在history.go,history.back,history.forward调用的时候触发
+  
+  3、hashchange的时候触发
+  
+  > 注意:在firefox和Chrome中首次打开页面都不会触发popstate事件，但是Safari会。
+  
+  popstate事件点作用范围仅在于一个document里，由于pushState和hashChage都不会改变网页的内容
 
