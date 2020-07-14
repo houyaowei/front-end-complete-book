@@ -543,6 +543,7 @@ iframe实现可以让子应用独立开发、部署，然后方便地接入到�
   //app.helper.js
   export function shouldBeActive(app) {
     try {
+      //app表示每个已经注册的应用
       return app.activeWhen(window.location);
     } catch (err) {
       handleAppError(err, app);
@@ -563,6 +564,8 @@ iframe实现可以让子应用独立开发、部署，然后方便地接入到�
   window.addEventListener('popstate', urlReroute);
   ```
   
+  
+  
   hashchange事件监听的是URL中锚点的变化，该变化也会导致历史记录栈的变化，常见的改变网页锚点的变化有以下几种方式：
   
   1、直接改变浏览器的地址，在后面拼接或者改变 #hash值。
@@ -579,11 +582,24 @@ iframe实现可以让子应用独立开发、部署，然后方便地接入到�
   
   1、有history.pushState或者history.replaceState不触发该事件。
   
-  2、在history.go,history.back,history.forward调用的时候触发
+  2、在history.go,history.back,history.forward调用的时候触发。
   
-  3、hashchange的时候触发
+  3、hashchange的时候触发。
   
   > 注意:在firefox和Chrome中首次打开页面都不会触发popstate事件，但是Safari会。
   
-  popstate事件点作用范围仅在于一个document里，由于pushState和hashChage都不会改变网页的内容
+
+```js
+function urlReroute() {
+  reroute([], arguments)
+}
+```
+
+reroute方法是single-spa的核心，在这个方法中主要提供两个作用，
+
+
+
+
+
+![](./images/mf-06.png)
 
