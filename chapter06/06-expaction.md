@@ -595,11 +595,81 @@ function urlReroute() {
 }
 ```
 
-reroute方法是single-spa的核心，在这个方法中主要提供两个作用，
-
-
-
-
+reroute方法是single-spa的核心，这个方法中主要提供两个作用，第一是如果应用已经启动,就优化需要处理unload、unmount的应用；第二如果应用未启动就加载应用
 
 ![](./images/mf-06.png)
+
+// src/navigation/reroute.js
+
+```js
+if (isStarted()) {
+    appChangeUnderway = true;
+    appsThatChanged = appsToUnload.concat(
+      appsToLoad,
+      appsToUnmount,
+      appsToMount
+    );
+    return performAppChanges();
+  } else {
+    appsThatChanged = appsToLoad;
+    return loadApps();
+  }
+```
+
+在上面注册过子应用之后，可以使用singleSpa.start()启动应用
+
+```js
+export function start(opts) {
+  ...
+  if (isInBrowser) {
+    reroute();
+  }
+}
+```
+
+
+
+##### 子应用加载探究
+
+前面我们介绍过single-spa通过Systemjs加载器加载子应用代码。在内部，Single-spa提供约定声明周期的方法来对子应用进行管理。为了方便理解，我们先以React项目为例，看如何把一个普通的SPA应用改造成一个single-spa的子应用。
+
+为了能加载React子应用，需要先引入react的适配包，single-spa-react,适配包主要的作用就是适配通用的声明周期钩子函数，保证应用可以正确地运行。
+
+先看webpack配置，在entry配置中声明周期函数所在地文件作为入口
+
+![mf-07](./images/mf-07.png)
+
+entry.js
+
+```js
+import React from "react";
+import ReactDOM from "react-dom";
+import singleSpaReact from "single-spa-react";
+import Root from "./root.component.js";
+
+const reactLifecycles = singleSpaReact({ React, ReactDOM, rootComponent: Root, domElementGetter });
+
+export const bootstrap = [reactLifecycles.bootstrap];
+
+export const mount = [reactLifecycles.mount];
+
+export const unmount = [reactLifecycles.unmount];
+
+function domElementGetter() {
+  // Make sure there is a div for us to render into
+  let el = document.getElementById("app1");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "app1";
+    document.body.appendChild(el);
+  }
+  return el;
+}
+```
+
+在singleSpaReact的构造函数中，需要传入React的核心库、React-dom、rootComponent、和挂载节点的Getter函数。
+
+在domElementGetter方法中，指定React应用挂载到子节点。实例化后会立即把页面挂载到该DOM节点上。
+
+![mf-08](./images/mf-08.png)
 
