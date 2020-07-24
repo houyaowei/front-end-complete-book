@@ -673,3 +673,66 @@ function domElementGetter() {
 
 ![mf-08](./images/mf-08.png)
 
+Systemjs是支持多种模块规范的代码加载器，可以支持AMD,CMD,commonjs,ES6等规范。在前面的html文件中我们引入了amd.js, named-reports.jshe use-default.js
+
+![mf-09](./images/mf-09.png)
+
+这些库究竟是要完成哪些功能呢，
+
+- amd.js：支持AMD规范实现的模块加载。
+- named-exports: 对AMD模块、全局导入的扩展，支持模块按需引入，如 `import {format} from '../tools.js' `,而不是 `import T from '../tools.js';T.format()`
+- use-default: 直接返回AMD模块，而不是返回`{default: amdModule}`
+
+> 在ES6 module中有相应的default命令，比如说把某个方法或者变量导出为默认的。
+>
+> 比如 export default function(){
+>
+> ​       return "default function" 
+>
+>    }
+>
+> 引入的时候就可以使用import func from "文件路径"
+>
+> func(). //返回 "default function"
+
+通过上面的配置不难发现，各个子应用都会和AMD规范相关。为了使systemjs能够准确地加载子应用，我们就把各个应用打包(webpack)成AMD规范的。
+
+首先需要在webpack的output中配置：
+
+```js
+libraryTarget: "amd",
+```
+
+libraryTarget是指设置library的暴露方式，具体的值有commonjs、commonjs2、umd,this、var等。
+
+- libraryTarget:“assign”，暴露一个未定义的library设置的变量。在node环境不支持
+
+- libraryTarget:“var”，暴露一个用var 定义的library设置的变量。在node环境下不支持
+
+- libraryTarget:“window”，在window对象上定一个library设置的变量。在node环境下不支持
+
+- libraryTarget:“global”，在global对象上定义一个library设置的变量。受target属性影响，当target为默认值web时，会在window上注册，如果你想在global上注册，必须修改target为node
+
+- libraryTarget:“this”，在当前this对象上定义一个library设置的变量，如果this是window，就在window。在node的环境中，如果没指定require赋值的变量，并不会在指向global。
+
+- libraryTarget:“commonjs”，在export对象上定义library设置的变量。在node中支持，浏览器中不支持。
+
+- libraryTarget:“commonjs2”，直接用module.export导出export，会忽略library设置的变量。在node中支持，在浏览器中不支持。
+
+- libraryTarget:“amd”，在define方法上定义library设置的变量，不能用script直接引用，必须通过第三方模块来时用。
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
