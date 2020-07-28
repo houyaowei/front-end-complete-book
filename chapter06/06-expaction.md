@@ -723,16 +723,127 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
 
   
 
-  
+  ##### 注意点：
 
-  
+  1、Systemjs不应该被转译：在single-spa实现的微前端应用中，Systemjs是扮演一个加载器的角色，而不应该被其他编译工具干扰，所以在webpack配置js文件加载时需要将此文件排除掉, 在rules中增加如下配置：
 
-  
+  ```js
+{
+    parser: {
+    System: false,
+    },
+ }
+  ```
 
+  2、去掉webpack中splitChunks配置，这项配置我们在第五章性能优化的相关章节中做过相关的介绍，我们在这里再简单介绍一下，有些库包会比较大，如果一起打包的话会导致文件过大，所以应该利用浏览器的并发数，把大文件拆开来。
   
-
+  ```js
+  splitChunks: {
+    chunks: "all",
+    maxAsyncRequests: 5,
+    maxInitialRequests: 3,
+    cacheGroups: {
+      vendor: {
+        chunks: "all",
+        test: path.resolve(__dirname, "../node_modules"),
+        name: "duplication-[hash:5]",
+        enforce: true
+      }
+    }
+  }
+  ```
   
-
+  上面的配置，我们把所有node_modules中的配置最大加载次数为5的强制打包到 *duplication-[hash:5].js*中  ，以减少主js文件的大小。
   
-
+  如果不去掉这项配置，single-spa是无法正确加载React应用的源文件。
+  
+  
+  
+  ##### 配置Vue项目
+  
+  在日常的web开发中，Vue及其全家桶的范围日益扩大，PC端、APP端都有好的选择，毕竟低门口的入门诱惑，良好的文档结构，强大的社区做支撑想不流行起来也是很难道。最近Vue3.0已进入RC阶段，相信不久就会出GA版。如此架构升级的版本，很是期待。
+  
+  回到主题，single-spa接入Vue应用无论如何也是一个绕不开的话题。
+  
+  在上面接入React的项目中，我们详细介绍了各个部分，所以在本小节中接入Vue应用会轻松很多。主要还是有几方面的修改：
+  
+  1、添加工程的入口文件，并引入single-spa和vue的连接库
+  
+  ```js
+  yarn add single-spa-vue
+  ```
+  
+  并进行实例化，然后添加mount和unmout 声明周期方法
+  
+  ```
+  import singleSpaVue from "single-spa-vue";
+  import App from "./App.vue";
+  
+  Vue.config.productionTip = false;
+  const vueLifecycles = singleSpaVue({
+    Vue,
+    appOptions: {
+      el: "#app4",
+      render: h => h(App)
+    }
+  });
+  export const bootstrap = [vueLifecycles.bootstrap];
+  export function mount(props) {
+    createDomElement();
+    //window.store = props.globalEventDistributor;
+    //window.globalEventDistributor = props.globalEventDistributor;
+    return vueLifecycles.mount(props);
+  }
+  
+  export const unmount = [vueLifecycles.unmount];
+  function createDomElement() {
+    // Make sure there is a div for us to render into
+    let el = document.getElementById("app4");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "app4";
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+  ```
+  
+  2、在webpack配置（如果是非vue-cli生成的工具）的module/rules中增加如下配置
+  
+  ```js
+  {
+    parser: {
+      System: false
+    }
+  }
+  ```
+  
+  如果是vue-cli生成的工程，需要在vue.config.js的chainWebPack中进行配置。
+  
+  3、在external中配置不打入bundle包中的三方库，前提是你在公共应用中已经把该三方库写入到import-maps中。
+  
+  
+  
+  
+  
+  #### 6.3 Docker部署前端应用
+  
+  Docker 变得越来越流行，它可以轻便灵活地隔离环境，进行扩容，运维管理。对于业务开发者而言，随着持续集成的发展，对代码质量及快速迭代的要求也越来越高。
+  
+  对于前端而言，在 CI 环境中使用也更容易集成开发，测试与部署。比如可以为流水线(Pipeline)设置 Lint/Test/Security/Audit/Deploy/Artifact 等任务，更好地把控项目质量。
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
