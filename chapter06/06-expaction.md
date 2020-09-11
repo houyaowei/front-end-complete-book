@@ -878,7 +878,7 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   
   Dorcker核心概念
   
-  镜像（Image）、容器（Container）与仓库（Repository），这三个是Docker中最基本也是最核心的概念，对这三个概念的掌握与理解，是学习Docker的关键
+  镜像（Image）、容器（Container）与仓库（Repository），这三个是Docker中最基本也是最核心的概念，对这三个概念的掌握与理解，是学习Docker的关键。
   
   - 镜像
   
@@ -894,7 +894,7 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   
   仓库（Repository）是集中存放镜像文件的场所。有时候会把仓库和仓库注册服务器（Registry）混为一谈，并不严格区分。实际上，仓库注册服务器上往往存放着多个仓库，每个仓库中又包含了多个镜像，每个镜像有不同的标签（tag）。
   
-  仓库分为公开仓库（Public）和私有仓库（Private）两种形式。最大的公开仓库是 Docker Hub，存放了数量庞大的镜像供用户下载。国内的公开仓库包括 时速云 、网易云 等，可以提供大陆用户更稳定快速的访问。当然，用户也可以在本地网络内创建一个私有仓库。
+  仓库分为公开仓库（Public）和私有仓库（Private）两种形式。最大的公开仓库是 Docker Hub，存放了数量庞大的镜像供用户下载。国内的公开仓库包括 阿里云 、网易云 ，腾讯云，时速云等，可以提供大陆用户更稳定快速的访问。当然，用户也可以在本地网络内创建一个私有仓库。
   
   当用户创建了自己的镜像之后就可以使用 push 命令将它上传到公有或者私有仓库，这样下次在另外一台机器上使用这个镜像时候，只需要从仓库上 pull 下来就可以了。
   
@@ -909,9 +909,80 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   Docker version 19.03.8, build afacb8b
   ```
   
+  如果能正常显示版本号，证明已正确安装。
+  
+  先用docker images命令查看下本地镜像仓库有哪些镜像(如果是新安装的引擎，本地镜像未空)，
+  
+  ```js
+  ~ docker images
+  REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+  
+  ```
+  
+  前面我们已经做过介绍，镜像文件都在镜像仓库中存放。如果想直接使用现成的，可以通过pull命令从hub中拉取现成的镜像文件。顺便提一下，可以在官方的景象仓库(https://hub.docker.com/)中查找是否有现成的镜像文件可以，这就像在前端开发中，为了实现某一个功能在npm仓库中查找三方包一样。
+  
+  装npm包可以使用npm install xxx或者yarn add xxx，那么该怎么拉取镜像呢？docker中提供了pull命令可以达到这个目的。
+  
+  在docker hub中有一个hello-world镜像，帮助我们快速上手。这可能就是我们学习一门新语言的习惯吧。
+  
+  <img src="./images/docker-02.png"/>
+  
+  ```js
+  ~ docker pull hello-world 
+  Using default tag: latest
+  latest: Pulling from library/hello-world
+  0e03bdcc26d7: Pull complete 
+  Digest: sha256:4cf9c47f86df71d48364001ede3a4fcd85ae80ce02ebad74156906caff5378bc
+  Status: Downloaded newer image for hello-world:latest
+  docker.io/library/hello-world:latest
+  ```
+  
+  拉取一个或多个镜像使用`docker pull`，如果没有指定镜像标签，docker默认使用`:latest`，上面的示例命令就会拉取最新的镜像文件，等同于：`docker pull hello-world:latest`。docker使用内存寻址方式来存储镜像文件，镜像文件ID是通过SHA256摘要方式包含其配置和镜像层。
+  
+  接下来可以通过`docker images`查看本地已存在的镜像文件：
+  
+  ```js
+  ~ docker images
+  REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+  hello-world         latest              bf756fb1ae65        8 months ago        13.3kB
+  ```
+  
+  我们运行一下看看效果：
+  
+  ```js
+  ~ docker run hello-world
+  
+  Hello from Docker!
+  This message shows that your installation appears to be working correctly.
+  
+  To generate this message, Docker took the following steps:
+   1. The Docker client contacted the Docker daemon.
+   2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+      (amd64)
+   3. The Docker daemon created a new container from that image which runs the
+      executable that produces the output you are currently reading.
+   4. The Docker daemon streamed that output to the Docker client, which sent it
+      to your terminal.
+  
+  To try something more ambitious, you can run an Ubuntu container with:
+   $ docker run -it ubuntu bash
+  
+  Share images, automate workflows, and more with a free Docker ID:
+   https://hub.docker.com/
+  
+  For more examples and ideas, visit:
+   https://docs.docker.com/get-started/
+  ```
+  
+  根据上面的提示信息看，说明镜像文件已经正常工作了。
   
   
   
+  目前为止我们都是通过镜像名称或者加标签的方式拉取镜像文件，显然这是一种很方便的拉取镜像的方式。如果使用了标签拉取，当你再次使用`docker pull`的时候可以确保你能拉取到最新的镜像文件。例如：`docker pull ubuntu:18.04`便可以拉取最新的Ubuntu 18.04镜像。
+  
+  
+  
+  默认情况下`docker pull`会从docker hub拉取镜像文件，也可以手动指定一个仓库地址拉取镜像。假如你设置了一个本地仓库地址，那么你只要指定这个地址拉取镜像即可。仓库地址类似一个`URL`，但是没有协议头`http://`
   
   
   
