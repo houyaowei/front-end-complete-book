@@ -980,9 +980,30 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   
   目前为止我们都是通过镜像名称或者加标签的方式拉取镜像文件，显然这是一种很方便的拉取镜像的方式。如果使用了标签拉取，当你再次使用`docker pull`的时候可以确保你能拉取到最新的镜像文件。例如：`docker pull ubuntu:18.04`便可以拉取最新的Ubuntu 18.04镜像。
   
+  拉取一个镜像，需要指定`Docker Registry`的地址和端口号，默认是`Docker Hub`，还需要指定仓库名和标签，仓库名和标签唯一确定一个镜像，而标签是可能省略，如果省略，则默认使用latest作为标签名，另外，仓库名则由作者名和软件名组成。
+  
+  ```js
+  docker pull [选项] [Docker Registry 地址[:端口号]/]仓库名[:标签]
+  ```
+  
+  如果拉取非官方的第三方镜像，则需要指定完整仓库名，如下：
+  
+  ```js
+  docker pull mysql/mysql-server:latest
+  ```
+  
+  当本地有些镜像我们不需要时，那我们也可以删除该镜像，以节省存储空间，不过要注意，如果有使用该镜像创建的容器未删除，则不允许删除镜像。
+  
+  我们先试着删除一下hello-world镜像，看看会有什么效果，是否能像我们预想的那样能直接删除吗？
+  
+  ```js
+  ~ docker image rm hello-world
+  Error response from daemon: conflict: unable to remove repository reference "hello-world" (must force) - container 20e8f92b12f5 is using its referenced image bf756fb1ae65
+  ```
+  
+  这是因为在启动镜像的时候，使用`docker run`命令通过镜像创建一个全新的容器，因此需要在先停止容器的情况下才能成功删除镜像。
   
   
-  默认情况下`docker pull`会从docker hub拉取镜像文件，也可以手动指定一个仓库地址拉取镜像。例如从一个阿里云拉取镜像文件：nginx-front：
   
   
   
