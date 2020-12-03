@@ -947,6 +947,8 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   hello-world         latest              bf756fb1ae65        8 months ago        13.3kB
   ```
   
+  列表包含了 `仓库名`、`标签`、`镜像 ID`、`创建时间` 以及 `所占用的空间`。**镜像 ID** 则是镜像的唯一标识，一个镜像可以对应多个 **标签**, 每个仓库可以包含多个 **标签**（`Tag`）,每个标签对应一个镜像。
+  
   我们运行一下看看效果：
   
   ```js
@@ -976,7 +978,7 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   
   根据上面的提示信息看，说明镜像文件已经正常工作了。
   
-  
+  如果想让启动的容器在后台应用，可以加上-d参数
   
   目前为止我们都是通过镜像名称或者加标签的方式拉取镜像文件，显然这是一种很方便的拉取镜像的方式。如果使用了标签拉取，当你再次使用`docker pull`的时候可以确保你能拉取到最新的镜像文件。例如：`docker pull ubuntu:18.04`便可以拉取最新的Ubuntu 18.04镜像。
   
@@ -994,6 +996,8 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   
   当本地有些镜像我们不需要时，那我们也可以删除该镜像，以节省存储空间，不过要注意，如果有使用该镜像创建的容器未删除，则不允许删除镜像。
   
+  docker中有两个关于删除的命令，docker rm和docker rmi。docker rmi命令用于删除镜像，docker rm命令容器。
+  
   我们先试着删除一下hello-world镜像，看看会有什么效果，是否能像我们预想的那样能直接删除吗？
   
   ```js
@@ -1001,11 +1005,149 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   Error response from daemon: conflict: unable to remove repository reference "hello-world" (must force) - container 20e8f92b12f5 is using its referenced image bf756fb1ae65
   ```
   
-  这是因为在启动镜像的时候，使用`docker run`命令通过镜像创建一个全新的容器，因此需要在先停止容器的情况下才能成功删除镜像。
+  这是因为在启动镜像的时候，使用`docker run`命令基于镜像创建一个全新的容器，并依据选项来控制该容器。因此需要在先删除容器的情况下才能成功删除镜像。当然，这两个子命令都提供了 -f 命令，可强制删除存在容器的镜像或启动中的容器。
   
-  怎么才能查看容器的ID呢？
+  ```js
+   ~ docker rmi -f hello-world
+  Untagged: hello-world:latest
+  Untagged: hello-world@sha256:4cf9c47f86df71d48364001ede3a4fcd85ae80ce02ebad74156906caff5378bc
+  Deleted: sha256:bf756fb1ae65adf866bd8c456593cd24beb6a0a061dedf42b26a993176745f6b
+  ```
+  
+  还有一个比较重要的命令就是docker ps，该命令可以查看容器的相关信息，默认只显示正在运行的容器信息，可以查看的信息包含CONTAINER ID, NAMES, IMAGES,STATUS,PORTS等。
+  
+  ![docker-03](./images/docker-03.png)
   
   
+  
+  有了上面的命令基础，下面我们介绍一下docker和前端怎么融合。
+  
+  构建镜像前，需要先构造一个Dockerfile文件。什么是 Dockerfile？Dockerfile 是一个用来构建镜像的文本文件，文本内容包含了一条条构建镜像所需的指令和说明。
+  
+  先看一个简单的Dockerfile文件描述
+  
+  ```js
+  FROM node:12.19.0
+  
+  # 代表生产环境
+  ENV PROJECT_ENV production
+  
+  # 许多场景下会根据此环境变量使用不同的配置。特别是在webpack中打包也会根据此环境变量做出优化
+  ENV NODE_ENV production
+  
+  WORKDIR /code
+  ADD . /code
+  RUN npm install -g http-server
+  RUN npm install && npm run build
+  EXPOSE 80
+  
+  CMD http-server ./public -p 80
+  ```
+  
+  > 注意：Dockerfile指令不区分大小写，但是为方便和参数做区分，通常指令使用大写字母 
+  
+  
+  
+  先解释一下每条命令都是用来做什么的，这样再写其他的dockerfile文件更会得心应手。
+  
+  From命令表示该镜像是基于什么来构建的，换句话说是基于 FROM 的镜像，在有些镜像文件中你看到的可能是`From ubuntu`或者是 `From centos`等，这两个就是基于Ubuntu和centos来构建镜像。
+  
+  Env命令用来设置环境变量，定义了环境变量，那么在后续的指令中，就可以使用了。设置格式是这个样子的
+  
+  ```
+  ENV <key> <value>
+  ENV <key1>=<value1> <key2>=<value2>.
+  ```
+  
+  在上面中，我们设置了两个环境变量ROJECT_ENV 和NODE_ENV
+  
+  WORKDIR指定工作目录。作用同`docker run -w` 用 WORKDIR 指定的工作目录，会在构建镜像的每一层中都存在。工作目录可以指多个，每个WORKDIR只影响他下面的指令，直到遇见下一个WORKDIR为止。需要注意的是WORKDIR 指定的工作目录，必须是提前创建好的。
+  
+  Add命令，作用同copy命令，用法也一样，和copy命令不同的是，在执行 <源文件> 为 tar 包的时候，压缩格式为 gzip, bzip2 以及 xz 的情况下，会自动复制并解压到 <目标路径>。这就带来了一个弊端，在不解压的前提下，无法复制 tar 压缩文件。会令镜像构建缓存失效，从而可能会令镜像构建变得比较缓慢。具体是否使用，可以根据是否需要自动解压来决定。
+  
+  Run命令用于执行后面跟着的命令，如命令`RUN npm install -g http-server` ，等同在命令行全局安装http-server。如果是多条命令可以使用&&连接，到现在你有没有发现和shell命令写法如出一辙呢？其实在以某个基础镜像构建新的镜像时，就没有使用已该基础镜像的命令行。再看一个例子
+  
+  ```
+  FROM centos
+  RUN yum install wget
+  RUN wget -O redis.tar.gz "http://download.redis.io/releases/redis-5.0.3.tar.gz"
+  RUN tar -xvf redis.tar.gz
+  ```
+  
+  现在以centos为基础镜像，在Run中就可以使用yum命令来操作。就像在Ubuntu中使用apt命令。
+  
+  
+  
+  EXPOSE仅仅只是声明端口，有两个作用：
+  
+  1、帮助镜像使用者理解这个镜像服务的守护端口，以方便配置映射
+  
+  2、运行时使用随机端口映射时，也就是 docker run -P 时，会自动随机映射 EXPOSE 的端口
+  
+  CMD命令，类似于 RUN 指令，用于运行程序，但二者运行的时间点稍有不同。CMD 在docker run 时运行，RUN 是在 docker build执行。为启动的容器指定默认要运行的程序，程序运行结束，容器也就结束。CMD 指令指定的程序可被 docker run 命令行参数中指定要运行的程序所覆盖。如果 Dockerfile 中如果存在多个 CMD 指令，仅最后一个生效。
+  
+  
+  
+  **实例**
+  
+  了解了上面的命令后，下面通过一个简单的实例来构建一个简单的镜像，显示一个静态html文件并在页面显示“Docker is running”。为了演示效果，我们不引入后台服务，只是通过前端服务器构建。
+  
+  Dockerfile描述如下
+  
+  ```dockerfile
+  FROM node:12.19.0
+  ADD ./index.html /
+  RUN npm install -g http-server
+  EXPOSE 9001
+  CMD http-server -p 9001
+  ```
+  
+  该镜像构建在node@12.19.0的基础上，安装前端http服务器http-server并暴露9001端口
+  
+  > http服务器可以从https://www.npmjs.com/package/http-server下载
+  
+  在Dockerfile的同级目录下建一个静态html文件
+  
+  ```html
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Docker test</title>
+  </head>
+  <body>
+      <h3>Docker is running </h3>
+  </body>
+  </html>
+  ```
+  
+  一切就绪，现在开始通过 Dockerfile 构建一个 test:v1。
+  
+  ```shell
+  $ docker build -t test:v1 .
+  ```
+  
+  > **注**：最后的 **.** 代表本次执行的上下文路径， 指的是 docker 在构建镜像，如果要使用到本机的文件，docker build 命令得到这个路径后，会将路径下查找文件并打包
+  
+  
+  
+  打包的过程如下图所示
+  
+  <img src="./images/docker-04.png" alt="docker-04" style="zoom:67%;" />
+  
+  从上面的提示可以看出镜像打成功了，并且image ID为 9c1922490751, tag为v1。我们先看下本地仓库的镜像情况，并确认下新容器
+  
+  ```shell
+  docker images
+  ```
+  
+  <img src='./images/docker-06.png'/>确认过镜像没问题后，接着就可以运行看下能否实现我们最初的目标
+  
+  ```shell
+  docker run -p 9001:9001 test:v1
+  ```
+  
+  <img src="./images/docker-05.png" style="zoom:67%;float:left" />
   
   
   
