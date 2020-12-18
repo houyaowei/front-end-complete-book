@@ -1151,9 +1151,11 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   
   
   
-  6.4 聊聊WebAssembly
+  **6.4 聊聊WebAssembly**
   
-  2018年7月，WebAssembly1.0标准正式发布，使web开发进入到一个新的阶段，web能力有了进一步的延伸，解锁前端开发新技能。web端不再仅有HTML、CSS和JS，更可以加入C、C++、Rust、Go、Dart、Kotlin等开发语言，把中这些语言开发的代码转换成.wsam模块，然后又把`.wasm`模块转出base64，然后在浏览器里执行。
+  6.4.1 WebAssembly简介
+  
+  2018年7月，WebAssembly1.0标准正式发布，使web开发进入到一个新的阶段，web能力有了进一步的延伸，解锁前端开发新技能。web端不再仅有HTML、CSS和JS，更可以加入C、C++、Rust、Go、Dart、Kotlin等开发语言，把这些语言开发的代码转换成.wsam模块，然后又把`.wasm`模块转出base64，然后在浏览器里执行，wasm字节码既可以编译成机器码后执行，又可以使用解释器直接执行, 兼容性和性能兼有。
   
   WebAssembly诞生的意义非凡，它提供了一种可能性，使各种语言编写的代码都可以以接近原生的速度在 Web 端运行。
   
@@ -1183,9 +1185,84 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   
   JIT结合了上面两种编译的优点，在 JavaScript 引擎中增加一个监视器（也叫分析器）。监视器监控着代码的运行情况，记录代码一共运行了多少次、如何运行的等信息。如果同一行代码运行了几次，这个代码段就被标记成了 “warm”，如果运行了很多次，则被标记成 “hot”。
   
-  基线编译
+  **基线编译**
   
   如果一段代码变成了 “warm”，那么 JIT 就把它送到编译器去编译，并且把编译结果存储起来。代码段的每一行都会被编译成一个“桩”（stub），同时给这个桩分配一个以“行号 + 变量类型”的索引。如果监视器监视到了执行同样的代码和同样的变量类型，那么就直接把这个已编译的版本 push 出来给浏览器。通过这样的做法可以加快执行速度，除了这个手段，编译器还可以通过“优化”更有效地执行代码。
+  
+  **优化编译器**
+  
+  如果一个代码段变得 “very hot”，监视器会把它发送到优化编译器中。生成一个更快速和高效的代码版本出来，并且存储起来。
+  
+  
+  
+  加入JIT后，JavaScript的运行速度虽然有20-50倍的提高，但是JIT 的带来的性能提升很快就到了天花板。实际上 JIT 还是有以下问题的：
+  
+  （1）JIT 基于运行期分析编译，而 Javascript 是一个弱类型的语言，所以大部分时间，JIT 编译器其实都是在推测 Javascript 中的类型,比如下面的方法实现两个参数相加，
+  
+  ```js
+  function add(a, b) {
+    return a+b
+  }
+  var result = add(1, 2)
+  ```
+  
+  当JIT分析到这块代码时，会把add方法编译为
+  
+  ```js
+  function add(int a, int b) {
+    return a+b
+  }
+  ```
+  
+  如果换成了
+  
+  ```js
+  var result = add(“hello”, “world”)
+  ```
+  
+  JIT 编译器只能重新编译。整数加法和字符串连接是完全不同的两个操作，会被编译成不同的机器码。
+  
+  JIT 处理这个问题的方法是编译多基线桩。如果一个代码段是单一形态的（即总是以同一类型被调用），则只生成一个桩。如果是多形态的（即调用的过程中，类型不断变化），则会为操作所调用的每一个类型组合生成一个桩。
+  
+  
+  
+  在webassembly之前，已有许多大厂不断尝试在浏览器中直接运行C、C++代码。如最早1995年的NPAPI（Netscape Plugin API）,微软在浏览器直接嵌入可以运行本地代码的ActiveX控件，甚至2010年Google也开发了一种名叫NaCL（Native Clients）,不过遗憾的是这些技术实现都太过复杂导致推广受阻，最后都不了了之。
+  
+  应该是受上面项目失败的影响，Google另辟蹊径，尝试将Java转为JavaScript，因此推出了GWT（Google Web Toolkit），开创了将其他语言转为JavaScript的先河。之后的CoffeeScript、Dart、TypeScript等语言都是以输出JavaScript程序为最终目标。
+  
+  Mozilla创建了Emscripten项目，尝试通过LLVM工具链将C/C++语言编写的程序转译为JavaScript代码，利用LLVM编译器前端编译C/C++，生成LLVM特有的跨平台中间代码，最终再将LLVM跨平台中间语言代码转译为JavaScript的asm.js子集。
+  
+  2015年6月谋智公司在asm.js的基础上发布了WebAssembly项目，随后谷歌、微软、苹果等各大主流的浏览器厂商均大力支持。WebAssembly不仅拥有比asm.js更高的执行效能，而且由于使用了二进制编码等一系列技术，WebAssembly编写的模块体积更小且解析速度更快。
+  
+  > https://zh.wikipedia.org/wiki/LLVM
+  
+  
+  
+  到目前为止，桌面浏览器对webassembly的支持情况如下，除IE外其他主流浏览器都已经支持：
+  
+  ![wa01](./images/wa01.png) 
+  
+  
+  
+  WebAssembly既然可以实现Go、Java、Java等语言转换为JavaScript目标语言，那么对于前端而言，在特定场景下使用WebAssembly为应用开发提供了一种解决方案：
+  
+  1、计算密集型的应用，对于高度并行精度比较高的算法，可以使用webassembly在CPU上直接运行。
+  
+  2、区块链应用，Ethereum已经在核心库中加入 WebAssembly,叫做ewasm, 用来确定子集重新设计以太坊智能合约执行层的提议。
+  
+  3、IOT
+  
+  4、多媒体应用
+  
+  5、web游戏
+  
+  6、深度学习
+  
+  
+  
+  6.4.2 webassembly入门
+  
+  
   
   
   
