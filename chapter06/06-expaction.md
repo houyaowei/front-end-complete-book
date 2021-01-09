@@ -1262,7 +1262,45 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   
   6.4.2 webassembly入门
   
+  在这节中我们通过两个简单的例子来说明已Go语言为蓝本，编译成webassembly的操作过程，基本用法，并详细介绍利用webassembly怎么和DOM交互，算是抛砖引玉吧，希望能引起更多的coder去探索Go语言，探索Webassembly。拓展前端的技能圈。
   
+  既然是以Go语言为蓝本，我们还是有必要对Go语言做简单的介绍。
+  
+  Go语言是由Google开发的一种编译型语言，同时它又是强类型的，天然支持并发性、垃圾回收，总体说来，它具有以下主要优点：
+  
+  1.静态类型检查，有过动态语言开发经验的同学会深有感触静态检查有多么的重要，可以在编译时进行语法检查，能避开很多不必要的错误。
+  
+  2、语言级别的并发支持，这个是Go语言骨子里的东西，因为Go语言本身支持goroutine和管道，可以并行执行并支持goroutine之间安全的数据通信，避免了像其他语言里共享内存访问引起的问题。
+  
+  3、丰富的标准库，Go语言内置了很多的标准库，特别是网络库，功能强大。
+  
+  4、编译速度快。官方编译器在期初是用C语言写的，后面使用Go进行了重写。并且可以跨平台编译成目标二进制文件。
+  
+  5、类型系统简单。由于Go语言的作者都是C语言出身，所以和C的语言结构比较相似。
+  
+  6、还有其他的，比如说内置强大的工具链，高性能HTTP Server，defer机制等。
+  
+  
+  
+  既然Go语言有这么多的优点，那么可以做哪方面的应用呢，大概归结为这几类
+  
+  1、服务器编程。如果C、C++适合做的事儿，那么用Go来做也合适。
+  
+  2、分布式系统开发。
+  
+  3、其他辅助系统开发。如百度和京东的消息系统，京东商城，小米运维监控系统（http://open-falcon.com/），日志搜索系统Poseidon（https://github.com/Qihoo360/poseidon），甚至包括腾讯游戏。在国外更是有很多成功的Go项目，如nsq消息队列，k8s为docker应用部署、规划、更新、维护服务。Doozer分布式同步工具，类似ZooKeeper。groupcache，memcahe作者写的用于Google下载系统的缓存系统。还有很多，大家可以自行搜索。
+  
+  3、web编程。这块的应用目前最为广泛。web开发在当前仍然是热门职位，所以，Go语言的web开发框架也不会缺席，beego（https://github.com/beego/beego），buffalo（https://github.com/gobuffalo/buffalo），echo（https://github.com/labstack/echo），在gin（https://github.com/gin-gonic/gin），iris（https://github.com/kataras/iris），revel（https://github.com/revel/revel）。在国内以beego为口碑最佳。
+  
+  4、云平台，目前国外很多云平台在采用Go开发，CloudFoundy的部分组建
+  
+  
+  
+  >  注：本章节并非介绍Go语言的入口，所以暂不介绍Go语言的安装、环境配置等基本操作，我们直接从实际操作入手。
+  
+  
+  
+  先新建一个Go工程
   
   
   
