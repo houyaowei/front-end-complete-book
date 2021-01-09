@@ -1300,7 +1300,90 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   
   
   
-  先新建一个Go工程
+  先新建一个Go工程，工程目录大概是这样：
+  
+  <img src="./images/wa02.png" alt="wa02" style="zoom:67%;" />
+  
+  bin: 存放编译后的可执行文件。
+  
+  pkg: 存放编译后的包文件。
+  
+  src: 存放项目源文件。
+  
+  intro：自定义目录，用来测试第一个webassembly。
+  
+  
+  
+  接下来，在src目录下，建立一个go文件，命名为main.go
+  
+  ```go
+  package main
+  import "fmt"
+  
+  func main() {
+  	fmt.Println("Hello, WebAssembly!")
+  }
+  
+  ```
+  
+  main.go是主程序的入口，主入口程序有两个比较明显的特征，第一个就是声明的mian方法，编译器会把这个名字的包编译成二进制可执行文件，如果没有这个方法，程序就没有办法执行，另一个就是在第一行声明的包名
+  
+  ```go
+  package main
+  ```
+  
+  在go语言中，每行代码都要归属到某一个包中，就算是main.go也不例外。包定义了一组编译过的代码，和命名空间比较类似，用来间接访问包内声明的。
+  
+  接着导入fmt包，这个包提供了完整格式化的功能，在main方法中，我们只打印一句话。
+  
+  在前面我们介绍过，可以把go代码编译为webassembly。要想实现编译其实还是很简单的。
+  
+  先试下下面的命令：
+  
+  ```shell
+  GOOS=js GOARCH=wasm go build -o test.wasm main.go
+  ```
+  
+  这里需要说明一下GOOS和GOARCH这两个环境变量的作用。 在go里面，可以将go代码编译成各个平台的目标结果。比如GOOS，可以指定为windows、linux，android、illumos、solaris，netbsd、js等。GOARCH表示系统架构，比如可以指定为arm, amd64,wasm等。-o 表示 output，输出文件，输出文件名紧跟该选项，如果想把文件直接编译到某个目录下，可以指定具体的目录，如编译到当前的test文件夹中，可以指定为'./test/test.wasm'。在上面的命令中，输入的文件名为test.wasm。最后的选项为需要编译的源文件。
+  
+   现在我们有了wasm文件，还有一个比较重要的步骤就是需要在html中引入go提供的js库，值得欣喜的是，go语言开发者已帮我们准备好了，只要正确配置GOPATH，剩下的就是执行一条命令的事情了，
+  
+  ```shell
+  cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" .
+  ```
+  
+  通过该命令就可以把核心库文件拷贝到当前目录，或者到指定目录。
+  
+  
+  
+  到现在，准备工作已经差不多了。需要html的的时候了。为了和go语言的源码分开，新建一个intro目录，把wasm文件、js核心库文件拷贝的该目录下，并在html文件中准备一下内容：
+  
+  ```html
+  <!doctype html>
+  <html>
+      <head>
+          <meta charset="utf-8"/>
+          <title> wasm 介绍</title>
+           <script type="text/javascript" src="./wasm_exec.js"></script>
+      </head>
+      <body>
+          <h1>Chapter6</h1>
+          <h3>compile Go to webassembly</h3>
+         <script>
+             const go = new Go();
+             WebAssembly.instantiateStreaming(fetch("./test.wasm"), go.importObject).then((result) => {
+                 go.run(result.instance);
+             });
+         </script>
+      </body>
+  </html>
+  ```
+  
+  代码中使用WebAssembly.instantiateStreaming方法直接从流式底层源编译和实例化WebAssembly模块。该方式是加载wasm代码比较高效的方法。
+  
+  > 具体加载wasm的方式可以参考https://developer.mozilla.org/zh-CN/docs/WebAssembly/Loading_and_running
+  
+  
   
   
   
