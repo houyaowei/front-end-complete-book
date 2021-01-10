@@ -1346,7 +1346,7 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   
   这里需要说明一下GOOS和GOARCH这两个环境变量的作用。 在go里面，可以将go代码编译成各个平台的目标结果。比如GOOS，可以指定为windows、linux，android、illumos、solaris，netbsd、js等。GOARCH表示系统架构，比如可以指定为arm, amd64,wasm等。-o 表示 output，输出文件，输出文件名紧跟该选项，如果想把文件直接编译到某个目录下，可以指定具体的目录，如编译到当前的test文件夹中，可以指定为'./test/test.wasm'。在上面的命令中，输入的文件名为test.wasm。最后的选项为需要编译的源文件。
   
-   现在我们有了wasm文件，还有一个比较重要的步骤就是需要在html中引入go提供的js库，值得欣喜的是，go语言开发者已帮我们准备好了，只要正确配置GOPATH，剩下的就是执行一条命令的事情了，
+   现在我们有了wasm文件，还有一个比较重要的步骤就是需要在html中引入go提供的js库，值得欣喜的是，go语言开发者已帮我们准备好了，其位于$GOROOT/misc/wasm下，只要正确配置GOPATH，剩下的就是执行一条命令的事情了，
   
   ```shell
   cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" .
@@ -1379,13 +1379,234 @@ libraryTarget是指设置library的暴露方式，具体的值有commonjs、comm
   </html>
   ```
   
-  代码中使用WebAssembly.instantiateStreaming方法直接从流式底层源编译和实例化WebAssembly模块。该方式是加载wasm代码比较高效的方法。
+  代码中使用WebAssembly.instantiateStreaming方法直接从流式底层源编译和实例化WebAssembly模块，正常的流程是先转换成ArrayBuffer，再进行实例化，如果要分步实现，支持数字相加和平方的代码初始话是这样的：
+  
+  ```html
+  WebAssembly.compile(new Uint8Array(`
+    00 61 73 6d  01 00 00 00  01 0c 02 60  02 7f 7f 01
+    7f 60 01 7f  01 7f 03 03  02 00 01 07  10 02 03 61
+    64 64 00 00  06 73 71 75  61 72 65 00  01 0a 13 02
+    08 00 20 00  20 01 6a 0f  0b 08 00 20  00 20 00 6c
+    0f 0b`.trim().split(/[\s\r\n]+/g).map(str => parseInt(str, 16)) 
+  )).then(module => {
+    const instance = new WebAssembly.Instance(module)
+    const { add, square } = instance.exports
+    console.log('3 + 6 =', add(3, 6))
+    console.log('3^2 =', square(3))
+    console.log('(9 + 1)^2 =', square(add(9 + 1)))
+  })
+  ```
+  
+   [`WebAssembly.compile`](http://webassembly.org/docs/js/#webassemblycompile) 可以用来编译 wasm 的二进制源码，它接受 BufferSource 格式的参数，返回一个 Promise。所以我们使用Uint8Array把字符串转成 ArrayBuffer。把字符串分割成数组，然后将普通数组转成 8 位无符号整数的数组。
+  
+  ```js
+  new Uint8Array(
+    `...`.trim().split(/[\s\r\n]+/g).map(str => parseInt(str, 16))
+  )
+  ```
+  
+  了解了上面的处理方式，就不难理解通过instantiateStreaming加载wasm代码比较高效的了。
   
   > 具体加载wasm的方式可以参考https://developer.mozilla.org/zh-CN/docs/WebAssembly/Loading_and_running
   
+  根据规范，instantiateStreaming接收两个参数，
   
+  ```go
+  dictionary WebAssemblyInstantiatedSource {
+     required WebAssembly.Module module;
+     required WebAssembly.Instance instance;
+  };
   
+  Promise<InstantiatedSource> instantiateStreaming(source [, importObject])
+  ```
   
+  > 规范地址 https://webassembly.org/docs/web/#webassemblyinstantiatestreaming
   
+  *source*： 一个Response或者Promise对象
   
+  *importObject*： 包含一些想要导入到新创建`Instance`中值的对象，这样在wasm的模块中就可以访问到js对象。
+  
+  instantiateStreaming返回一个Promise，通过resolve返回的对象包含两个对象，module和instance，module表示编译完成的WebAssembly模块. 这个`Module`能够再次被实例化（WebAssembly.Instance）或 通过[postMessage()](https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage)共享。instance包含WebAssembly所有公开方法（Exported WebAssembly functions），这些函数基本上只是webassembly中Javascript的包装器。 被调用时，用户侧在后台得到一些技能加持，将参数转换为wasm可以使用的类型(例如将Javascript的number转换为Int32类型的)，将参数传给wasm模块内部的函数，当函数被调用，结果转换并回传给Javascirpt。
+
+​      到这一步我们还是无法执行html文件，因为考虑到前端的跨域问题还需要一个服务器。继续在src目录下新建一个server.go。新建go服务器时我们需要几个关键的包：flag，http包。
+
+在启动命令行程序（工具、server）时，有时需要对命令参数进行解析，这时就用到了flag包。如果要创建http服务，那么http包也就成了必选项。
+
+先介绍一下这两个包的基本用法，方便理解服务器代码
+
+flag基本用法
+
+两种常用的定义命令行 flag 参数的方法
+
+```go
+flag.Type(flag 名, 默认值, 帮助信息) *Type
+```
+
+Type 可以是 Int、String、Bool 等，返回值为一个相应类型的指针，例如我们要定义姓名、年龄两个命令行参数，可以按如下方式定义：
+
+```go
+name := flag.String("name", "houyw", "姓名")
+age := flag.Int("age", 36, "年龄")
+```
+
+需要注意的是，此时 name、age均为对应类型的指针,而不是具体的值。
+
+还有一种格式
+
+```go
+flag.TypeVar(Type 指针, flag 名, 默认值, 帮助信息)
+```
+
+TypeVar 可以是 IntVar、StringVar、BoolVar 等，其功能为将 flag 绑定到一个变量上，例如我们要定义姓名、年龄两个命令行参数，可以按如下方式定义：
+
+```go
+var name string
+var age int
+flag.StringVar(&name, "name", "houyw", "姓名")
+flag.IntVar(&age, "age", 36, "年龄")
+```
+
+还有一个比较重要flag.parse()，通过以上两种方法定义好命令行 flag 参数后，必须通过调用 flag.Parse() 来对命令行参数进行解析。
+
+启动一个HTTP服务可以调用ListenAndServe来实现。
+
+通过这两个简单的包可以实现一个简单的server.go:
+
+```go
+package main
+
+import (
+	"flag"
+	"log"
+	"net/http"
+)
+
+var (
+	listen = flag.String("listen", ":9002", "listen address")
+	dir    = flag.String("dir", "../intro", "directory to serve")
+)
+
+func main() {
+	flag.Parse()
+	log.Printf("listening on %q...", *listen)
+	err := http.ListenAndServe(*listen, http.FileServer(http.Dir(*dir)))
+	log.Fatalln(err)
+}
+
+```
+
+万事俱备，启动一下服务看看
+
+```go
+go run server.go
+```
+
+<img src="./images/wa03.png" alt="wa03" style="zoom:50%;" />
+
+终于成功了。
+
+说起来web开发，Dom操作是常规操作，什么getElementById,getElementsByClass都是核心api，那么在webassembly中是怎么实现这种最基本的交互呢。下面我们再通过一个例子实现。
+
+说起来dom操作，需要导入另一个js相关的包：syscall/js，该包提供了操作dom的底层api
+
+```go
+import (
+	"fmt"
+	"syscall/js"
+	"time"
+)
+```
+
+js.Global()` 返回一个 `js.Value` 类型的结构体，它指代 JS 中的全局对象，在浏览器环境中即为 `window` 对象。可以通过其 `Get()` 方法获取 `window` 对象中的字段，也是 `js.Value` 类型，包括其中的函数对象，并使用其 `Invoke()方法调用 JS 函数。
+
+```
+| Go                     | JavaScript             |
+| ---------------------- | ---------------------- |
+| js.Value               | [its value]            |
+| js.Func                | function               |
+| nil                    | null                   |
+| bool                   | boolean                |
+| integers and floats    | number                 |
+| string                 | string                 |
+| []interface{}          | new array              |
+| map[string]interface{} | new object             |
+```
+
+```go
+win := js.Global()
+doc := win.Get("document")
+body := doc.Get("body")
+```
+
+执行上面的代码后，变量win就指向了window对象，可以像普通的JavaScript对象一样在该对象上挂载属性或者方法。变量doc指向了document对象，body指向了body对象。
+
+现在，我们使用set方法给window对象上挂载一个方法MyGoFunc，这样在html页面中就可以直接调用这个方法了。
+
+```go
+win.Set("MyGoFunc", MyGoFunc())
+```
+
+在main.go中再定义MyGoFunc方法
+
+```go
+func MyGoFunc() js.Func {
+	return js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		return map[string]interface{}{
+			"hello":  "myGoFunc invoked ",
+			"name": "houyw",
+		}
+	})
+}
+```
+
+Go 中函数必须是 `func(args []js.Value)` 形式的，使用 `args` 参数接收 JS 调用的参数。稍后我们在html页面中测试效果。
+
+在常规的DOM中，我们总是使用document.getElementById来获得DOM元素，现在我们看下怎么在syscall/js中应该怎么做。在上面的代码中变量doc应该指向document对象，如果要获得
+
+```html
+<button id="test">click me </button>
+```
+
+的dom元素，可以使用doc的Get方法
+
+```go
+btn := doc.Call("getElementById", "test")
+```
+
+绑定事件当然可以像普通的DOM对象一样
+
+```go
+var callback js.Func
+callback = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+  fmt.Println("click invoke")
+  fmt.Println(args)
+  btn.Set("innerHTML", "changed by go")
+  return nil
+})
+btn.Call("addEventListener", "click", callback)
+```
+
+<img src="./images/wa04.png" alt="wa04" style="zoom:67%;" />
+
+事件执行的过程中把原来显示的“click me”变成了“changed by go”。在顺便测试下在window上绑定的方法MyGoFunc，看是否真能调用到。
+
+```html
+<button onclick="handleGoFunc()">func defined in go</button>
+function handleGoFunc() {
+	console.log(MyGoFunc())
+}
+```
+
+<img src="./images/wa05.png" alt="wa04" style="zoom:67%;" />
+
+没错，这是我们想要的结果。
+
+如果是动态创建一个元素呢? 使用doc.call调用底层的dom方法，并传入元素名，接着就是常规操作，设置样式，最后把新建的元素追加到父节点上。
+
+```go
+newDiv := doc.Call("createElement", "div")
+newDiv.Set("innerHTML", "create new div when page onload")
+newDiv.Set("style","border: 1px solid red")
+body.Call("appendChild", newDiv)
+```
 

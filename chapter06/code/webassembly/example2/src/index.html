@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title> wasm 介绍</title>
+         <script type="text/javascript" src="./wasm_exec.js"></script>
+    </head>
+    <body>
+        <h4>webassembly interaction with DOM</h4>
+
+        <button id="alert">alert test</button>
+        <button id="test">click me </button>
+        <button onclick="handleGoFunc()">func defined in go</button>
+       <script>
+           const go = new Go();
+           WebAssembly.instantiateStreaming(fetch("./test.wasm"), go.importObject).then((result) => {
+               go.run(result.instance);
+           });
+           function handleGoFunc() {
+               console.log(MyGoFunc())
+           }
+       </script>
+    </body>
+</html>
