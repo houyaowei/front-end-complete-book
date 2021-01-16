@@ -1,29 +1,33 @@
 ## 第4章 前端架构核心思想
 
-扎实的基础是学习架构（或js框架）的关键，如果基础掌握得不牢固，则在读js库或框架时，必然觉得代码晦涩难懂。正所谓“工欲善其事，必先利其器”， 本章将围绕以下内容进行详细阐述：
+扎实的基础是学习架构（或js框架）的关键，如果基础掌握得不牢固，则在学习js库或框架时，必然觉得代码晦涩难懂，无从下手。正所谓“工欲善其事，必先利其器”， 本章将围绕以下内容进行详细阐述：
 
-1. 框架中常用的6种设计模式。
+1. 框架中比较重要的6种设计模式。
 2. 前端开发人员必须了解的v8知识点。
 3. 宏任务和微任务的处理过程。
 4. 异步加载规范。
 5. 函数式编程基础。
-6. 通过案例深入剖析v-dom和状态原理的实现过程。
+6. 通过案例深入剖析状态原理的实现过程。
 
 ### 4.1 常用设计模式介绍
 
 #### 4.1.1状态模式
 
-状态模式是一个比较有用的模式，它是指当一个对象的内部状态发生变化时，会产生不同的行为。
+状态模式是一个比较有用的模式，它是指当一个对象的内部状态发生变化时，会产生不同的行为。程序在任意时刻都处在任意一种状态中。
 
 比如某电灯，按一下按钮打开弱光, 按两下按钮打开强光, 按三下按钮关闭灯光，基本模型如图4-1所示。
 
-![](images/4-1-2.png)
+<img src="images/4-1-2.png" style="zoom:67%;" />
+
+<center>图4-1
 
 状态模式允许对象在内部状态改变时，改变其行为，从对象的角度看好像进行了改变。实际开发中，某处文字可能和模型中的一字段进行关联，根据某一个状态显示不同的内容，这时候状态模式可能是你需要的（当然 switch-case, if-else可以继续）。
 
 状态模式中有几个角色，分别是Context、State，以及各个子状态的实现。Context中既保存了Client端的操作接口，也保存子状态的实现，代表着当前状态。抽象类State声明了子状态应该实现的各个方法，如图4-2所示。
 
-![](images/state.jpg)
+<img src="images/state.jpg" style="zoom:67%;" />
+
+<center>图4-2
 
 Context的实现如下：
 
@@ -36,8 +40,8 @@ export default class Context {
 
     public transitionTo(_s: State): void {
         console.log(`Context: transition to ${(<any>_s).constructor.name}`);
-    this.state = _s;
-    this.state.setContext(this);
+        this.state = _s;
+        this.state.setContext(this);
     }
 
     public setSlighLight(): void {
@@ -55,18 +59,18 @@ export default class Context {
 }
 ```
 
-在transitionTo方法中改变当前状态，参数为实例化的子状态类。
+在transitionTo方法中改变当前状态，参数为实例化的子状态类。如果需要将上下文转换为另一个状态，只需要将当前活动的状态对象替换为新的状态对象即可。需要说明的是，如果想采用这种方式，状态的各子类必须保证实现相同的接口。
+
+> 为什么要实现相同的接口呢？大家可以类比下面向对象中的多态特性。多态具体说就是在父类中定义的属性和方法被子类继承之后，子类就具有表现不同的数据类型或表现的能力。它可以消除类型之间的强耦合关系，让子类具有了可替换性，所以就更加的灵活。
 
 再来看State的实现及其SlightLightClass的实现，限于篇幅，这里只贴出部分代码，完整的代码参考外链<4-1>[https://github.com/houyaowei/front-end-complete-book/tree/master/chapter04/code/4.1DesignPattern/State](https://github.com/houyaowei/front-end-complete-book/tree/master/chapter04/code/4.1DesignPattern/State)。
 
 ```ts
 export default abstract class State {
-
     protected context: Context;
     public setContext(_c: Context) {
         this.context = _c;
     }
-
     public abstract slightLight(): void;
     public abstract highLight(): void;
     public abstract close(): void;    
@@ -80,10 +84,9 @@ export default abstract class State {
 export default class SlighLightClass extends State {
 
     public slightLight(): void {
-
-        console.log("state in SlighLightClass, I will change state to         highLight");
-    //切换到新的状态
-    this.context.transitionTo(new HighLight());
+        console.log("state in SlighLightClass, I will change state to highLight");
+        //切换到新的状态
+       this.context.transitionTo(new HighLight());
     }
 
     public highLight(): void {
@@ -151,9 +154,9 @@ Context: transition to ColseClass
 状态模式封装了转换规则，并枚举了所有可能的状态。当把所有的与某个状态有关的行为放到一个类中时，即可方便地增加状态。
 
 状态模式的使用必然会增加系统类和对象的个数。 状态模式的结构与实现都较为复杂，如果使用不当，则程序结构和代码都将变得混乱。 
-状态模式对"开闭原则"的支持并不太好，对于可以切换状态的状态模式，在增加新的状态类时要求必须修改那些负责状态转换的源代码，否则无法切换到新增的状态。如果需要修改某个状态类的行为，则同样需修改对应类的源代码。
+状态模式对"开闭原则"的支持并不太好，准确说的话是代码的侵入性比较高，对于可以切换状态的状态模式，在增加新的状态类时要求必须修改那些负责状态转换的源代码，否则无法切换到新增的状态。如果需要修改某个状态类的行为，则同样需修改对应类的源代码。
 
-
+最后一点需要说明的是，如果是状态比较少，并且状态之间很少发生改变，那么使用状态模式是不是显得小题大做了？大家可以根据实际的业务场景来选择。
 
 
 #### 4.1.2策略模式
@@ -2066,7 +2069,6 @@ export default {
 state带对应addItem类型的mutation，在state数组中push一条记录。至此，我们就了解了state的状态机是如何工作的，Proxy的set钩子是如何被触发的，子组件是在何种情况下重新工作的。
 
 一切都变得顺理成章。现在可以启动一下示例代码或者按照这个思路重新实现一遍，看看效果是怎样的。
-
 
 ps：在后续编写中，注意：
 1.英文大小写前后一致，与代码中的也要一致。
