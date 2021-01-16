@@ -5,6 +5,7 @@
 import State from "./State";
 
 export default class Context {
+  // refer to current State
   private state: State;
 
   constructor(state: State) {

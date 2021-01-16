@@ -2,7 +2,7 @@
 /**
  * @author houyw
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var Context = /** @class */ (function () {
     function Context(state) {
         this.transitionTo(state);
@@ -23,4 +23,4 @@ var Context = /** @class */ (function () {
     };
     return Context;
 }());
-exports.default = Context;
+exports["default"] = Context;

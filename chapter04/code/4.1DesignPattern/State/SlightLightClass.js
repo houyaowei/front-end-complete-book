@@ -3,7 +3,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 /**
  * @author houyw
  * 弱光
@@ -26,7 +26,7 @@ var SlighLightClass = /** @class */ (function (_super) {
     }
     SlighLightClass.prototype.slightLight = function () {
         console.log("state in SlighLightClass, I will change state to highLight");
-        this.context.transitionTo(new HighLightClass_1.default());
+        this.context.transitionTo(new HighLightClass_1["default"]());
     };
     SlighLightClass.prototype.highLight = function () {
         console.log("hightstate state in SlighLightClass");
@@ -35,5 +35,5 @@ var SlighLightClass = /** @class */ (function (_super) {
         console.log("close state in SlighLightClass");
     };
     return SlighLightClass;
-}(State_1.default));
-exports.default = SlighLightClass;
+}(State_1["default"]));
+exports["default"] = SlighLightClass;
