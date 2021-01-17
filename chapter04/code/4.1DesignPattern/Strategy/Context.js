@@ -2,7 +2,7 @@
 /**
  * Context类，保持对当前策略的引用
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var names = ["hou", "cao", "ss"];
 var Context = /** @class */ (function () {
     function Context(_s) {
@@ -19,4 +19,4 @@ var Context = /** @class */ (function () {
     };
     return Context;
 }());
-exports.default = Context;
+exports["default"] = Context;

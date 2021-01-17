@@ -2,7 +2,7 @@
 /**
  * 策略实现类B
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var StrategyBImpl = /** @class */ (function () {
     function StrategyBImpl() {
     }
@@ -11,4 +11,4 @@ var StrategyBImpl = /** @class */ (function () {
     };
     return StrategyBImpl;
 }());
-exports.default = StrategyBImpl;
+exports["default"] = StrategyBImpl;
