@@ -8,4 +8,4 @@ let customer2 = new Customer(1102, "houyw", "henan", "12900001");
 os.register(customer2);
 
 console.log("现在商家有", os.getAllCustomers().length, "个客户订阅");
-os.fire();
+os.notifyAll();

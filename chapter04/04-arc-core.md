@@ -163,9 +163,9 @@ Context: transition to ColseClass
 
 策略模式是一种行为模式，它允许定义一系列算法，并将各个算法分别放入独立的类中，在运行时可以相互替换。它的主要作用是当多个算法较为相似时，可以减少if-else的使用。
 
-策略模式的应用较为广泛，比如年终奖的发放，很多公司都是根据员工的薪资基数和年底绩效考评来计算的。以3、6、1方式为例，绩效为3的员工，年终奖为2倍工资；绩效为6的员工年终奖为1.2倍工资；绩效为1的员工，年终奖为X.X倍工资。
+策略模式的应用较为广泛，比如年终奖的发放，很多公司都是根据员工的薪资基数和年底绩效考评来计算的。以绩效比例3+6+1方式为例，绩效为3的员工，年终奖为2倍工资；绩效为6的员工年终奖为1.2倍工资；绩效为1的员工，年终奖为X.X倍工资。
 
-下面以一个字符串操作为例进行解释，对数组的sort和reverse方法，定义两种策略，根据需要的策略实例执行对应的策略。
+下面以一个简单的字符串数组操作为例对改模式详细解释，对sort和reverse方法，定义两种策略，根据需要执行对应的策略。UML描述如下图4-3所示。
 
 <img src="./images/strategy.png" alt="strategy" style="zoom: 67%;" />
 
@@ -440,79 +440,89 @@ sorry,type wma is not support
 
 观察者模式（Observer Pattern）又叫作发布——订阅模式(Pub/Sub)模式或消息机制。它可以帮助对象知晓现状，以便对象及时响应订阅的事件，可以看成是一种一对多的关系。当订阅的对象的状态发生改变时，所有依赖它的对象都应得到通知。
 观察者模式是松耦合设计的关键。
-下面通过一个例子来理解观察者模式。
-当你在淘宝上找到一款心仪的电脑时，比如16寸的Mackbook Pro，联系某卖家后发现没有现货，鉴于此店铺较好的信誉度和较大的优惠力度，你觉得还是在这家店铺买比较划算，于是就问卖家什么时候有货。卖家回复说需要等一周左右，还友情提示你:"亲，你可以先收藏我们的店铺，等有货了会再通知你的。"因此你收藏了这家店铺。电脑发烧友可不止你一个，小明、小华等陆陆续续也都收藏了该店铺。</br>
-从上面的示例中可以看出，这是一个典型的观察者模式，卖家是发布者，你、小明、小华等是订阅者。当16寸的Mackbook Pro到货时（即状态发生了改变），卖家会使用旺旺等工具通知你、小明、小华等，依次给你们发送消息。
+现实生活中，大家都经常在某宝上购物，下面通过一个购物例子来理解观察者模式。
+当你在某宝上找到一款心仪的电脑时，比如16寸的Mackbook Pro，联系某卖家后发现没有现货，鉴于此店铺较好的信誉度和较大的优惠力度，你觉得还是在这家店铺买比较划算，于是就问卖家什么时候有货。卖家回复说需要等一周左右，还友情提示你:"亲，你可以先收藏我们的店铺，等有货了会再通知你的。"因此你收藏了这家店铺。电脑发烧友可不止你一个，小明、小华等陆陆续续也都收藏了该店铺。</br>
+从上面的示例中可以看出，这是一个典型的观察者模式，卖家是发布者(Publisher)，你、小明、小华等是订阅者(subscribers)。当16寸的Mackbook Pro到货时（即状态发生了改变），卖家会使用旺旺等工具通知你、小明、小华等，依次给你们发送消息，"亲，货品已经到了，您可以下单了"。
 
-基本的模型如图4-3所示。
+基本模型如图4-5所示。
 
 <img src="images/4-1-1.png" style="zoom:67%;" />
 
-在图4-3中可以看出，卖家（发布者）维护着和各位客户（订阅者）的引用关系，并且可以通过观察者模式添加、解除引用关系。比如，当某天某客户不再中意这款电脑时，卖家（发布者）就无法再引用这份关系了。
+<center>图4-5</center>
 
-> 本书中所有的代码均是用Typescript编写的，众所周知，Typescript是JavaScript的超集，具有强类型约束，在编译期即可消除安全隐患，具体的介绍可参见官网，见链接<4-2>[https://www.typescriptlang.org/](https://www.typescriptlang.org/)。
+在图4-5中可以看出，卖家（发布者）维护着和各位客户（订阅者）的引用关系，并且可以通过观察者模式添加、解除引用关系。比如，当某天某客户不再中意这款电脑时，卖家（发布者）就无法再引用这份关系了。
 
-下面我们看看代码实现，首先看卖家的模型：
+> 本书中所有的代码均是用Typescript编写的，众所周知，Typescript是JavaScript的超集，具有强类型约束，在编译期即可消除安全隐患。
+
+下面我们看看代码实现，首先看发布者的模型：
+
+
 
 ```ts
-import Customer from "{path}/CustomerModal";
-
-export default class Seller {
-
-    customers: Customer[];
-    register(customer): void {
-        this.customers.push(customer);
-    }
-
-    remove(id: number): void {
-        this.customers.forEach(c => {
-        if (c.getId() === id) {
-            console.log(`this id: ${id} should be removed`);
-        }
-        });
-    }
-
-    notifyAll(): void {
-        this.customers.forEach(cus => {
-        cus.dealOrder();
-    });
-    }
-
+/**
+ * subject，表示发布者操作的接口
+ */
+export default interface ISubject {
+    state: number;
+    //注册订阅
+    register(observer: Observer): void;
+    //取消订阅
+    remove(observer: Observer): void;
+    //通知订阅者
+    notify(): void;
 }
 ```
 
-customers数组维护着所有的订阅者，数组中的每个元素都是Customer对象。我们从模拟对象出发，抽象出该对象：
+在发布着操作的接口中，使用register方法注册观察者，使用remove方法把目标观察者从列表中移除，这两个方法的参数都是观察者实例对象，这个后面我们再具体定义。
+
+为了方便发布者操作，还需要实现一个具体的发布者实例类（实现该接口），以实现Pub/Sub的核心原理
 
 ```ts
-export default class Customer {
+import Observer from "./Observer";
+import Subject from "./Subject"
 
-    private id: number;
-    private name: string;
-    private address: string;
-    private telNum: string;
-    private orders: Order[];
+export default class SubjectA implements Subject {
 
-    constructor(_id: number, _name: string, _address: string, _telNum: string) {
+  //状态码
+  public state: number;
+  //保存所有的订阅者
+  private observers: Observer[] = [];
 
-        this.id = _id;
-        this.name = _name;
-        this.address = _address;
-        this.telNum = _telNum;
-    }
+  //注册
+  public register(observer: Observer): void {
+    const isExist = this.observers.indexOf(observer);
+    if (isExist != -1) {
+        return console.log('订阅者已经存在');
+    }
+    this.observers.push(observer);
+    console.log("订阅者添加完成");
+  }
+  //移出
+  public remove(observer: Observer): void {
+    const observerIndex = this.observers.indexOf(observer);
+    if (observerIndex === -1) {
+        return console.log('要删除的订阅者不存在');
+    }
 
-    getId(): number {
-        return this.id;
-    }
-
-    dealOrder(): void {
-        //make a order
-        console.log(`I am + ${this.name}， I have got message from seller`);
-    }
-
+    this.observers.splice(observerIndex, 1);
+    console.log('订阅已删除');
+  }
+  public notify() {
+    for (const observer of this.observers) {
+      // console.log(this)
+      observer.update(this);
+    }
+  }
+  public setSteateToNotify(): void {
+    this.state = Math.floor(Math.random() * (10 + 1));
+    console.log(`state已经更新为: ${this.state}，并开始通知`);
+    this.notify();
+  }
 }
+
 ```
 
-在看了卖家的模型后，再来看看观察者模式的模型：
+
 
 ```ts
 import Seller from "./Seller";
@@ -542,7 +552,7 @@ export default class Observer {
 }
 ```
 
-在上面的代码中，是从OOP的实现方式开始进行设计的。已经有了观察者模式所需要的两个主要元素：主题（卖家）和观察者（各位客户）（ps:这里是否需要改为发布者和订阅者），一旦数据发生改变，新的数据就会以某种形式推送给观察者。
+在上面的代码中，是从OOP的实现方式开始进行设计的。已经有了观察者模式所需要的两个主要元素：发布者（卖家）和订阅者（各位客户），一旦数据发生改变，新的数据就会以某种形式推送给观察者。
 
 下面我们来测试前面的几段代码：
 

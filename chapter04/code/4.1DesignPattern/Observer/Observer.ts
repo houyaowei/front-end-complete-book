@@ -15,7 +15,7 @@ export default class Observer {
     console.log("");
     this.seller.register(customer);
   }
-  fire(): void {
+  notifyAll(): void {
     this.seller.notifyAll();
   }
   getAllCustomers(): Customer[] {

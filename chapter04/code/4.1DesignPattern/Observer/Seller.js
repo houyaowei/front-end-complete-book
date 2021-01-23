@@ -3,7 +3,7 @@
  * @Date 2020-2-5
  * @author houyw
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var Seller = /** @class */ (function () {
     function Seller() {
         this.customers = new Array();
@@ -25,4 +25,4 @@ var Seller = /** @class */ (function () {
     };
     return Seller;
 }());
-exports.default = Seller;
+exports["default"] = Seller;

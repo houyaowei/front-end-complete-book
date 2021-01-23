@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 /**
  * @Date 2020-2-5
  * @author houyw
@@ -7,13 +7,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Seller_1 = require("./Seller");
 var Observer = /** @class */ (function () {
     function Observer() {
-        this.seller = new Seller_1.default();
+        this.seller = new Seller_1["default"]();
     }
     Observer.prototype.register = function (customer) {
         console.log("");
         this.seller.register(customer);
     };
-    Observer.prototype.fire = function () {
+    Observer.prototype.notifyAll = function () {
         this.seller.notifyAll();
     };
     Observer.prototype.getAllCustomers = function () {
@@ -24,4 +24,4 @@ var Observer = /** @class */ (function () {
     };
     return Observer;
 }());
-exports.default = Observer;
+exports["default"] = Observer;
