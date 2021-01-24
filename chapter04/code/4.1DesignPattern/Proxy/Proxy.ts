@@ -11,7 +11,7 @@ export default class Proxy implements Subject {
   }
 
   private chcekIsGoodFriend() : boolean {
-    console.log("It's is checking if good friend");
+    console.log("It's checking if good friend");
     const r = Math.ceil(Math.random() * 10);
     //只有够意思才给你传话
     if (r > 6 || r == 6) {
@@ -31,9 +31,8 @@ export default class Proxy implements Subject {
 
   public proposal() : void {
     if(this.checkPromission()) {
-      this
-        .realSubject
-        .proposal();
+      this.realSubject.proposal();
+      console.log("Maybe she is willing")
     } else {
       console.log("This friend is unwilling to talk to his girlfriend");
     }

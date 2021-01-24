@@ -625,11 +625,13 @@ state已经更新为: 8，开始通知所有观察者....
 
 电视剧《西游记》中也有代理模式的影子，在《计收猪八戒》中，孙悟空为了给高家“除妖”，扮成高翠兰的模样。从代理模式的角度来看，孙悟空把高翠兰的外貌和行为抽象成了接口，高翠兰和孙悟空都使用了这个接口，可以说孙悟空就是高翠兰的代理类。
 
-下面我们用一个例子进行说明，一位男士想向他女朋友求婚，但由于各种原因不好意思说出口，就想请他的好朋友帮忙传话，如图4-4所示。
+下面我们用一个例子进行说明，一位男士想向他女朋友求婚，但由于各种原因不好意思说出口，就想请他的好朋友帮忙传话，UML描述如图4-7所示。
 
 ![](images/proxy.jpg)
 
-接口：
+<center>图4-7</center>
+
+先定义目标对象接口：
 
 ```ts
 interface Subject {
@@ -637,7 +639,7 @@ interface Subject {
 }
 ```
 
-实现类：
+有了对象接口，我们得看下实现类，也好明白想让目标对象到底做什么（被求婚）：
 
 ```ts
 class RealSubject implements Subject {
@@ -648,7 +650,7 @@ class RealSubject implements Subject {
 }
 ```
 
-代理类：
+接下来定义传话人---代理类：
 
 ```ts
 class Proxy implements Subject {
@@ -696,13 +698,25 @@ let subject : Subject = new Proxy(realSubject);
 
 subject.proposal();
 ```
-PS:这里先给一个测试结果？
-具体请自行检测。
+```
+It's checking the promission
+It's checking if good friend
+Darling, Can you marray me?
+Maybe she is willing
+```
 
-代理模式的优点和缺点：PS： 这里不是少内容了。
+当然，ta也许不同意呢。
 
-代理模式可以代理目标对象，并且是在毫无觉察的情况下进行。
-可以在不修改服务或客户端的情况下，创建新代理。
+```
+It's checking the promission
+It's checking if good friend
+This friend is not worth be trusted. 
+This friend is unwilling to talk to his girlfriend
+```
+
+代理模式可以在不知不觉中访问到具体对象，即便是服务对象不存在或者不可用时。该模式同样也符合开闭原则，即便是在不需要修改服务对象或者客户端代码的情况下，还能创建新的代理。
+
+但是不足的时，代码有变得臃肿的可能，新增加一种代理，就要增加一部分代码。另外，访问目标对象毕竟是通过了中间代理，还是有部分的延迟。
 
 #### 4.1.6装饰者模式
 

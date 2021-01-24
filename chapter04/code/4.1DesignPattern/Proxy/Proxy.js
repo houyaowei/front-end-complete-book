@@ -1,11 +1,11 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var Proxy = /** @class */ (function () {
     function Proxy(ro) {
         this.realSubject = ro;
     }
     Proxy.prototype.chcekIsGoodFriend = function () {
-        console.log("It's is checking if good friend");
+        console.log("It's checking if good friend");
         var r = Math.ceil(Math.random() * 10);
         //只有够意思才给你传话
         if (r > 6 || r == 6) {
@@ -25,9 +25,8 @@ var Proxy = /** @class */ (function () {
     };
     Proxy.prototype.proposal = function () {
         if (this.checkPromission()) {
-            this
-                .realSubject
-                .proposal();
+            this.realSubject.proposal();
+            console.log("Maybe she is willing");
         }
         else {
             console.log("This friend is unwilling to talk to his girlfriend");
@@ -35,4 +34,4 @@ var Proxy = /** @class */ (function () {
     };
     return Proxy;
 }());
-exports.default = Proxy;
+exports["default"] = Proxy;

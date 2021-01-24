@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var RealSubject = /** @class */ (function () {
     function RealSubject() {
     }
@@ -8,4 +8,4 @@ var RealSubject = /** @class */ (function () {
     };
     return RealSubject;
 }());
-exports.default = RealSubject;
+exports["default"] = RealSubject;
