@@ -726,9 +726,11 @@ This friend is unwilling to talk to his girlfriend
 
 2.在某些编译型语言中(如Java)是不允许同时继承多个类的。
 
-下面我们通过一个简单的示例进行说明，如图4-5所示。
+下面我们通过一个简单的示例进行说明，如图4-8所示。
 
 ![](images/decorator.jpg)
+
+<center>图4-8</center>
 
 首先，在接口中定义一个基本的draw方法：
 
@@ -746,14 +748,14 @@ interface Shape {
 CircleShape implements Shape {
 
     public draw(): void {
-       console.log("the drow method in class CircleShape");
+       console.log("the draw method in class CircleShape");
     }
 }
 
 class RectangleShape implements Shape {
 
     public draw(): void {
-        console.log("the drow method in class RectangleShape");
+        console.log("the draw method in class RectangleShape");
     }
 
 }
@@ -777,7 +779,7 @@ class ShapeDecorator implements Shape {
 }
 ```
 
-protected属性保存着Shape对象的引用，调用draw方法，就相当于调用该对象的该方法（ps：哪个对象的哪个方法 最好指明）。接下来定义扩展后的装饰类：
+protected属性保存着Shape对象的引用，调用draw方法，就相当于调用Shape实例对象中的draw方法。接下来定义扩展后的装饰类：
 
 ```ts
 class BlueShapeDecorator extends ShapeDecorator {
@@ -843,7 +845,11 @@ set border in GreenShapeDecorator
 
 `
 
-小结：装饰者和被装饰者相互对立，不是相互耦合。装饰者模式是继承的替代品，可以动态扩展一个实现类。
+装饰者和被装饰者相互对立，不是相互耦合。装饰者模式是继承的替代品，可以动态扩展一个实现类。
+
+从上面的实例中大家也不难发现，想要扩展对象的行为，无需增加新的子类，并且是在运行时执行。再者就是可以使用装饰器对象组合几种操作，而不是在一个装饰器中增加多种操作，操作维护也更方便。但是在装饰器栈中想要删除某一个就显得不那么随意了。
+
+
 
 ### 4.2 V8引擎
 
