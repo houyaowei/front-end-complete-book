@@ -454,9 +454,19 @@ sorry,type wma is not support
 
 > 本书中所有的代码均是用Typescript编写的，众所周知，Typescript是JavaScript的超集，具有强类型约束，在编译期即可消除安全隐患。
 
-下面我们看看代码实现，首先看发布者的模型：
+下面我们看看代码实现，首先看发布者、订阅者的接口定义：
 
+观察者接口定义如下：
 
+```typesript
+export default interface IObserver{
+  update(subject: Subject): void;
+}
+```
+
+该接口只有一个update方法，用来在主题Subject状态改变时接收到通知。在稍后的例子中我们再展开，这里只配合说明接口定义。
+
+发布者的接口
 
 ```ts
 /**
@@ -475,7 +485,7 @@ export default interface ISubject {
 
 在发布着操作的接口中，使用register方法注册观察者，使用remove方法把目标观察者从列表中移除，这两个方法的参数都是观察者实例对象，这个后面我们再具体定义。
 
-为了方便发布者操作，还需要实现一个具体的发布者实例类（实现该接口），以实现Pub/Sub的核心原理
+发布者要想真正实现操作，还需要有一个发布者实现类（实现该接口），以完成Pub/Sub的核心原理。
 
 ```ts
 import Observer from "./Observer";
@@ -514,71 +524,88 @@ export default class SubjectA implements Subject {
     }
   }
   public setSteateToNotify(): void {
-    this.state = Math.floor(Math.random() * (10 + 1));
-    console.log(`state已经更新为: ${this.state}，并开始通知`);
+    this.state = Math.floor(Math.random() * 10);
+    console.log(`state已经更新为: ${this.state}，开始通知所有观察者....`);
     this.notify();
   }
 }
 
 ```
 
+实现ISubject接口，就要实现该接口中的所有方法（这是接口实现的约定）。定一个Observer类型私有变量observers，暂存所有的观察者。为了演示，在register方法和remove方法中只是做简单的indexOf判断，并不严谨。在notify方法中遍历观察者列表，通知各观察者。我们在方法setSteateToNotify中使用Math的random方法产生随机数，模拟状态的动态改变，并继续通知所有观察者。
 
+下面，看下观察者的具体实现
 
 ```ts
-import Seller from "./Seller";
+import Observer from "./Observer"
+import Subject from "./Subject"
+import SubjectInstance from "./SubjectA"
 
-import Customer from "./CustomerModal";
-
-export default class Observer {
-
-    constructor() {
-        this.seller = new Seller();
-    }
-    private seller: Seller;
-
-    register(customer: Customer): void {
-        console.log("");
-        this.seller.register(customer);
-    }
-
-    fire(): void {
-        this.seller.notifyAll();
-    }
-
-    remove(customerId: number): void {
-        this.seller.remove(customerId);
+export default class ObserverB implements Observer {
+  public update(subject: Subject): void {
+    if (subject instanceof SubjectInstance && (subject.state < 8)) {
+        console.log('--观察者B收到通知--');
     }
-
+  }
 }
 ```
 
-在上面的代码中，是从OOP的实现方式开始进行设计的。已经有了观察者模式所需要的两个主要元素：发布者（卖家）和订阅者（各位客户），一旦数据发生改变，新的数据就会以某种形式推送给观察者。
+在Subject的实现类中通过notify通知各个观察者，` observer.update(this)` ，如果满足条件就执行对应的逻辑。
+
+已经有了观察者模式所需要的两个主要元素：发布者（卖家）和订阅者（各位客户），就具备了观察者模式的核心。另外就是我们前面也提到过，一旦发布者（商家）的状态发生改变，新的数据就会以某种形式推送给观察者。
 
 下面我们来测试前面的几段代码：
 
 ```ts
-let customer1 = new Customer(1101, "caozn", "shanxi", "12900000");
-let os = new Observer();
-os.register(customer1);
+import SubjectA from "./SubjectA"
+import ObserverA from "./ObserverA"
+import ObserverB from "./ObserverB"
+//发布者对象
+const subject = new SubjectA();
 
-let customer2 = new Customer(1102, "houyw", "henan", "12900001");
-os.register(customer2);
-console.log(os.getAllCustomers().length);
+//订阅者声明并增加到观察者列表
+const observer1 = new ObserverA();
+subject.register(observer1);
 
-os.fire();
+const observer2 = new ObserverB();
+subject.register(observer2);
+console.log("---------------")
+//通知两次
+subject.setSteateToNotify();
+console.log("---------------")
+
+subject.remove(observer2);
+
+subject.setSteateToNotify();
 ```
 
 得到的结果如下：
 
 `
 
-现在商家有 2 个客户订阅
+订阅者添加完成
 
-I am caozn， I have got message from seller
+订阅者添加完成
 
-I am houyw， I have got message from seller
+\---------------
+
+state已经更新为: 6，开始通知所有观察者....
+
+--观察者A收到通知--
+
+--观察者B收到通知--
+
+\---------------
+
+订阅已删除
+
+state已经更新为: 8，开始通知所有观察者....
+
+--观察者A收到通知--
 
 `
+
+从测试代码看，我们给依赖列表增加两个观察者：A和B，调用setSteateToNotify()，这两个观察者都能收到相应的通知，然后再从观察者列表中把B项移除，就只能有A有通知了。这个效果是我们期望的。
 
 主题和观察者之间是一对多的关系。观察者依赖整个主题（卖家），因为要从主题那里获得通知。主题是有状态的，并且（主语是谁？）可以控制这些状态。
 

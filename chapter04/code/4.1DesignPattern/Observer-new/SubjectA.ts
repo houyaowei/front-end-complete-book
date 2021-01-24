@@ -34,8 +34,8 @@ export default class SubjectA implements Subject {
     }
   }
   public setSteateToNotify(): void {
-    this.state = Math.floor(Math.random() * (10 + 1));
-    console.log(`state已经更新为: ${this.state}，并开始通知`);
+    this.state = Math.floor(Math.random() * 10);
+    console.log(`state已经更新为: ${this.state}，开始通知所有观察者....`);
     this.notify();
   }
 }

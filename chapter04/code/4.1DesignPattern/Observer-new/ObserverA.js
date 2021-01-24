@@ -6,8 +6,8 @@ var ObserverA = /** @class */ (function () {
     }
     ObserverA.prototype.update = function (subject) {
         // console.log("is ObserverA: " , subject instanceof SubjectInstance)
-        if (subject instanceof SubjectA_1["default"] && subject.state < 13) {
-            console.log('观察者A收到通知.');
+        if (subject instanceof SubjectA_1["default"] && subject.state < 10) {
+            console.log('--观察者A收到通知--');
         }
     };
     return ObserverA;

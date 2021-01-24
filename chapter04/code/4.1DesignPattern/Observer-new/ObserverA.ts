@@ -7,8 +7,8 @@ export default class ObserverA implements Observer {
   public update(subject: Subject): void {
     // console.log("is ObserverA: " , subject instanceof SubjectInstance)
 
-    if (subject instanceof SubjectInstance && subject.state < 13) {
-        console.log('观察者A收到通知.');
+    if (subject instanceof SubjectInstance && subject.state < 10) {
+        console.log('--观察者A收到通知--');
     }
   }
 }

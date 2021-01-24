@@ -31,8 +31,8 @@ var SubjectA = /** @class */ (function () {
         }
     };
     SubjectA.prototype.setSteateToNotify = function () {
-        this.state = Math.floor(Math.random() * (10 + 1));
-        console.log("state\u5DF2\u7ECF\u66F4\u65B0\u4E3A: " + this.state + "\uFF0C\u5E76\u5F00\u59CB\u901A\u77E5");
+        this.state = Math.floor(Math.random() * 10);
+        console.log("state\u5DF2\u7ECF\u66F4\u65B0\u4E3A: " + this.state + "\uFF0C\u5F00\u59CB\u901A\u77E5\u6240\u6709\u89C2\u5BDF\u8005....");
         this.notify();
     };
     return SubjectA;
