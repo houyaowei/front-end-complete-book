@@ -454,6 +454,12 @@ sorry,type wma is not support
 
 > 本书中所有的代码均是用Typescript编写的，众所周知，Typescript是JavaScript的超集，具有强类型约束，在编译期即可消除安全隐患。
 
+UML描述如图4-6所示
+
+<img src="./images/observer.png" alt="observer" style="zoom: 50%;" />
+
+<center>图4-6</center>
+
 下面我们看看代码实现，首先看发布者、订阅者的接口定义：
 
 观察者接口定义如下：
