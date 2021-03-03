@@ -7,7 +7,7 @@ const download = require("download-git-repo")
 const ora = require("ora")
 
 //项目模板
-const url = "https://github.com/houyaowei/vue-dev-template.git"
+const url = "direct:https://github.com/houyaowei/vue-dev-template"
 const branch = "master"
 
 commander.version(require('./package').version, '-v, --version')
@@ -26,11 +26,10 @@ commander.version(require('./package').version, '-v, --version')
         message: "请输入作者名称"
       }
     ]).then(answers => {
-      //
+      const spinner = ora("正在下载模板...");
+      spinner.start();
+      console.log(url)
       download(url+ '#' + branch, name, err=> {
-        const spinner = ora("正在下载模板...");
-        spinner.start();
-
         if(!err){
           spinner.succeed();
           const meta = {
