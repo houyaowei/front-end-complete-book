@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+const fs = require("fs")
 const commander = require("commander");
 const inquirer = require("inquirer");
 const chalk = require("chalk");
@@ -10,7 +10,7 @@ const ora = require("ora")
 const url = "https://github.com/houyaowei/vue-dev-template.git"
 const branch = "master"
 
-commander.version("1.0.0").command("init <name>")
+commander.version(require('./package').version, '-v, --version')
   .description("初始化模板").action((name) => {
     if (fs.existsSync(name)) {
       chalk.red.bgRed.bold("project is exist")
@@ -27,11 +27,11 @@ commander.version("1.0.0").command("init <name>")
       }
     ]).then(answers => {
       //
-      download(url+ '#' + branch, name, error => {
+      download(url+ '#' + branch, name, err=> {
         const spinner = ora("正在下载模板...");
         spinner.start();
 
-        if(!error){
+        if(!err){
           spinner.succeed();
           const meta = {
             name,
@@ -53,4 +53,4 @@ commander.version("1.0.0").command("init <name>")
       })
     })
   })
-  program.parse(process.argv);
+  commander.parse(process.argv);
