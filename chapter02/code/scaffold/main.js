@@ -1,22 +1,28 @@
 #!/usr/bin/env node
 const fs = require("fs")
-const commander = require("commander");
+const { program } = require('commander');
+const handlebars = require("handlebars")
 const inquirer = require("inquirer");
 const chalk = require("chalk");
 const download = require("download-git-repo")
 const ora = require("ora")
 
 //项目模板
-const url = "direct:https://github.com/houyaowei/vue-dev-template"
+const url = "direct:https://github.com/houyaowei/vue-dev-template.git"
 const branch = "master"
-
-commander.version(require('./package').version, '-v, --version')
-  .description("初始化模板").action((name) => {
+// console.log(program.command)
+program.version(require('./package').version, '-v, --version')
+  .description("初始化模板").
+  action((name) => {
     if (fs.existsSync(name)) {
       chalk.red.bgRed.bold("project is exist")
       process.exit()
     }
     inquirer.prompt([
+      {
+        name: "projName",
+        message: "请输入项目名字"
+      },
       {
         name: "description",
         message: "请输入项目描述"
@@ -27,9 +33,9 @@ commander.version(require('./package').version, '-v, --version')
       }
     ]).then(answers => {
       const spinner = ora("正在下载模板...");
-      spinner.start();
-      console.log(url)
-      download(url+ '#' + branch, name, err=> {
+      spinner.start(); 
+      let name = answers.projName
+      download(url+ '#' + branch, name, {clone: true}, err=> {
         if(!err){
           spinner.succeed();
           const meta = {
@@ -52,4 +58,4 @@ commander.version(require('./package').version, '-v, --version')
       })
     })
   })
-  commander.parse(process.argv);
+  program.parse(process.argv);
