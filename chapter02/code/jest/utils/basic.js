@@ -18,12 +18,17 @@ function fetchData() {
 }
 
 async function fetchDataWithAwait() {
-  const res = await axios.get(url);
+  const res = await fetchData();
   return res;
+}
+
+function testException(){
+   throw new Error("no cookies")
 }
 
 module.exports = {
   sum,
   fetchData,
-  fetchDataWithAwait
+  fetchDataWithAwait,
+  testException
 }

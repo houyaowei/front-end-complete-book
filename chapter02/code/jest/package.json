@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build-coverage": "jest -coverage"
   },
   "keywords": [],
   "author": "",
