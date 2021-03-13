@@ -6,7 +6,7 @@ const { getApplist} = require("../utils/funcList")
 jest.mock('axios');
 
 describe("function test cases", ()=> { 
-    
+  expect.assertions(1); 
   test('getApplist  should return value ', async ()=> {
     const apps = [{
       appId: '1',

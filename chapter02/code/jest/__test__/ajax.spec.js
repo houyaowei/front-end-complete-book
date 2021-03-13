@@ -1,12 +1,17 @@
 /**
- * 测试异步代码
+ * 测试异步代码,主要测试Promise
  */
 
 const { fetchData ,fetchDataWithAwait } = require("../utils/basic")
 
 describe("ajax functions test cases", ()=> {
-  test('should ', () => {
-    
+  test('should return data when fetchData with request ', () => {
+      return expect(fetchData()).resolves.toEqual({
+        "userId": 1,
+        "id": 1,
+        "title": "delectus aut autem",
+        "completed": false
+    }) 
   })
   
   // test('should return data when fetchData request success', () => {

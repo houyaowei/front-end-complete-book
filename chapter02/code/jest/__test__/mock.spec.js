@@ -35,21 +35,12 @@ describe("mock function test",()=> {
   })
   test('mock calls test cases ', () => {
       const mockCallback = jest.fn();
-      forEach([0, 1], mockCallback);
+      forEach([0, 1], mockCallback); //mock函数代替真实的回调函数
 
       //调用两次
       expect(mockCallback.mock.calls.length).toBe(2);
       // 第一次调用函数时的第一个参数是 0
       expect(mockCallback.mock.calls[0][0]).toBe(0);
-  })
-  test('mock Object', () => {
-      const myMock = jest.fn();
-      const a = new myMock();
-      const b = {};
-      const bound = myMock.bind(b);
-      bound();
-      
-      console.log(myMock.mock.instances);
   })
   
 })
