@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rollup --config"
+    "build": "cross-env NODE_ENV=production rollup --config"
   },
   "keywords": [],
   "author": "houyw",
   "license": "MIT",
   "dependencies": {
+    "cross-env": "^7.0.3",
     "rollup": "^2.41.5"
   },
   "devDependencies": {

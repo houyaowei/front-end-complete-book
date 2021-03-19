@@ -1,18 +1,1 @@
-(function (factory) {
-	typeof define === 'function' && define.amd ? define(factory) :
-	factory();
-}((function () { 'use strict';
-
-	function createCommonjsModule(fn, module) {
-		return module = { exports: {} }, fn(module, module.exports), module.exports;
-	}
-
-	var module1 = createCommonjsModule(function (module) {
-	  module["export"] = function () {
-	    return "aa";
-	  };
-	});
-
-	module1();
-
-})));
+!function(n){"function"==typeof define&&define.amd?define(n):n()}(function(){"use strict";var n;(function(n){n.export=function(){return"aa"}}(n={exports:{}}),n.exports)()});
