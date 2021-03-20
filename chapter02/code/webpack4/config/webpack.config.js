@@ -7,11 +7,23 @@ const resolve = dir => {
 module.exports = {
   mode: 'development',
   entry: {
-    index: [
-      './src/scripts/index.js',
-    ]
+    index: './src/scripts/index.js'
   },
   output: {
-    filename: 'index.js'
-  }
+    filename: '[name].js',
+    path: path.resolve(__dirname, '../dist'),
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+          commons: {
+            chunks: 'all',
+            name: 'commons',
+            minChunks: 1,
+            minSize: 10,
+            maxSize: 20
+          }
+      }
+    }
+}
 }
