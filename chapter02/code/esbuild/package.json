@@ -1,0 +1,18 @@
+{
+  "name": "esbuild",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "esbuild app.jsx --bundle --define:process.env.NODE_ENV=development --outfile=out.js",
+    "build": "esbuild app.jsx --bundle --outfile=out.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.9.5",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  }
+}
