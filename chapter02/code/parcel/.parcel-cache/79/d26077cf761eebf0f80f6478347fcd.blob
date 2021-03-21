@@ -1,0 +1,2 @@
+require("../utils/utils");
+document.write("hello,parcel");

@@ -1,0 +1,8 @@
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+_parcelHelpers.defineInteropFlag(exports);
+exports.default = {
+  getCreateTime: () => {
+    let d = new Date();
+    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDay();
+  }
+};

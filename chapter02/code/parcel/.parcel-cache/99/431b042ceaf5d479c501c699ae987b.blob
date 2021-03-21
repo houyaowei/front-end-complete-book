@@ -1,0 +1,5 @@
+var _srcUtilsIndex = require("src/utils/index");
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+var _srcUtilsIndexDefault = _parcelHelpers.interopDefault(_srcUtilsIndex);
+document.writeln("hello,parcel");
+document.writeln("name from utils:", _srcUtilsIndexDefault.default.projectName);

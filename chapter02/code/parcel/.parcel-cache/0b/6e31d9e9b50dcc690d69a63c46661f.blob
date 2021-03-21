@@ -1,0 +1,3 @@
+require("../utils/utils");
+document.write("hello,parcel");
+document.write("name from utils:");

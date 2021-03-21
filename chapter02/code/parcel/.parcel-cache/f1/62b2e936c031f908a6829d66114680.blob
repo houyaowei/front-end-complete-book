@@ -1,0 +1,1 @@
+module.exports = JSON.parse("{\"name\":\"parcel\",\"version\":\"1.0.0\",\"description\":\"procel for book\",\"main\":\"entry.js\",\"scripts\":{\"start\":\"parcel index.html\"},\"keywords\":[],\"author\":\"houyw\",\"license\":\"MIT\",\"dependencies\":{\"parcel\":\"^2.0.0-beta.2\",\"postcss-modules\":\"3.2.2\"},\"devDependencies\":{\"autoprefixer\":\"^10.2.5\"}}");

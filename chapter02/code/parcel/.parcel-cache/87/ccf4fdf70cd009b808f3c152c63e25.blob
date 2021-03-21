@@ -1,0 +1,12 @@
+var _srcUtilsIndex = require("./src/utils/index");
+var _parcelHelpers = require("@parcel/transformer-js/lib/esmodule-helpers.js");
+var _srcUtilsIndexDefault = _parcelHelpers.interopDefault(_srcUtilsIndex);
+var _srcScriptsIndex = require("./src/scripts/index");
+var _srcScriptsIndexDefault = _parcelHelpers.interopDefault(_srcScriptsIndex);
+require("./style.css");
+debu;
+document.writeln("hello,parcel<br>");
+document.writeln("project name :", _srcUtilsIndexDefault.default.projectName, "<br>");
+document.writeln("project version :", _srcUtilsIndexDefault.default.getVersion(), "<br>");
+document.writeln("project create at:", _srcScriptsIndexDefault.default.getCreateTime(), "<br>");
+document.writeln("project created by:", _srcUtilsIndexDefault.default.getAuthor(), "<br>");
