@@ -1,0 +1,19 @@
+{
+  "name": "webpack5",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf dist/ && webpack --config config/webpack.config.js --progress"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack-dev-server": "^3.11.2"
+  },
+  "dependencies": {
+    "webpack": "4.44.2",
+    "webpack-cli": "3.3.12"
+  }
+}
