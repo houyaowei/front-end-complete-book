@@ -71,3 +71,109 @@ console.log("hello,webpack4 ")
 
 > 可以通过  **npm ls webpack** 命令查看已经安装包的版本
 
+![webpack5](./images/wp-01.png)
+
+<center>图4-1</center>
+
+![webpack5](./images/wp-02.png)
+
+<center>图4-2</center>
+
+接下来在package.json中配置script：
+
+```js
+"scripts": {
+    "build": "rm -rf dist/ && webpack --config config/webpack.config.js --progress"
+ }
+```
+
+有了配置后，我们开始编译这两个工程:
+
+```js
+yarn run build
+```
+
+先看两个版本打包后文件大小
+
+v5
+
+```
+asset index.js 1.26 KiB [emitted] (name: index)
+```
+
+v4
+
+```js
+index.js   6.26 KiB      index  [emitted]  index
+```
+
+只从文件大小来看，明显缩小了很多。因为在webpack5的版本中去掉了很多模块管理代码，代码一下子清爽了很多，如下代码。
+
+```js
+/*
+ * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
+/******/ (() => { // webpackBootstrap
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/scripts/index.js":
+/*!******************************!*\
+  !*** ./src/scripts/index.js ***!
+  \******************************/
+/***/ (() => {
+
+eval("console.log(\"hello,webpack5\")\n\n//# sourceURL=webpack://webpack5/./src/scripts/index.js?");
+
+/***/ })
+```
+
+下面看下另一个比较实用的配置：splitChunks和module size。
+
+在v4版本中，通常在optimization会这样配置：
+
+```
+optimization: {
+    splitChunks: {
+      cacheGroups: {
+          commons: {
+            chunks: 'all',
+            name: 'commons',
+            minChunks: 1,
+            minSize: 10,
+            maxSize: 20
+          }
+      }
+    }
+  }
+```
+
+与显示单个数字和具有不同类型的尺寸相比，模块现在有了更好的方式表示不同size的能力。 现在，SplitChunksPlugin知道如何处理这些不同的size，并将它们用于minSize和maxSize。 默认情况下，仅处理javascript大小。
+
+```js
+optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          chunks: 'all',
+          name: 'commons',
+        }
+      },
+      minSize: {
+        javascript: 0,
+        style: 0,
+      },
+      //最大的文件 超过之后继续拆分
+      maxSize: {
+        javascript: 1,
+        style: 3000,
+      }
+    }
+  }
+```
+
+ 

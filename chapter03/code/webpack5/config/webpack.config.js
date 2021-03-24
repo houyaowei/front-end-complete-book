@@ -14,17 +14,17 @@ module.exports = {
     filename: '[name].js',
     path: path.resolve(__dirname, '../dist'),
   },
-  cache: {
-    type: 'filesystem',
-    // 自定义缓存目录，
-    cacheDirectory: path.resolve(__dirname, '.cache_file'),
-    // buildDependencies: {
-    //   // 添加项目配置作为构建依赖项，以便配置更改时缓存失效
-    //   config: [_cacheFileName],
-    //   // 如果还有构建依赖其他内容，在此处添加
-    //   //注意，配置中引用的webpack、加载器和所有模块都会被自动添加
-    // }
-  },
+  // cache: {
+  //   type: 'filesystem',
+  //   // 自定义缓存目录，
+  //   cacheDirectory: path.resolve(__dirname, '.cache_file'),
+  //   // buildDependencies: {
+  //   //   // 添加项目配置作为构建依赖项，以便配置更改时缓存失效
+  //   //   config: [_cacheFileName],
+  //   //   // 如果还有构建依赖其他内容，在此处添加
+  //   //   //注意，配置中引用的webpack、加载器和所有模块都会被自动添加
+  //   // }
+  // },
   optimization: {
     splitChunks: {
       cacheGroups: {
