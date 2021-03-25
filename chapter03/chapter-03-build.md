@@ -223,7 +223,7 @@ node包引用的过程是这样的：在require一个核心模块或者本地相
 npm install -g yarn
 ```
 
-也需要在package.json配置
+也需要在package.json配置，也可以通过yarn --pnp开启（yarn --disable-pnp关闭），
 
 ```json
 // package.json
@@ -235,5 +235,14 @@ npm install -g yarn
 }
 ```
 
+我们先把node_modules删掉，再执行**yarn install** , 发现不再有node_modules生成，而是多了一个.pnp.js文件。这是一张静态映射表，该表中包含了以下信息：
 
+- 当前项目包含了哪些依赖包的哪些版本
+- 依赖包是如何互相关联的
+- 依赖包在文件系统中的具体位置
 
+这个 `.pnp.js` 文件是如何生成，Yarn 又是如何利用它的呢？
+
+在安装依赖时，在第 3 步完成之后，Yarn 并不会拷贝依赖到 `node_modules` 目录，而是会在 `.pnp.js` 中记录下该依赖在缓存中的具体信息。这样就避免了大量的 I/O 操作同时项目目录也不会有 `node_modules` 目录生成。
+
+同时 `.pnp.js` 还包含了一个特殊的 resolver，Yarn 会利用这个特殊的 resolver 来处理 `require()` 请求，该 resolver 会根据 `.pnp.js` 文件中包含的静态映射表直接确定依赖在文件系统中的具体位置，从而避免了现有实现在处理依赖引用时的 I/O 操作。
