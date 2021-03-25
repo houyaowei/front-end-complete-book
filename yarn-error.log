@@ -1,0 +1,27 @@
+Arguments: 
+  /usr/local/bin/node /usr/local/Cellar/yarn/1.22.10/libexec/bin/yarn.js add lite-server global
+
+PATH: 
+  /Users/eason/.deno/bin:/Library/Frameworks/Python.framework/Versions/3.7/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Library/Apple/usr/bin:/Users/eason/.cargo/bin:/Users/eason/Documents/workspace/go/bin:/usr/local/go/bin:/Users/eason/Documents/flutter/lib/bin:/Users/eason/Library/Android/sdk/tools:/Users/eason/Library/Android/sdk/platform-tools:/Users/eason/Documents/appBuild/apache-maven-3.6.3/bin
+
+Yarn version: 
+  1.22.10
+
+Node version: 
+  12.13.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: read ETIMEDOUT
+      at TLSWrap.onStreamRead (internal/stream_base_commons.js:201:27)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
