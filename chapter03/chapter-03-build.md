@@ -256,3 +256,50 @@ npm install -g yarn
 #### 真实内容哈希
 
 当output中的filname使用 `[contenthash]` 时，webpack4仅使用文件内部结构的哈希。webpack5是文件内容真实哈希，如果是仅修改注释或重命名变量，webpack5是可以监测到文件变化的，而webpack4监听不到变化。
+
+#### 命名代码块 ID 
+
+webpack5中默认在开发模式下启用了新命名的module ID算法，该算法提供了chunks（和文件名）开发人员可读的引用方式。 module ID由其相对于上下文的路径确定。 chunk ID由module的内容确定，例如：src_demo1_data_js.js，因此在开发调试chunk不再需要这样使用： 
+
+```
+import(/* webpackChunkName: "name" */ "module")
+```
+
+而是直接
+
+```
+import("module") 
+```
+
+当然，也可以在生产环境安全的前提下使用 ，需要在optimization 设置`chunkIds: "named"` 。如果你不喜欢在开发中改变文件名，你可以通过 `chunkIds: "natural"` 来使用旧的数字模式。
+
+#### 支持全新的 Node.js 生态特性
+
+这部分主要包含两部分，第一就是Yarn PnP，该特性在前面已经做了解释。再者就是支持 package.json 中的 `exports` 和 `imports` 字段。
+
+package.json中的exports字段允许先声明再使用，比如“import  crypto-test” 或“import  crypto-test/sub”之类的。 这种实现方式替换了导入模块时默认返回包的index.js文件。文件系统会查找“crypto-test/sub”。
+
+比如说这样的配置
+
+```
+{
+  "exports": {
+    ".": "./main.js",
+    "./sub/path": "./secondary.js",
+    "./prefix/": "./directory/",
+    "./prefix/deep/": "./other-directory/",
+    "./other-prefix/*": "./yet-another/*/*.js"
+  }
+}
+```
+
+对应的导出结果是这样的
+
+| 模块标识                            | 查找文件结果                                     |
+| :---------------------------------- | :----------------------------------------------- |
+| `package`                           | `.../package/main.js`                            |
+| `package/sub/path`                  | `.../package/secondary.js`                       |
+| `package/prefix/some/file.js`       | `.../package/directory/some/file.js`             |
+| `package/prefix/deep/file.js`       | `.../package/other-directory/file.js`            |
+| `package/other-prefix/deep/file.js` | `.../package/yet-another/deep/file/deep/file.js` |
+| `package/main.js`                   | Error                                            |
