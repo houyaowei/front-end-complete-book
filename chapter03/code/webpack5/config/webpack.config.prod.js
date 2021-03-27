@@ -1,5 +1,4 @@
 const path = require('path')
-const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 const _cacheFileName = "catch_fle"
 const resolve = dir => {
@@ -7,17 +6,13 @@ const resolve = dir => {
 }
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: {
     index: './src/scripts/index.js'
   },
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, '../dist'),
-  },
-  devServer: {
-    contentBase: './dist',
-    port: 9001
   },
   // cache: {
   //   type: 'filesystem',
@@ -50,13 +45,18 @@ module.exports = {
     //   }
     // }
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      title: 'Development',
-      template: 'index.html',
-      meta: {
-        keywords: 'webpack5的使用',
-      },
-    }),
-  ],
+  // module: {
+  //   rules: [
+  //     {
+  //       test: /\.js$/,
+  //       exclude: /node_modules/,
+  //       use: {
+  //         loader: 'babel-loader',
+  //         options: {
+  //           presets: ['@babel/preset-env']
+  //         }
+  //       }
+  //     }
+  //   ]
+  // }
 }

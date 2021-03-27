@@ -322,7 +322,7 @@ package.json中的exports字段允许先声明再使用，比如“import  crypt
 
 接下来建一个主文件encrypt.js, 输入示例代码：
 
-```
+```js
 module.exports = function(){
   console.log("packages/encrypto.js")
 }
@@ -330,7 +330,7 @@ module.exports = function(){
 
 在根目录下建立子目录libs，并建立子包需要的文件trim.js
 
-```
+```js
 module.exports = function(str){
   return str.replace(/\s+/g,"")
 }
@@ -362,10 +362,145 @@ module.exports = function(str){
 
 有了上面的配置，就可以在js文件中以如下方式引用改包了
 
-```
+```js
 import encryptTest from "encrypt-test";
 import trim from "encrypt-test/trim";
 ```
 
 #### 经过优化的构建目标(target) 
+
+Webpack 5 允许传递一个目标列表，并且支持目标的版本。例如：
+
+```
+target: "node14"   
+target: ["web", "es2020"]
+```
+
+####  Web 平台特性支持
+
+###### 图片导入
+
+Webpack 5 已经对资源模块提供了内置支持,这些模块可以在输出文件夹生成一个文件。
+
+导入图片时，不再像以前借助file-loader、url-loader、raw-loader, 在webpack5中简单配置即可。
+
+```js
+module.exports = {
+  output: {
+    assetModuleFilename: 'images/[name].[hash:5][ext]',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpg|svg)$/,
+        type: 'asset',
+      },
+    ],
+  },
+  experiments: {
+    asset: true,
+  },
+};
+```
+
+###### 异步引入
+
+wepback4是这样异步引入代码的
+
+```js
+import('./entry').then(res => {
+  console.log(res);
+});
+```
+
+但是，无法处理被导入的模块是async/await实现的。
+
+```js
+// async.js
+let output;
+async function main() {
+  const dynamic = await import('./data');
+  output = dynamic + 'from aysnc';
+}
+main();
+export default output;
+
+// index.js
+import output from './async';
+console.log(output); // undefined
+
+```
+
+在webpack5中修复了这个问题，开启topLevelAwait 就可以实现，并且无需外面包裹 async，所以就变成了下面的样子
+
+```js
+// async.js
+const dynamic = await import('./data');
+const output = dynamic 'from aysnc';
+export default output;
+```
+
+###### webassembly更方便支持
+
+我们先把两个数相加的工具方法生成一个wasm文件utils.wasm，如果对webassembly不是很熟悉，请先移步到本书的6.6节了解相关的东西。
+
+```go
+func add(a,b int) int {
+	return a+b
+}
+```
+
+
+
+在webpack4中不能同步地加载，否则会报错，更不能把wasm当成主chunk。
+
+```
+import('path/utils.wasm').then(_ => {
+   console.log(_.add(4, 6));
+});
+```
+
+用了webpack5之后，只要开启 syncWebAssembly和syncWebAssembly后，就可以像导入一个普通的模块那样使用了
+
+```js
+// webpack.config.js
+module.exports = {
+  experiments: {
+    asyncWebAssembly: true,
+    syncWebAssembly: true,
+  },
+};
+
+// index.js
+import { add } from './utils'
+console.log(add(4, 6))
+```
+
+###### webpack-dev-server改进
+
+webpack5中使用dev server更加方便，在装完npm包，不需要要在webpack配置文件中引入该插件，只要在package.json的scripts中加上 serve 参数即可
+
+```js
+webpack serve --config config/webpack.config.js --open
+```
+
+
+
+#### 模块联邦
+
+Webpack5之前可以通过 DLL 或者 Externals 做代码共享，但是不足的是还做不到跨项目和应用共享，更别说要做到热拔插了。webpack5中的模块联邦就是为了解决这种问题而诞生的。通过该机制，可以让构建后的代码库**动态的**、**运行时的**跑在另一个代码库中。通过细化功能模块、组件复用、共享第三方库、线上加载npm包等方式，可以更好的服务于多页应用、微前端等开发模式。
+
+webpack5提供了一个叫做ModuleFederationPlugin的插件实现该机制，需要配置一下几个参数：
+
+name：必传且唯一，第三方引用关键名称。
+
+library: 声明一个挂载在全局下的变量名，其中name即为umd的name
+
+filename: 构建后的chunk名称
+
+Exposes: 作为被引用方最关键的配置项，用于暴露对外提供的modules模块
+
+shared: 声明共享的第三方资源
+
+
 
