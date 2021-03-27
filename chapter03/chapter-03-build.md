@@ -277,7 +277,7 @@ import("module")
 
 这部分主要包含两部分，第一就是Yarn PnP，该特性在前面已经做了解释。再者就是支持 package.json 中的 `exports` 和 `imports` 字段。
 
-package.json中的exports字段允许先声明再使用，比如“import  crypto-test” 或“import  crypto-test/sub”之类的。 这种实现方式替换了导入模块时默认返回包的index.js文件。文件系统会查找“crypto-test/sub”。
+package.json中的exports字段允许先声明再使用，比如“import  crypto-test” 或“import  crypto-test/sub”之类的。 这种实现方式替换了导入模块时默认返回包的index.js文件。
 
 比如说这样的配置
 
@@ -295,11 +295,77 @@ package.json中的exports字段允许先声明再使用，比如“import  crypt
 
 对应的导出结果是这样的
 
-| 模块标识                            | 查找文件结果                                     |
-| :---------------------------------- | :----------------------------------------------- |
-| `package`                           | `.../package/main.js`                            |
-| `package/sub/path`                  | `.../package/secondary.js`                       |
-| `package/prefix/some/file.js`       | `.../package/directory/some/file.js`             |
-| `package/prefix/deep/file.js`       | `.../package/other-directory/file.js`            |
-| `package/other-prefix/deep/file.js` | `.../package/yet-another/deep/file/deep/file.js` |
-| `package/main.js`                   | Error                                            |
+| 模块标识                             | 查找文件结果                                 |
+| :----------------------------------- | :------------------------------------------- |
+| `.` 不能省略，和原配置main的含义相同 | `package/main.js`                            |
+| `package/sub/path`                   | `package/secondary.js`                       |
+| `package/prefix/some/file.js`        | package/directory/some/file.js`              |
+| `package/prefix/deep/file.js`        | `package/other-directory/file.js`            |
+| `package/other-prefix/deep/file.js`  | `package/yet-another/deep/file/deep/file.js` |
+| `package/main.js`                    | Error                                        |
+
+如果没有对应的配置，就会报错，如上面的**`package/main.js`**.
+
+我们先定义一个实例module，目录命名为encrypt-test, 并新建一个package.json，name和目录名保持一致。
+
+```
+{
+  "name": "encrypt-test"
+}
+```
+
+我们下看下目录结构
+
+![webpack5](./images/wp-03.png)
+
+<center>图3-3</center>
+
+接下来建一个主文件encrypt.js, 输入示例代码：
+
+```
+module.exports = function(){
+  console.log("packages/encrypto.js")
+}
+```
+
+在根目录下建立子目录libs，并建立子包需要的文件trim.js
+
+```
+module.exports = function(str){
+  return str.replace(/\s+/g,"")
+}
+```
+
+现在在package.json中配置exports
+
+```js
+{
+  "name": "encrypt-test",
+  "exports": {
+    ".": {
+      "browser" : {
+        "default": "./encrypt.js"
+      },
+      "require": "./encrypt.js",
+      "import": "./encrypt.js"
+    },
+    "./trim" : {
+      "browser" : {
+        "default": "./libs/trim.js"
+      }
+    }
+  }
+}
+```
+
+先配置一个**.**，这个是必须的，代表main字段配置。browser代码支持浏览器，require代表require()方式引入，import代表"import xx from ..."引用方式。
+
+有了上面的配置，就可以在js文件中以如下方式引用改包了
+
+```
+import encryptTest from "encrypt-test";
+import trim from "encrypt-test/trim";
+```
+
+#### 经过优化的构建目标(target) 
+

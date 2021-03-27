@@ -1,0 +1,17 @@
+{
+  "name": "encrypt-test",
+  "exports": {
+    ".": {
+      "browser" : {
+        "default": "./encrypt.js"
+      },
+      "require": "./encrypt.js",
+      "import": "./encrypt.js"
+    },
+    "./trim" : {
+      "browser" : {
+        "default": "./libs/trim.js"
+      }
+    }
+  }
+}
