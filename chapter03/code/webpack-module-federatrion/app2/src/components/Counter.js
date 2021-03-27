@@ -3,9 +3,9 @@ import React from 'react';
 function Counter(props) {
   return (
     <>
-      <p>Count: {props.count}</p>
-      <button onClick={props.onIncrement}>Increment</button>
-      <button onClick={props.onDecrement}>Decrement</button>
+      <p>当前值: {props.count}</p>
+      <button onClick={props.onIncrement}>增加</button>
+      <button onClick={props.onDecrement}>减少</button>
     </>
   );
 }

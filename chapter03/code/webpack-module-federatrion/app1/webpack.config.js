@@ -29,7 +29,7 @@ module.exports = {
       name: 'app1',
       library: { type: 'var', name: 'app1' },
       remotes: {
-        app2: 'app2',
+        appAlias: 'app2',
       },
       shared: ['react', 'react-dom'],
     }),

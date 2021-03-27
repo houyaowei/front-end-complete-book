@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
-const Counter = React.lazy(() => import('app2/Counter'));
+const Counter = React.lazy(() => import('appAlias/Counter'));
 
 function App() {
   const [count, setCount] = useState(0);
   return (
     <>
-      <h1>Hello from React component</h1>
+      <h3>module federation App1 </h3>;
+
       <React.Suspense fallback='Loading Counter...'>
         <Counter
           count={count}

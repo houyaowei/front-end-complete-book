@@ -496,11 +496,137 @@ name：必传且唯一，第三方引用关键名称。
 
 library: 声明一个挂载在全局下的变量名，其中name即为umd的name
 
-filename: 构建后的chunk名称
+filename: 构建后的chunk名称，通过
 
 Exposes: 作为被引用方最关键的配置项，用于暴露对外提供的modules模块
 
 shared: 声明共享的第三方资源
 
+我们接下来通过一个简单的实例来实战一把。新建两个工程App1和APP2，在APP2中暴露一定的模块在APP1中使用。先看下App2，
 
+```
+├── package.json
+├── public
+|  └── index.html
+├── src
+|  ├── app.js
+|  ├── components
+|  └── index.js
+├── webpack.config.js
+└── yarn.lock
+```
+
+配置webconfig.config.js（省略部分配置），端口暴露为3001
+
+```js
+const { ModuleFederationPlugin } = require('webpack').container;
+
+module.exports = {
+  entry: './src/index',
+  mode: 'development',
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    port: 3001,
+  },
+  output: {
+    publicPath: "http://localhost:3001/", 
+  },
+  module: {
+    省略
+  },
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'app2',
+      library: { type: 'var', name: 'app2' },
+      filename: 'remoteEntry.js',
+      exposes: {
+        './Counter': './src/components/Counter',
+      },
+      shared: ['react', 'react-dom'],
+    })
+  ],
+};
+
+
+```
+
+需要注意的是filename，这个是暴露出去的chunk名称，也就是可以通过这个name进行远程访问。接下来，再在src/components声明一个要暴露出去的展示组件。
+
+```
+import React from 'react';
+
+function Counter(props) {
+  return (
+    <>
+      <p>Count: {props.count}</p>
+      <button onClick={props.onIncrement}>Increment</button>
+      <button onClick={props.onDecrement}>Decrement</button>
+    </>
+  );
+}
+```
+
+App2工程新建完毕。现在我们看下App1的配置。先看webpack.config.js，设置端口为3000
+
+```js
+const { ModuleFederationPlugin } = require('webpack').container;
+
+module.exports = {
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    port: 3000,
+  },
+  output: {
+    publicPath: "http://localhost:3000/",
+  },
+  module: {
+    省略
+  },
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'app1',
+      library: { type: 'var', name: 'app1' },
+      remotes: {
+        appAlias: 'app2',
+      },
+      shared: ['react', 'react-dom'],
+    }),
+  ],
+};
+```
+
+在这里特别需要注意的是在ModuleFederationPlugin中设置remote，指定依赖的远程库，并给远程库起一个别名appAlias。
+
+还需要在index.html中引入远程库
+
+```
+<script src="http://localhost:3001/remoteEntry.js"></script>
+```
+
+下面我们在APP1中新建一个组件用例测试一下远程组件是否真的生效。在src下新建一个app.js
+
+```react
+const Counter = React.lazy(() => import('appAlias/Counter'));
+
+function App() {
+  const [count, setCount] = useState(0);
+  return (
+    <>
+      <React.Suspense fallback='Loading Counter...'>
+        <Counter
+          count={count}
+          onIncrement={() => setCount(count + 1)}
+          onDecrement={() => setCount(count - 1)}
+        />
+      </React.Suspense>
+    </>
+  );
+}
+```
+
+万事俱备，现在可以把两个应用启动一下看看效果了。
+
+![效果](./images/wp-4.png)
+
+<center>图3-4</center>
 
