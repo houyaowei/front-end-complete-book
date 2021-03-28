@@ -4,7 +4,7 @@ import { Button } from 'antd'
 function Home() {
   return (
     <div>
-      <div>Home</div>
+      <div>Home, from router</div>
       <Button type="primary">submit</Button>
     </div>
   );

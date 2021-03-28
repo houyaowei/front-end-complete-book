@@ -665,7 +665,271 @@ Bundle和Bundleless是两种开发方式，自 2015 年 ESM 标准发布后，�
 - 使用System.js 之类的 ES 模块加载器，这样做的好处是具有很好的模块兼容性。
 - 直接利用标准的 ES Module。该module实现已经标准化，并且各个浏览器厂商也已纷纷支持(edge79, firefox 67, chrome63, safari11.1,opera50, 这是几个浏览器支持ES module的最低版本 )。我详细以后前端同时整体架构在各种标准化的基础上也会变得更加简单。
 
+可以用一个表格对两种模式进行下对比。
 
+|          | Bundle                          | Bundleless                       |
+| -------- | ------------------------------- | -------------------------------- |
+| 启动时间 | 时间较长                        | 短，只启动Server 按需加载        |
+| 构建时间 | 随项目体积线性增长              | 构建时间复杂度O(1)               |
+| 加载性能 | 打包后加载对应Bundle            | 请求映射的本地文件               |
+| 缓存能力 | 缓存利用率一般，受split方式影响 | 缓存利用率近乎完美               |
+| 文件更新 | 重新打包                        | 重新请求单个文件                 |
+| 调试体验 | 需要SourceMap                   | 不强依赖SourceMap,可单文件调试   |
+| 生态     | 比较完善                        | 目前相对不成熟，但是方案越来越多 |
+
+基于ES module的构建，其实vite并不是首创，同样的实践在之前以后类似的轮子，如esbuild，snowpack，es-dev-server等。这部分我们将通过一个实例来介绍一下vite是如何进行开发的。
+
+同常见的开发工具一样，vite 提供了用 npm 或者 yarn 一建生成项目结构的方式。我们使用 yarn来生成一个React项目：
+
+```js
+yarn create vite-app vite-project
+cd vite-project
+yarn install
+```
+
+目录结果是这样的：
+
+```js
+├── index.html
+├── node_modules
+├── package.json
+├── src
+|  ├── App.css
+|  ├── App.jsx
+|  ├── api
+|  |  ├── request.js
+|  |  ├── serviceApi.js
+|  |  └── urlConfig.js
+|  ├── constants
+|  |  └── statusCode.js
+|  ├── contanier
+|  |  ├── home
+|  |  └── main
+|  ├── favicon.svg
+|  ├── index.css
+|  ├── logo.svg
+|  ├── main.jsx
+|  ├── routers
+|  |  ├── history.js
+|  |  └── index.js
+|  └── utils
+├── vite.config.js
+└── yarn.lock
+```
+
+index.html为页面入口，main.jsx为系统主入口，vite.config.js为配置文件，该文件可以类比vue项目的vue.config.js。
+
+在项目开始前，我先引入几个项目核心库: 核心库react-router-dom和history, UI库ant design，ajax库axios，css预处理器Less。
+
+第一步先配置下组件库，因为在后面的组件中我们会用到UI组件。我们考虑在配置文件中引入，而不是在main.jsx中，这是因为如果是在main.jsx中引入的话，项目build的时候构建工具会把整个css文件全部引入，这样是没有必要的，所以尝试按需加载。
+
+vite按需加载需要借助插件vite-plugin-imp ，
+
+```js
+yarn add vite-plugin-imp -D
+```
+
+在vite.config.js中配置插件
+
+```js
+import vitePluginImp from 'vite-plugin-imp'
+ plugins: [
+    vitePluginImp({
+      libList: [
+        {
+          libName: "antd",
+          style: (name) => `antd/lib/${name}/style/index.less`,
+        },
+      ],
+    })
+  ],
+   css: {
+    preprocessorOptions: {
+      less: {
+        // 支持内联 JavaScript
+        javascriptEnabled: true,
+      }
+    }
+  }
+```
+
+css预处理器来提取公用css变量及css函数并放在一个文件中, 所以确认增加以上配置。并且配置 `javascriptEnabled`为 `true`，支持 less 内联 JS。
+
+还有一个比较实用的功能就是自动刷新，vite也没有掉队。借助插件@vitejs/plugin-react-refresh，
+
+```js
+import reactRefresh from '@vitejs/plugin-react-refresh'
+plugins: [
+   reactRefresh()
+]
+```
+
+短路径配置
+
+```js
+resolve: {
+    alias: {
+      "@": path.resolve(__dirname, 'src') 
+    }
+ },
+```
+
+代理配置
+
+```js
+server : {
+    proxy: {
+      '/api': {
+        target: 'http://jsonplaceholder.typicode.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  }
+```
+
+环境参数配置
+
+在日常开发中，经常会遇到有些代码或者配置是要区分环境的。在webpack中可以在scripts中定义NODE_ENV或者在webpack.config.js中定义DefinePlugin实现。
+
+在vite中可以通过在scripts中定义mode实现：
+
+```js
+"dev": "vite --mode development",
+```
+
+ ```js
+//环境值
+const env = process.argv[process.argv.length - 1]
+console.log("当前环境：", env) // development
+ ```
+
+
+
+我们先在container目录下建两个组件： home和main，当path为"/"是渲染home组件，当path为"/main"是渲染main组件，
+
+```react
+// container/home/home.jsx
+import { Button } from 'antd'
+function Home() {
+  return (
+    <div>
+      <div>Home, from router</div>
+      <Button type="primary">submit</Button>
+    </div>
+  );
+}
+//container/main/index.jsx
+function Main() {
+  return (
+    <div>
+      Main, from router
+    </div>
+  );
+}
+```
+
+有了组件，我们开始配置router，在routers目录下建立index.js
+
+```js
+import Home  from "@/contanier/home"
+import Main from "@/contanier/main"
+export default [
+  {
+    path: "/",
+    component: Home
+  },
+  {
+    path: "/main",
+    component: Main 
+  }
+]
+```
+
+定义配置后，需要在app.jsx中遍历这个数组，生成路由配置
+
+```react
+//app.jsx
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import routes from "./routers"
+function App() {
+  const [count, setCount] = useState(0)
+  return (
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          // 省略部分代码
+          <Switch>
+            {
+              routes.map(route => <Route exact key={route.path} path={route.path}>
+                <route.component />
+              </Route>)
+            }
+          </Switch>
+        </header>
+      </div>
+    </Router>    
+  )
+}
+```
+
+先启动下项目看看效果
+
+```
+yarn run dev
+
+vite v2.1.2 dev server running at:
+  > Local:    http://localhost:3000/
+  > Network:  http://192.168.1.6:3000/
+  > Network:  http://192.168.192.196:3000/
+
+  ready in 1982ms.
+```
+
+![home](./images/vite-04.png)
+
+<center>图3-6</center>
+
+然后再输入http://localhost:3000/main
+
+![home](./images/vite-05.png)
+
+<center>图3-7</center>
+
+有了页面组件，就要考虑ajax请求的事儿了，要么页面是没有灵魂的。在api目录下建立request.js，先对axios做一层封装，配置request和response拦截器，这也是前端开发里面的通用做法。
+
+```js
+import axios from "axios";
+import StatusCode from "@/constants/statusCode";
+
+const instance = axios.create({
+  baseURL: "",
+  timeout: 50000,
+  xsrfCookieName: "xsrf-token",
+});
+//请求拦截器，如果说hearder中需要增加什么参数，可以在这里统一处理
+instance.interceptors.request.use(
+  (config) => {
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+// 添加一个响应拦截器，对每次返回的数据进行拦截，并进行业务判断
+instance.interceptors.response.use(
+  (response) => {
+    return Promise.reject(response.data);
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+```
+
+axios拦截器为我们的日常开发提供了很多便利，如果需要在每个请求中增加相同的参数，可以在request拦截器中进行配置。如果是统一处理返回的数据，如无权限，404，没有登录等这种通用场景，可以同一再response的拦截器处理。
+
+以上是vite配合React开发的基本配置，大家可以上手一试。
 
 
 

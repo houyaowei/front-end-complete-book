@@ -3,7 +3,7 @@ import React from 'react';
 function Main() {
   return (
     <div>
-      Main
+      Main, from router
     </div>
   );
 }

@@ -3,6 +3,9 @@ import { defineConfig } from 'vite'
 import reactRefresh from '@vitejs/plugin-react-refresh'
 import vitePluginImp from 'vite-plugin-imp'
 
+//环境值
+const env = process.argv[process.argv.length - 1]
+console.log("当前环境：", env)
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
@@ -10,6 +13,15 @@ export default defineConfig({
       "@": path.resolve(__dirname, 'src') 
     }
   },
+  // server : {
+  //   proxy: {
+  //     '/api': {
+  //       target: 'http://jsonplaceholder.typicode.com',
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/api/, '')
+  //     }
+  //   }
+  // },
   plugins: [
     reactRefresh(),
     vitePluginImp({
