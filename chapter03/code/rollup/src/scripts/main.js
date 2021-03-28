@@ -1,2 +1,1 @@
-import getName from './modules/module1.js';
-getName()
+import {encrypt,decrypt} from './modules/encrypt.js';

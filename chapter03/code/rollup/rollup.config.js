@@ -1,29 +1,29 @@
-import babel from "rollup-plugin-babel"; //
+ import babel from "@rollup/plugin-babel";
 import { eslint } from 'rollup-plugin-eslint';
-import resolve from 'rollup-plugin-node-resolve'; //配合resolve包使用
-import commonjs from 'rollup-plugin-commonjs'; //将 commonjs 模块转成 es6 模块
 import replace from "rollup-plugin-replace";
 import { uglify } from "rollup-plugin-uglify";
+import builtins from 'rollup-plugin-node-builtins';
+import resolve from "@rollup/plugin-node-resolve";
+import json from '@rollup/plugin-json';
+import commonjs from "@rollup/plugin-commonjs";
 
 module.exports={
   input: "src/scripts/main.js",
   output: {
-    file: "dist/main.prod.js",
+    file: "dist/encrypt.min.js",
     format: "umd",
     name: "test",
     sourceMap: 'inline'
   },
   plugins: [
-    resolve({
-      jsnext: true,  //node ->ES6
-      main: true,
-      browser: true,
-    }),
+    json(),
+    builtins(),
+    resolve(),
     commonjs(),
-    eslint({
-      include: ['src/**'],
-      exclude: ['node_modules/**']
-    }),
+    // eslint({
+    //   include: ['src/**'],
+    //   exclude: ['node_modules/**']
+    // }),
     babel({
       exclude: 'node_modules/**',
     }),

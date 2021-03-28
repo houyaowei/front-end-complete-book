@@ -933,6 +933,127 @@ axios拦截器为我们的日常开发提供了很多便利，如果需要在每
 
 
 
-### 3.3 rollup实战
+### 3.3 Rollup实战
+
+Rollup 是一个 JavaScript 模块打包器，可以将小块代码编译成大块复杂的代码。当你用ES2015及其以后的规范来编写应用或者库时，它也可以对它有效的打包来，打包成为一个单独文件供浏览器和 Node.js 使用。从这个角度讲，它和browserify、webpack、gulp有几分相似。
+
+为了更好说明rollup的应用场景，我们先简单比较一下rollup和webpack：
+
+- webpack天然支持code spliting和HRM,但是rollup却不支持。
+- Rollup打包出来的代码体积更小，webpack4版本的bundle中有大量的模块适配代码。
+- Rollup 是基于 ES2015 模块的，它相比于webpack 所使用的 CommonJS 模块更加具有效率，另外 Rollup也支持 *tree-shaking*（ES 模块中支持 ），这意味着在最终的 bundle中只有我们实际需要的代码。
+- webpack更适合做应用开发，Rollup更适合打包库
+
+下面通过一个简单的加解密例子说明下Rollup的用法。
+
+目录基本是这样的：
+
+```js
+├── node_modules
+├── package-lock.json
+├── package.json
+├── rollup.config.js
+├── src
+|  ├── scripts
+|  |  ├── main.js
+|  |  ├── modules
+|  |  └── utils
+|  └── styles
+└── yarn.lock
+```
+
+先使用yarn命令生成package.json
+
+```js
+yarn init -y 
+```
+
+再新建一个rollup.config.js,这是rollup要求的配置文件，在package.json中指定该配置启动
+
+```js
+//package.json
+"build": "cross-env NODE_ENV=production rollup --config",
+```
+
+```js
+module.exports={
+  input: "src/scripts/main.js",
+  output: {
+    file: "dist/encrypt.min.js",
+    format: "umd",
+    name: "encrypt",
+    sourceMap: 'inline'
+  }
+}
+```
+
+先初始化一个基本的rollup配置，指明入口文件和输出文件。input比较好理解，指的是rollup启动时需要执行的文件。我们需要对output中的字段进行下说明，它允许传入一个对象或一个数组，当为数组时，依次输出多个文件：
+
+- file：输出文件的详细路径。
+- format：Rollup 支持多种输出格式。因为要兼容其他模式，在这里指定为”UMD“格式。还有其他的格式可以选择，cjs（commonjs）,esm(ES module), system, amd,iife。
+- name：输出文件名。
+- sourceMap ：如果有 sourcemap 的话，那么调试代码时会比较轻松，这个选项会在生成文件中直接添加 sourcemap。
+
+接下来先介绍几款插件，要不然改工程依然无法正常运行。
+
+首先是babel插件rollup-plugin-babel，这个插件详细大家比较熟悉了，主要作用就是编译ES6的语法为ES5，让浏览器可以识别。
+
+```js
+yarn add @rollup/plugin-babel -D
+```
+
+在rollup.config.js中增加plugin配置
+
+```js
+//rollup.config.js
+import babel from "@rollup/plugin-babel";
+plugins: [
+  babel()
+]
+```
+
+第二个插件是*rollup-plugin-node-resolve*，默认包后的`bundle.js`仍然会在`Node.js`中工作。为了解决这个问题，将我们的代码与依赖的第三方库进行合并才能解决这个问题。
+
+```js
+import resolve from "@rollup/plugin-node-resolve";
+plugins: [
+	resolve()   
+]
+```
+
+第三个是commonjs插件，rollup.js编译源码中的模块引用默认只支持ES6+的模块方式`import/export`。然而有大量npm模块是基于`CommonJS`模块方式，这就导致了大量 npm模块不能直接编译使用
+
+```js
+import commonjs from "@rollup/plugin-commonjs";
+plugins: [
+	commonjs()   
+]
+```
+
+第四个就是json插件，在咱们的实例中，我们会根据package.json生成加密、解密的密钥,
+
+```js
+const hash = require("content-hash");
+function generatorKey() {
+    let es = hash.encode("swarm-ns", fs.readFileSync("../../../package.json"))
+    key = Buffer.from(es.substring(0,16), 'utf8');
+    iv = Buffer.from(es.substring(2,18),'utf8');
+}
+```
+
+在rollup中加载json文件需要插件协助，@rollup/plugin-json
+
+```js
+import json from '@rollup/plugin-json';
+plugins: [
+	json()   
+]
+```
+
+
+
+
+
+
 
 ### 3.4 parcel实战
