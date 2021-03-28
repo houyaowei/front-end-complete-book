@@ -43,6 +43,13 @@ function generatorKey() {
 
 generatorKey()
 
+// const sign = encrypt('hello world');
+// console.log(sign); // 764a669609b0c9b041faeec0d572fd7a
+// console.log("加密后的长度：" +sign.length)
+// // 解密
+// const src= decrypt(sign);
+// console.log(src); // hello world
+
 module.exports = {
     encrypt,
     decrypt   

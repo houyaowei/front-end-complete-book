@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "node src/scripts/modules/encrypt.js",
     "build": "cross-env NODE_ENV=production rollup --config",
     "build-dir": "tree -l 3"
   },

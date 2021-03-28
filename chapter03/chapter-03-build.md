@@ -1012,6 +1012,23 @@ plugins: [
 ]
 ```
 
+还需要增加babel配置，在.babel文件中增加
+
+```json
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "modules": false  //Enable transformation of ES6 module syntax to another module type
+      }
+    ]
+  ]
+}
+```
+
+
+
 第二个插件是*rollup-plugin-node-resolve*，默认包后的`bundle.js`仍然会在`Node.js`中工作。为了解决这个问题，将我们的代码与依赖的第三方库进行合并才能解决这个问题。
 
 ```js
@@ -1050,7 +1067,100 @@ plugins: [
 ]
 ```
 
+有了上面的插件，rollup的基本构建就已经成型，下面我们看下具体的加解密代码。
 
+```js
+const crypto = require('crypto');
+const fs = require("fs")
+const hash = require("content-hash");
+const util = require("../utils/util")
+
+//128-cbc需要定义16位的key和iv
+let key = '';
+let iv = '';
+//加密方式
+const DEFAULT_CRYPTO_TYPE = 'aes-128-cbc';
+const UTF8_TYPE = 'utf8';
+const HEX_FORMAT = 'hex';
+
+/**
+ * 加密方法
+ * @param {*} src ，需要加密的字符串
+ */
+function encrypt(src) {
+    let sign = '';
+    const cipher = crypto.createCipheriv(DEFAULT_CRYPTO_TYPE, key, iv);
+    sign += cipher.update(util.trim(src), UTF8_TYPE, HEX_FORMAT);
+    sign += cipher.final(HEX_FORMAT);
+    return sign;
+}
+
+/**
+ * 解密方法
+ * @param {*} sign ,需要解密的字符串
+ */
+function decrypt(sign) {
+    let src = '';
+    const cipher = crypto.createDecipheriv(DEFAULT_CRYPTO_TYPE, key, iv);
+    src += cipher.update(sign, HEX_FORMAT, UTF8_TYPE);
+    src += cipher.final(UTF8_TYPE);
+    return src;
+}
+
+function generatorKey() {
+    let es = hash.encode("swarm-ns", fs.readFileSync("../../../package.json"))
+    key = Buffer.from(es.substring(0,16), 'utf8');
+    iv = Buffer.from(es.substring(2,18),'utf8');
+}
+
+generatorKey()
+
+module.exports = {
+    encrypt,
+    decrypt   
+}
+```
+
+这个加密工具方法中 ，我们使用128位aes-128-cbc加密方法，该加密方法17位的key和iv向量，为了不暴露key和iv，我们在generatorKey方法中，通过生成package.json文件的内容hash值来计算出。
+
+我们先测试一下，看加解密是否能起作用
+
+```js
+const sign = encrypt('hello world');
+console.log(sign);
+console.log("加密后的长度：" +sign.length)
+// 解密
+const src= decrypt(sign);
+console.log(src); 
+```
+
+经过测试，符合我们的预期效果
+
+```
+f09a42f0e4b7c667f3ba26e0d5d6e0b3
+加密后的长度：32
+helloworld
+```
+
+平时我们见到的工具包，以压缩文件居多，目的主要有两个，一来可以减少文件体积，二者可以隐藏代码实现。我们也按照这样的思路来，先安装插件 rollup-plugin-uglify，并在配置文件中进行配置
+
+```js
+import { uglify } from "rollup-plugin-uglify";
+plugins: [
+	process.env.NODE_ENV === "production" && uglify()
+]
+```
+
+下面开始最终打包，
+
+```js
+yarn run build
+
+$ cross-env NODE_ENV=production rollup --config
+src/scripts/main.js → dist/encrypt.min.js..
+created dist/encrypt.min.js in 2.6s
+✨  Done in 5.84s.
+```
 
 
 
