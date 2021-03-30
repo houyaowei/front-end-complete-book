@@ -1,9 +1,12 @@
 import name from "./src/utils/index"
 import ss from "./src/scripts/index"
-// import "./style.css"
+import Person from "./src/models/person"
+import "./style.css"
 
-document.writeln("hello,parcel<br>")
-document.writeln("project name :", name.projectName ,"<br>")
-document.writeln("project version :", name.getVersion() ,"<br>")
-document.writeln("project create at:", ss.getCreateTime(),"<br>")
-document.writeln("project created by:", name.getAuthor(),"<br>")
+const p = new Person("houyw",23)
+console.log("class.name", p.getName())
+console.log("class.name", p.getAge())
+console.log("project name :", name.projectName)
+console.log("project version :", name.getVersion() )
+console.log("project create at:", ss.getCreateTime())
+console.log("project created by:", name.getAuthor())

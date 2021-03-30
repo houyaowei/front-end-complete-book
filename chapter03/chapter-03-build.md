@@ -1180,4 +1180,112 @@ parcel将一个入口点作为输入，在parcel中定义了各种资源类型�
 
 在构建bundle树之后，每一个包都有特定的文件类型的包装器写入文件。
 
-下面通过一个简单的例子看下
+下面通过构建一个实例来说明parcel在日常开发中需要的组件是如何配置的。
+
+先新建一个package.json，并安装parcel核心包
+
+```
+yarn init -y
+yarn add parcel
+```
+
+在package.json的同级目录下新建index.html和app.js, 在index.html中引入app.js, 了解一点web开发都知道，这是最直接、最方便的加载js文件的方式
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>parcel practise</title>
+</head>
+<body>
+  <div class="app"></div>
+  <script src="./app.js"></script>
+</body>
+</html>
+```
+
+为了验证方便，我们先输入最简单的一句：
+
+```
+//app.js
+document.writeln("hello,parcel<br>")
+```
+
+在package.json的scripts配置中也是非常简单
+
+```
+ "start": "parcel index.html",
+```
+
+![parcel-01](./images/parcel-01.png)
+
+<center>图3-8</center>
+
+是我们预想的结果。这种开发方式确实能让人眼前一亮，没有任何配置，不用指定loader就可以运行。
+
+我们接着看下是不是能识别import和ES语法，
+
+```js
+// src/scripts/index.js
+export default {
+  getCreateTime: ()=> {
+    let d = new Date()
+    return d.getFullYear()+  "-"+ (d.getMonth()+1) + "-"+ d.getDate()
+  }
+}
+```
+
+```js
+// src/utils/index.js
+const _package = require("../../package.json")
+export default {
+  projectName: "parcel project",
+  getAuthor: function(){
+    return "houyw"
+  },
+  getVersion: ()=>{
+    return _package.version
+  }
+}
+```
+
+```js
+// src/models/person.js
+export default class Person {
+  constructor(name,age){
+    this.name = name;
+    this.age = age;
+  }
+  getName(){
+    return this.name
+  }
+  getAge(){
+    return this.age
+  }
+}
+```
+
+下面我们把这几个例子都import到app.js中测试下，
+
+```js
+import name from "./src/utils/index"
+import ss from "./src/scripts/index"
+import Person from "./src/models/person"
+import "./style.css"
+
+const p = new Person("houyw",23)
+console.log("class.name", p.getName())
+console.log("class.name", p.getAge())
+console.log("project name :", name.projectName)
+console.log("project version :", name.getVersion() )
+console.log("project create at:", ss.getCreateTime())
+console.log("project created by:", name.getAuthor())
+```
+
+修改代码后，parcel的服务会自动重启。
+
+![parcel-02](./images/parcel-02.png)
+
+<center>图3-9</center>
+
+从测试结果来看，parcel并不需要配置babel就可以将ES6转成ES5。
