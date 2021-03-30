@@ -1182,7 +1182,7 @@ parcel将一个入口点作为输入，在parcel中定义了各种资源类型�
 
 下面通过构建一个实例来说明parcel在日常开发中需要的组件是如何配置的。
 
-先新建一个package.json，并安装parcel核心包
+先新建一个package.json，并安装parcel核心包(本节实例基于2.0.0-beta.2)
 
 ```
 yarn init -y
@@ -1288,4 +1288,39 @@ console.log("project created by:", name.getAuthor())
 
 <center>图3-9</center>
 
-从测试结果来看，parcel并不需要配置babel就可以将ES6转成ES5。
+从测试结果来看，parcel并不需要配置babel就可以将ES6转成ES5。这是因为在parcel中已经预置了babel编译 @parcel-transform-babel，更多的内置都插件可以在node_modules/@parcel目录下找到。
+
+web开发中处理css文件是无论如何也不会少的。在parcel中，也提供比较清爽的处理方式：
+
+```js
+import "./style.css"
+```
+
+对sass的支持是怎样的呢？再style.css同级目录新建style.scss，并修改原来的样式引入
+
+```scss
+.app {
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+
+  .title {
+    color: red;
+  }
+}
+```
+
+服务重新启动后，页面报错
+
+![parcel-03](./images/parcel-03.png)
+
+<center>图3-10</center>
+
+这是因为parcel没有预置sass预处理器，需要我们手动安装
+
+```js
+yarn add scss -D
+```
+
+重新编译，正常运行。

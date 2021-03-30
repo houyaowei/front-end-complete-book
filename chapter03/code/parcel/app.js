@@ -1,7 +1,7 @@
 import name from "./src/utils/index"
 import ss from "./src/scripts/index"
 import Person from "./src/models/person"
-import "./style.css"
+import "./style.scss"
 
 const p = new Person("houyw",23)
 console.log("class.name", p.getName())
