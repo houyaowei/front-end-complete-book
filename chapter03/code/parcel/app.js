@@ -10,3 +10,6 @@ console.log("project name :", name.projectName)
 console.log("project version :", name.getVersion() )
 console.log("project create at:", ss.getCreateTime())
 console.log("project created by:", name.getAuthor())
+
+console.log("-------node env-----")
+console.log(process.env.NODE_ENV)

@@ -1359,5 +1359,50 @@ module.exports = function (app) {
 };
 ```
 
+下面看下在parcel中怎么定义环境变量和在代码中怎么获取环境变量。
+
+Parcel 使用[dotenv](https://github.com/motdotla/dotenv)支持从`.env`文件加载环境变量，默认会安装dotenv包，所以可以通过新建 **.env.${NODE_ENV}** 这样的文件来定义环境变量，开发环境的可以如下面在.env.development中定义。
+
+```
+NODE_ENV='development'
+```
+
+应用启动时默认加载development中定义的环境变量。相应的逻辑可以在parcel的源码中看到,具体的路径为src/utils/env.js
+
+```
+const config = require('./config');
+const dotenv = require('dotenv');
+
+async function loadEnv(filepath) {
+  const NODE_ENV = process.env.NODE_ENV || 'development';
+  const dotenvFiles = [
+    `.env.${NODE_ENV}.local`,
+    `.env.${NODE_ENV}`,
+    // Don't include `.env.local` for `test` environment
+    // since normally you expect tests to produce the same
+    // results for everyone
+    NODE_ENV !== 'test' && '.env.local',
+    '.env'
+  ].filter(Boolean);
+
+  await Promise.all(
+    dotenvFiles.map(async dotenvFile => {
+      const envPath = await config.resolve(filepath, [dotenvFile]);
+      if (envPath) {
+        dotenv.config({path: envPath});
+      }
+    })
+  );
+}
+```
+
+经过前面几个实验给人的感觉，0配置的parcel给人很好的开发体验，让前端开发避免陷入前端无穷配置的泥淖中，专注业务。但是有些问题还是会给实际的业务开发带来写不便， parcel现在稳定版本还是1.12.4，该分支也有至少1年的时间没有维护，并且很多关键的特性是缺失的，比如说公共文件提取，scope Hoisting，tree shake等。
+
+从parcel 在GitHub上的提交记录上看，该团队在着力开发2.0的代码，并且在2.0中也加入了使用配置，如显式proxy，scope Hoisting, 可扩展的API接口，SourceMap，Optimizer等等。但是要想成立主力分支现在看来还为时尚早，和三方包的集成也存在很多问题，parcel团队还需要很多的时间修复问题并保持feature的稳定。
+
+所以建议大家长期关注并实验，积累parcel的最佳实践。不要急于用来上手项目，毕竟产品不等于试验品。
+
+期待parcel的稳定版早日到来，也期待这新版本让前端在开发的路上如释重负。
+
 
 

@@ -4,7 +4,7 @@
   "description": "procel for book",
   "main": "entry.js",
   "scripts": {
-    "start": "parcel index.html",
+    "start": "parcel index.html --open ",
     "build:prod": "parcel build",
     "build-tree": "tree -l 3 --ignore node_modules "
   },
