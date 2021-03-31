@@ -1324,3 +1324,40 @@ yarn add scss -D
 ```
 
 重新编译，正常运行。
+
+接下来我们看下代理配置，这个配置在开发阶段经常用到，主要有两个方面的作用，第一是如果有单独的后端开发服务器 API，并且希望在同域名下发送 API 请求 ，那么这个配置会很有用。第二个也是最常见的解决开发环境的跨域问题。在开发过程中, 开发环境一般都是http://localhost, 但是如果请求的接口不在本地, 那么就要面对跨域请求的问题了。
+
+parcel中配置proxy有两种方式，第一中是新建**.proxyrc**文件，该文件中是以json的方式定义proxy
+
+```json
+{
+  "/api": {
+    "target" : "http://demo.test.com:8000/",
+    "pathRewrite" : {
+      "^/api" : ""
+    }
+  }
+}
+```
+
+这个代理表示的意思如果发起 **http://localhost:8080/api/getUsers** 会被代理到**ttp://demo.test.com:8000/getUsers**。
+
+另外一种代理就是如果是配置比较复杂，可以使用.proxyrc.js文件，然后引入**http-proxy-middleware**
+
+```js
+const { createProxyMiddleware } = require("http-proxy-middleware");
+
+module.exports = function (app) {
+  app.use(
+    createProxyMiddleware("/api", {
+      target: "http://demo.test.com:8000/",
+      pathRewrite: {
+        "^/api": "",
+      },
+    })
+  );
+};
+```
+
+
+

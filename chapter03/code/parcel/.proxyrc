@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target" : "http://demo.test.com:8000/",
+    "pathRewrite" : {
+      "^/api" : ""
+    }
+  }
+}
