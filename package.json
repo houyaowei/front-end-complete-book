@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "global": "^4.4.0",
-    "lite-server": "^2.6.1"
-  }
-}
