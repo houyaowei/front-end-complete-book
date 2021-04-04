@@ -45,7 +45,8 @@ async function create(name) {
   }
   // generator init
   const generator = new Generator(pkg, path.join(process.cwd(), name))
-  //
+  
+  //执行generator的render方法，由_injectFileMiddleware方法记录中间件
   _answers.features.forEach(feature => {
     require(`./generator/${feature}`)(generator, _answers)
   })
@@ -53,10 +54,12 @@ async function create(name) {
   await generator.generate()
 
   // 安装依赖
-  await executeCommand('npm install', path.join(process.cwd(), name)).catch(e=> {})
-  console.log('\n依赖下载完成! 执行下列命令开始开发：\n')
-  console.log(`cd ${name}`)
-  console.log(`npm run dev`)
+  // TODO,npm包安装失败
+  await executeCommand('npm install', path.join(process.cwd(), name)).catch(e=> {
+    console.log("execute npm install failed")
+  })
+  console.log('\n项目创建成功, 执行下列命令开始开发：\n')
+  console.log(`cd ${name} \n npm run dev`)
 }
 
 module.exports = create;

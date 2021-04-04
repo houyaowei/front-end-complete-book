@@ -1,4 +1,4 @@
-module.exports = function sortObject(obj, keyOrder, dontSortByUnicode) {
+function sortObject(obj, keyOrder, dontSortByUnicode) {
     if (!obj) return
     const res = {}
 
@@ -20,3 +20,5 @@ module.exports = function sortObject(obj, keyOrder, dontSortByUnicode) {
 
     return res
 }
+
+module.exports = sortObject

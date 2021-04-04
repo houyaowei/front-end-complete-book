@@ -5,10 +5,7 @@
 const program = require('commander')
 const create = require('../core/create')
 
-program
-.version('0.0.1')
-.command('create <name>')
-.description('create a new project')
+program.version('0.0.1').command('create <name>').description('create a new project')
 .action(name => { 
     create(name)
 })

@@ -1,3 +1,6 @@
+/**
+ * 识别并转换文件并写入指定的路径
+ */
 const transforms = require('./utils/configTransforms')
 
 class ConfigTransform {

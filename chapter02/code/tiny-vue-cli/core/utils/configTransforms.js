@@ -1,3 +1,6 @@
+/**
+ * 根据文件类型读文件，解析需要写入的内容
+ */
 const stringifyJS = require('./stringifyJS')
 const merge = require('deepmerge')
 

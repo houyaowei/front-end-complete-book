@@ -9,6 +9,7 @@ const { isBinaryFileSync } = require('isbinaryfile')
 const isObject = (val) => val && typeof val === 'object'
 const ConfigTransform = require('./ConfigTransform')
 
+//默认转换的配置
 const defaultConfigTransforms = {
     babel: new ConfigTransform({
         file: {
@@ -139,6 +140,7 @@ class Generator {
     // 使用 ejs 解析 lib\generator\xx\template 中的文件
     async resolveFiles() {
         const files = this.files
+        console.log(this.fileMiddlewares)
         for (const middleware of this.fileMiddlewares) {
             await middleware(files, ejs.render)
         }
@@ -241,7 +243,7 @@ class Generator {
             ...additionalData,
         }
     }
-
+    //render generator下模板值
     renderFile(name, data, ejsOptions) {
         // 如果是二进制文件，直接将读取结果返回
         if (isBinaryFileSync(name)) {

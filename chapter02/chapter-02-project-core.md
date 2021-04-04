@@ -73,14 +73,192 @@ web工程化在前端日常开发的重要性不言而喻，因为涉及到多�
 
    #### 3.1脚手架入门
 
-   只要是做过vue，React开发，脚手架就应该不会再感到陌生，vue-cli3和create-React-APP
+   只要是做过vue，React开发，脚手架就应该不会再感到陌生，vue-cli3和create-React-APP都是很好的选择。
+
+   脚手架的实现有两种方式：
+
+   - 第一种是是新建一个Git仓库，然后包装一个脚手架的壳子，命令启动后从git clone仓库。严格说，这个更像是一种模板方法，这样的实现存在一个比较严重的问题就是对脚手架的升级无法反应到工程结构上。
+- 第二种是提供需要安装的插件、根据用户的选择创建 `package.json` 文件，并添加对应的依赖项，生成项目模板和工程的核心配置。
+  
+
+  
+
+下面我们看下创建vue工程脚手架的详细过程。
+
+```
+├── bin
+|  └── tiny.js
+├── core
+|  ├── ConfigTransform.js
+|  ├── Creator.js
+|  ├── Generator.js
+|  ├── create.js
+|  ├── generator
+|  |  ├── babel
+|  |  ├── linter
+|  |  ├── router
+|  |  ├── vue
+|  |  ├── vuex
+|  |  └── webpack
+|  ├── requireModules
+|  |  ├── babel.js
+|  |  ├── linter.js
+|  |  ├── router.js
+|  |  └── vuex.js
+|  ├── requireModulesAPI.js
+|  └── utils
+|     ├── clearConsole.js
+|     ├── codemods
+|     ├── configTransforms.js
+|     ├── executeCommand.js
+|     ├── normalizeFilePaths.js
+|     ├── sortObject.js
+|     ├── stringifyJS.js
+|     └── writeFileTree.js
+├── package-lock.json
+├── package.json
+├── readme.md
+└── yarn.lock
+```
+
+
+
+   首先，我们先在定义package.json，先在bin中定义我们使用哪个命令创建新工程
+
+   ```json
+   "bin": {
+       "tiny-cli": "./bin/tiny.js"
+    }
+   ```
+
+   我们定义了一个**tiny-cli**命令。
+
+   ```js
+   // bin/tiny.js
+   const program = require('commander')
+   const create = require('../core/create')
+   
+   program.version('0.0.1').command('create <name>').description('create a new project')
+   .action(name => { 
+       //create(name)
+      console.log(name)
+   })
+   ```
+
+   在tiny.js中定义了脚手架的第一个功能，用commander处理用户的命令，提取用户输入比如说工程名称交给脚手架处理。通过command定义了一个create命令。
+
+  我们先看下效果，看是否能如期执行。进行执行npm link,将npm 模块链接到对应的运行项目中去。
+
+![1](./images/1.png)
+
+<center>图2-1</center>   
+
+   也可以通过 **tiny-cli --help** 查看已经注册的事件
+
+![1](./images/2.png)
+
+接下来，我们定义需要安装的组件babel, lint, vuex,router，在core目录下新建一个目录requireModules，为每个模块新建独立的模块：
+
+```js
+// babel.js
+module.exports = (api) => {
+    api.injectFeature({
+        name: 'Babel',
+        value: 'babel',
+        short: 'Babel',
+        description: 'Transpile modern JavaScript to older versions (for compatibility)',
+        link: 'https://babeljs.io/',
+        checked: true,
+    })
+}
+```
+
+下面是router.js，linter.js和vuex.js的配置和这两个配置类似，所以忽略显示，具体的请查阅源码。
+
+```js
+
+const chalk = require('chalk')
+module.exports = (api) => {
+    api.injectFeature({
+        name: 'Router',
+        value: 'router',
+        description: 'Structure the app with dynamic pages',
+        link: 'https://router.vuejs.org/',
+    })
+    api.injectPrompt({
+        name: 'historyMode',
+        when: answers => answers.features.includes('router'),
+        type: 'confirm',
+        message: `Use history mode for router?`,
+        description: `By using the HTML5 History API, the URLs don't need the '#' character anymore.`,
+        link: 'https://router.vuejs.org/guide/essentials/history-mode.html',
+    })
+}
+
+```
+
+   使用inquirer询问用户选择哪些项目，
+
+```json
+{
+ type: String, // 提问的类型，有input, number, confirm, list, rawlist, expand, checkbox, password, editor
+ name: String, // 在最后获取到的answers回答对象中，作为当前这个问题的键
+ message: String|Function, // 问题标题
+ default: String|Number|Array|Function, // 用户不输入回答时，问题的默认值。
+ choices: Array|Function, // 给出选择的列表，如果是一个函数的话，第一个参数为当前问题的输入答案。为数组时，数组的每个元素可以为基本类型中的值。
+ validate: Function, // 校验用户输入的输入，如果符合返回true。当函数返回false时，一个默认的错误信息会被提供给用户。
+ filter: Function, // 接受用户输入并且将值转化后返回填充入最后的answers对象内。
+ when: Function|Boolean, // 接受当前用户输入的answers对象，并且通过返回true或者false来决定是否当前的问题应该去问
+ pageSize: Number, // 改变渲染list,rawlist,expand或者checkbox时的行数的长度。
+}
+```
+
+这里需要解释的是，使用injectFeature方法保存第一级需要的提示，用injectPrompt来提示二级操作。有了上面的配置后，可以在Creator类中进行组装
+
+```js
+class Creator {
+  constructor() {
+    this.featurePrompt = {
+        name: 'features',
+        message: 'select the features for your project:',
+        pageSize: 10,
+        type: 'checkbox',
+        choices: [],
+    }
+    this.injectedPrompts = []
+  }
+  getFinalPrompts() {
+    this.injectedPrompts.forEach(prompt => {
+        const originalWhen = prompt.when || (() => true)
+        prompt.when = answers => originalWhen(answers)
+    })
+    const prompts = [
+        this.featurePrompt,
+        ...this.injectedPrompts,
+    ]
+    return prompts
+  }
+}
+```
+
+都声明完成后，可以通过creator.getFinalPrompts()方法获得所有需要提示的选项。但是这个需要一个前提，把这几个都要require进来并且执行。所以需要在create.js中加上
+
+```js
+function getPromptModules() {
+  return [
+    'babel',
+    'router',
+    'vuex',
+    'linter',
+  ].map(file => require(`./requireModules/${file}`))
+}
+const _promptModules = getPromptModules()
+const _promptAPI = new RequireModulesAPI(_creator)
+  //执行注入各模块的提示语
+_promptModules.forEach(m => m(_promptAPI))
+```
 
    
 
    
 
-   
-
-   
-
-   

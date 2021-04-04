@@ -6,7 +6,7 @@ class Creator {
   constructor() {
     this.featurePrompt = {
         name: 'features',
-        message: 'Check the features for your project:',
+        message: 'select the features for your project:',
         pageSize: 10,
         type: 'checkbox',
         choices: [],
