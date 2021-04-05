@@ -71,7 +71,7 @@ web工程化在前端日常开发的重要性不言而喻，因为涉及到多�
 
    
 
-   #### 3.1脚手架入门
+   #### 3.1 脚手架入门
 
    只要是做过vue，React开发，脚手架就应该不会再感到陌生，vue-cli3和create-React-APP都是很好的选择。
 
@@ -484,3 +484,167 @@ function executeCommand(command, cwd) {
 }
 ```
 
+#### 3.2 自动化部署
+
+
+
+#### 3.3 Nginx
+
+nginx是一种轻量级、高性能、低内存的web服务器和反向代理服务器。传统的web服务器对于客户端的每一个连接都会创建一个新的进程/线程来处理，也创建了新的运行时，消耗额外的内存，随着连接的增多，web服务器响应变慢，延迟增加。Nginx对传统服务而言，优化了服务器资源的使用，也支持连接的动态增加。
+
+Nginx有如下几个比较显著的优点：
+
+- 热部署：因为Nginx的mastar进程和worker进程是独立设计的（一个mastar多个worker进程），所以在不间断服务的前提下升级可执行文件、配置文件等等
+- 高并发：Nginx支持的连接数官方测试能够支撑5万并发连接，实际生产环境中可以支撑2~4万并发连接数。如果是clustered，支持的连接说会更高。
+- 内存消耗少
+- 高可靠性
+- 响应迅速。
+
+什么是正向代理、反向代理？
+
+正向代理： 客户端向代理服务器发送请求，并指定目标服务器地址，然后由代理服务器和原始服务器通信，转交请求并获得响应，再返回给客户端。正向代理隐藏了真实的客户端，为客户端收发请求，使真实客户端对服务器不可见。
+
+<img src="./images/nginx-1.png" style="zoom: 67%;" />
+
+<center>图4-5</center>
+
+反向代理：是指以代理服务器来接受 internet 上的连接请求，然后将请求转发给内部网络上的服务器，并将从服务器上得到的结果返回给 internet 上请求连接的客户端，此时代理服务器对外就表现为一个反向代理服务器。
+
+<img src="./images/nginx-2.png" style="zoom: 67%;" />
+
+<center>图4-6</center>
+
+接下来我们就从头开始看下是怎么安装和配置。
+
+Mac系统可以借助工具brew安装
+
+```shell
+brew install nginx
+```
+
+安装成功后，可以通过命令查看安装的位置:
+
+```shell
+brew list nginx
+
+/usr/local/Cellar/nginx/1.19.7/.bottle/etc/ (15 files)
+/usr/local/Cellar/nginx/1.19.7/bin/nginx
+/usr/local/Cellar/nginx/1.19.7/homebrew.mxcl.nginx.plist
+/usr/local/Cellar/nginx/1.19.7/html -> ../../../var/www
+/usr/local/Cellar/nginx/1.19.7/share/man/man8/nginx.8
+/usr/local/Cellar/nginx/1.19.7/share/nginx/ (2 files)
+```
+
+配置文件目录在 /usr/local/etc/nginx目录下
+
+nginx常用命令：
+
+```
+nginx  #启动nginx
+nginx -s quit  #快速停止nginx
+nginx -V #查看版本，以及配置文件地址
+nginx -v #查看版本
+nginx -s reload|reopen|stop|quit   #重新加载配置|重启|快速停止|安全关闭
+nginx -h #帮助
+```
+
+我们先分析下配置文件的结构，方便修改配置。我们先看下nginx.config的默认文件
+
+```
+worker_processes  1;
+
+#pid        logs/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #access_log  logs/access.log  main;
+    sendfile        on;
+    #tcp_nopush     on;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       9003;
+        server_name  localhost;
+        location / {
+            root   /examples/nginx-test;
+        		try_files $uri $uri/ /index.html;
+            #index  index.html index.htm;
+        }
+        location /mydir {
+            alias  html/mydir;
+        }
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+
+    include servers/*;
+}
+
+```
+
+`events` 和`http`指令驻留在**主上下文**中，`server`在`http`中的，而`location`在`server`块中，server和location都可以是多个配置。多个server代表多个服务，location代表多个匹配规则。
+
+该server中监听9003端口，`location`块指定与请求中的URI的“`/`”前缀相比较；对于匹配请求，URI将被添加到`root`指令中指定的路径，以形成本地文件系统上所请求文件的路径。try_files的作用是按顺序检查文件是否存在，返回第一个找到的文件或文件夹（结尾加斜线表示为文件夹），如果所有的文件或文件夹都找不到，会进行一个内部重定向到最后一个参数。
+
+举个栗子例如：URL请求http://localhost:9003/，那么Nginx会映射到/examples/nginx-test/index.html文件。
+
+
+
+##### 配置反向代理
+
+前端开发经常配置反向代理，经常被用来解决跨域问题, 我们修改下上面的location配置
+
+```
+location / {
+  proxy_pass https://www.baidu.com
+}
+```
+
+这样再刷新页面的时候就代理到百度了。
+
+思考一个问题，如果部署的服务是内网地址，如192.168.0.160:7300，那这里又该如何定义呢？
+
+这时候我们需要定义upstream 指令，upstream是用来定义一组服务器。 这些服务器可以监听不同的端口。
+
+```
+upstream demo-java-backend {
+    server 192.168.0.160:7300;
+}
+```
+
+这时候location也要改成：
+
+```
+location / {
+  proxy_pass http://demo-java-backend
+}
+```
+
+
+
+开启GZip压缩
+
+gzip 是一种常用的网页压缩技术，传输的网页经过 gzip 压缩之后大小通常可以变为原来的一半甚至更小，更小的网页体积也就意味着带宽的节约和传输速度的提升。使用 gzip 不仅需要 Nginx 配置，浏览器端也需要配合，需要在请求消息头中包含 `Accept-Encoding: gzip`
+
+Nginx 在拿到这个请求的时候，如果有相应配置，就会返回经过 gzip 压缩过的文件给浏览器，并在 response 相应的时候加上 `content-encoding: gzip` 来告诉浏览器自己采用的压缩方式。
+
+```
+gzip on; # 默认off，是否开启gzip
+gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+```
+
+gzip_types表示要采用 gzip 压缩的 MIME 文件类型。
