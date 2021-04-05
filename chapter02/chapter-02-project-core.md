@@ -260,6 +260,24 @@ const _promptAPI = new RequireModulesAPI(_creator)
 _promptModules.forEach(m => m(_promptAPI))
 ```
 
+RequiredModuleAPI.js
+
+```js
+class RequiredModuleAPI {
+  constructor(creator) {
+      this.creator = creator
+  }
+  injectFeature(feature) {
+      this.creator.featurePrompt.choices.push(feature)
+  }
+  injectPrompt(prompt) {
+      this.creator.injectedPrompts.push(prompt)
+  }
+}
+```
+
+
+
 为了保证效果能实现，需要先引入inquirer库
 
   ```js
@@ -271,4 +289,198 @@ const _answers = await inquirer.prompt(_creator.getFinalPrompts())
 ![1](./images/3.png)
 
    <center>图2-3</center>
+
+我们在featurePrompt中指定了type为CheckBox，多选，所以可以使用空格键选择多个，返回的值为
+
+```js
+{ features: ['babel', 'linter'] }
+```
+
+其中 `features` 是上面问题中的 `name` 属性。`features` 数组中的值则是每个选项中的 `value`。
+
+还有就是上一个问题选择了指定的选项，下一个问题怎么才会显示出来？这个是选择的相关性。仔细看下router.js中有一个when配置
+
+```
+ when: answers => answers.features.includes('router'),
+```
+
+当选中router时这个提示项才会显示。
+
+在vue的标准化项目中，vue，vue-router，vuex，babel，webpack，eslint这几项基本都是标配。我们把vue和webpack做成默认的，
+
+```js
+_answers.features.unshift('vue', 'webpack')
+```
+
+不需要用户选择。
+
+用户选择特性后，就需要生成package.json、编译模板、生成配置文件。在create.js中定义package.json的默认值
+
+```json
+{
+  name,
+  version: '0.1.0',
+  dependencies: {},
+  devDependencies: {},
+}
+```
+
+各个模板都在generator目录下。
+
+下面是babel相关配置
+
+```js
+module.exports = (generator) => {
+    generator.extendPackage({
+        babel: {
+            presets: ['@babel/preset-env'],
+        },
+        dependencies: {
+            'core-js': '^3.8.3',
+        },
+        devDependencies: {
+            '@babel/core': '^7.12.13',
+            '@babel/preset-env': '^7.12.13',
+            'babel-loader': '^8.2.2',
+        },
+    })
+}
+```
+
+模板调用 `generator` 对象的 `extendPackage()` 方法向 package.json 注入了 `babel` 相关的所有依赖，接下来看下`extendPackage()`是怎么实现的
+
+```js
+extendPackage(fields) {
+        const pkg = this.pkg
+        for (const key in fields) {
+            const value = fields[key]
+            const existing = pkg[key]
+            if (isObject(value) && (key === 'dependencies' || key === 'devDependencies' || key === 'scripts')) {
+                pkg[key] = Object.assign(existing || {}, value)
+            } else {
+                pkg[key] = value
+            }
+        }
+    }
+```
+
+注入过程其实遍历模板的所有配置加到package.json。
+
+看完怎么生成package.json,现在看下是怎么编译模板的？我们就以router为例说明。
+
+```js
+module.exports = (generator, options = {}) => {
+    generator.injectImports(generator.entryFile, `import router from './router'`)
+    generator.injectRootOptions(generator.entryFile, `router`)
+    generator.extendPackage({
+        dependencies: {
+            'vue-router': '^3.5.1',
+        },
+    })
+    generator.render('./template', {
+        historyMode: options.historyMode,
+        hasTypeScript: false,
+        plugins: [],
+    })
+}
+```
+
+```
+generator.injectImports(generator.entryFile, `import router from './router'`)
+```
+
+使用generator.injectImports把导入router注入到src的main.js中，注入的过程分为3步：
+
+1. 使用 vue-codemod 将代码解析成语法抽象树 AST。
+2. 将要插入的代码变成 AST 节点插入到上面生成的 AST 中。
+3. 将新的 AST 重新渲染成代码
+
+```js
+const { runTransformation } = require('vue-codemod')
+
+runTransformation(
+  { path: file, source: files[file] },
+  require('./utils/codemods/injectOptions'),
+  { injections },
+)
+```
+
+```js
+generator.injectRootOptions(generator.entryFile, `router`)
+```
+
+generator.injectRootOptions把router配置注入到入口文件 `src/main.js` 的 new Vue() 注入 router配置。
+
+```js
+generator.extendPackage({
+  dependencies: {
+    'vue-router': '^3.5.1',
+  },
+})
+```
+
+把router的依赖也加入到package.json中。generator.render负责渲染模板。
+
+具体的渲染过程可以用下图的图进行抽象概括
+
+![4](./images/4.png)
+
+<center>图4-4</center>
+
+提取babel配置，生成babel.config.js。
+
+在前面生成package.json配置时，我们把
+
+```json
+babel: {
+    presets: ['@babel/preset-env'],
+}
+```
+
+也写了进去，其实把该项配置放到babel的配置文件才比较标准。所以需要提取一下。我们可以调用 `generator.extractConfigFiles()` 将内容提取出来并生成 `babel.config.js` 文件中
+
+```js
+module.exports = {
+    presets: [
+        '@babel/preset-env'
+    ]
+}
+```
+
+模板文件渲染后还在内存中，需要进一步把文件写到硬盘。utils也提供了writeFileTree()方法来写文件
+
+```js
+async function writeFileTree(dir, files) {
+    Object.keys(files).forEach((name) => {
+        const filePath = path.join(dir, name)
+        fs.ensureDirSync(path.dirname(filePath))
+        fs.writeFileSync(filePath, files[name])
+    })
+}
+```
+
+下载依赖
+
+下载依赖我们使用比较execa，调用子进程来安装依赖包。
+
+```js
+function executeCommand(command, cwd) {
+    return new Promise((resolve, reject) => {
+        const child = execa(command, [], {
+            cwd,
+            stdio: ['inherit', 'pipe', 'inherit'],
+        })
+        child.stdout.on('data', buffer => {
+            process.stdout.write(buffer)
+        })
+        child.on('close', code => {
+            if (code !== 0) {
+                reject(new Error(`command failed: ${command}`))
+                return
+            }
+            resolve()
+        })
+    })
+}
+```
 

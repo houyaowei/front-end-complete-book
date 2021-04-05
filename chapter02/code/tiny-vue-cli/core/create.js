@@ -51,13 +51,10 @@ async function create(name) {
     require(`./generator/${feature}`)(generator, _answers)
   })
 
-  await generator.generate()
+  await generator.generate().catch(e=>{})
 
   // 安装依赖
-  // TODO,npm包安装失败
-  await executeCommand('npm install', path.join(process.cwd(), name)).catch(e=> {
-    console.log("execute npm install failed")
-  })
+  await executeCommand('yarn install', path.join(process.cwd(), name))
   console.log('\n项目创建成功, 执行下列命令开始开发：\n')
   console.log(`cd ${name} \n npm run dev`)
 }

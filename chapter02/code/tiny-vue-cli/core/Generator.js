@@ -140,7 +140,6 @@ class Generator {
     // 使用 ejs 解析 lib\generator\xx\template 中的文件
     async resolveFiles() {
         const files = this.files
-        console.log(this.fileMiddlewares)
         for (const middleware of this.fileMiddlewares) {
             await middleware(files, ejs.render)
         }

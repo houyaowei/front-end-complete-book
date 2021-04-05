@@ -3,6 +3,7 @@ const execa = require('execa')
 function executeCommand(command, cwd) {
     return new Promise((resolve, reject) => {
         const child = execa(command, [], {
+            shell: true,
             cwd,
             stdio: ['inherit', 'pipe', 'inherit'],
         })
