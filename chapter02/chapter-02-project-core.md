@@ -540,12 +540,13 @@ brew list nginx
 nginx常用命令：
 
 ```
-nginx  #启动nginx
-nginx -s quit  #快速停止nginx
-nginx -V #查看版本，以及配置文件地址
-nginx -v #查看版本
-nginx -s reload|reopen|stop|quit   #重新加载配置|重启|快速停止|安全关闭
-nginx -h #帮助
+nginx                              #启动nginx
+nginx -s quit                      #快速停止nginx
+nginx -V                           #查看版本，以及配置文件地址
+nginx -v                           #查看版本
+nginx -s reload|reopen|stop|quit   #重新加载配置|重启|停止|安全关闭
+nginx -h                           #帮助
+nginx -t                           校验配置文件
 ```
 
 我们先分析下配置文件的结构，方便修改配置。我们先看下nginx.config的默认文件
@@ -648,3 +649,105 @@ gzip_types text/plain text/css application/json application/x-javascript text/xm
 ```
 
 gzip_types表示要采用 gzip 压缩的 MIME 文件类型。
+
+
+
+##### Nginx支持websocket
+
+```
+map $http_upgrade $connection_upgrade {  
+    default upgrade;  
+    '' close;  
+}  
+upstream websocket_api {  
+    server 192.168.0.161:8888;  
+} 
+location / {  
+  proxy_pass http://websocket_api;  
+  proxy_http_version 1.1;  
+  proxy_set_header Upgrade $http_upgrade;  
+  proxy_set_header Connection "Upgrade";  
+} 
+```
+
+Nginx配置负载均衡
+
+负载均衡的主要思想就是把负载按照权重配置合理地分发到多个服务器上，实现压力分流，减轻服务器宕机的几率。
+
+主要配置如下：
+
+```
+http {
+  upstream myserver {
+    server 192.168.0.161:8081;  
+    server 192.168.0.161:8080;
+    server 192.168.0.160:8081 weight=5;  
+  }
+ 
+  server {
+    location / {
+    	proxy_pass http://myserver;
+    }
+  }
+}
+
+```
+
+如果不指定weight，默认为1。也就是如果有7个连接请求服务，那么5个连接会分配到server 192.168.0.160:8081。
+
+Nginx 提供了几种分配方式，默认为**轮询**，有以下几种分配方式：
+
+1. **轮询**，默认方式，每个请求按顺序逐一分配到不同的server。如果某个服务挂了，能被自动去除；
+
+2. **weight**，权重分配，指定轮询几率，权重越高被访问的概率越大，用于后端服务器性能不均的情况；
+
+3. **ip_hash**，每个请求按访问 IP 的 hash 结果分配，这样每个访客固定访问一个后端服务器，可以解决动态网页 session 共享问题。
+
+   
+
+   Nginx配置动静分离
+
+   把静态文件独立成单独的域名，放在独立的服务器上，实现资源共享。需要搭配expire配置使用。
+
+   
+
+   ##### 图片防盗配置
+
+   由于图片链接可以跨域访问，所以图片被其他网站引用，无形就增加服务器负担
+
+   ```
+   server {
+     # 图片防盗链
+     location ~* \.(jpg|jpeg|png|gif)$ {
+       valid_referers none blocked server_names ~\.test\. ~\.test2\. *.qq.com; 
+       if ($invalid_referer){
+         return 403;
+       }
+     }
+   }
+   ```
+
+   ##### 过滤请求
+
+   ```
+   # 非指定请求全返回 403
+   if ( $request_method !~ ^(GET|POST|HEAD)$ ) {
+     return 403;
+   }
+   
+   location / {
+     # IP访问限制（只允许IP是 192.168.0.2 机器访问）
+     allow 192.168.0.2;
+     deny all;
+   }
+   ```
+
+   
+
+   
+
+   
+
+   
+
+
