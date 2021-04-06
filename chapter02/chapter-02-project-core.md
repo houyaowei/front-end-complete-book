@@ -425,7 +425,7 @@ generator.extendPackage({
 
 ![4](./images/4.png)
 
-<center>图4-4</center>
+<center>图2-4</center>
 
 提取babel配置，生成babel.config.js。
 
@@ -484,6 +484,44 @@ function executeCommand(command, cwd) {
 }
 ```
 
+最后，我们进行下测试，
+
+```shell
+tiny-cli create demo
+```
+
+![1](./images/tiny-1.png)
+
+<center>图2-5</center>
+
+空格选择这三项后，按回车
+
+![1](./images/tiny-2.png)
+
+<center>图2-6</center>
+
+输入Y，继续回车
+
+![1](./images/tiny-3.png)
+
+<center>图2-7</center>
+
+选择一项eslint校验规则，回车：
+
+![1](./images/tiny-4.png)
+
+<center>图2-8</center>
+
+选择规则生效时间，继续回车：
+
+![1](./images/tiny-5.png)
+
+<center>图2-9</center>
+
+到这一步脚手架生成，npm包安装完成。
+
+
+
 #### 3.2 自动化部署
 
 
@@ -506,13 +544,13 @@ Nginx有如下几个比较显著的优点：
 
 <img src="./images/nginx-1.png" style="zoom: 67%;" />
 
-<center>图4-5</center>
+<center>图2-10</center>
 
 反向代理：是指以代理服务器来接受 internet 上的连接请求，然后将请求转发给内部网络上的服务器，并将从服务器上得到的结果返回给 internet 上请求连接的客户端，此时代理服务器对外就表现为一个反向代理服务器。
 
 <img src="./images/nginx-2.png" style="zoom: 67%;" />
 
-<center>图4-6</center>
+<center>图2-11</center>
 
 接下来我们就从头开始看下是怎么安装和配置。
 
@@ -744,10 +782,12 @@ Nginx 提供了几种分配方式，默认为**轮询**，有以下几种分配�
 
    
 
-   
+   #### 2.4 jest测试基础
 
    
 
+   
+   
    
 
 
