@@ -2,7 +2,7 @@
  * 测试异步代码,主要测试Promise
  */
 
-const { fetchData ,fetchDataWithAwait } = require("../utils/basic")
+const { fetchData ,fetchDataWithAwait } = require("../source/basic")
 
 describe("ajax functions test cases", ()=> {
   test('should return data when fetchData with request ', () => {

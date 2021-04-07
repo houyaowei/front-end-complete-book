@@ -1,7 +1,7 @@
 
-jest.mock("../utils/mockUtil.js")
+jest.mock("../source/mockUtil.js")
 
-const { getName } = require("../utils/mockUtil")
+const { getName } = require("../source/mockUtil")
 
 describe("mock functions continued",()=> {
   test('add function test case ', () => {

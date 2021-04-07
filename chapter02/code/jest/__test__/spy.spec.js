@@ -1,4 +1,4 @@
-const utils = require("../utils/mockUtil")
+const utils = require("../source/mockUtil")
 test("calls math.add", () => {
     // obj, func
     const getNameMock = jest.spyOn(utils, "getName");

@@ -2,7 +2,7 @@
  * 函数测试
  */
 const axios = require("axios")
-const { getApplist} = require("../utils/funcList")
+const { getApplist} = require("../source/funcList")
 jest.mock('axios');
 
 describe("function test cases", ()=> { 
