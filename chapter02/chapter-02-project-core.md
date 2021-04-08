@@ -831,11 +831,12 @@ Nginx 提供了几种分配方式，默认为**轮询**，有以下几种分配�
        "test": "jest",
     "build-coverage": "jest --coverage"
      },
+   ```
 ```
    
 先从最简单的开始测起。我们先新建一个basic.js文件，并把该方法暴露出去：
    
-```js
+​```js
    function sum(a,b){
      const na = a || 0;
      const nb = b || 0;
@@ -844,14 +845,14 @@ Nginx 提供了几种分配方式，默认为**轮询**，有以下几种分配�
    module.exports = {
      sum
    }
-   ```
-   
+```
+
    需要注意的是要遵守commonjs规范，因为是在node环境中运行的。初始方法已经有了，下面该怎么测试用？测试用例应该放到什么地方呢?jest能识别三种测试用例，分别是test.js结尾的，如果app.test.js；以spec.js结尾的，如app.spec.js; 最后一种就是在__test__文件的。
-   
+
    Jest 在运行测试用例的时候，提供一种机制，在整个项目会查找这三种情况，只要识别出任一一种都会执行。
-   
+
    我们选择最后一种存放测试用例。根目录下建立一个__test__文件夹。并新建第一个测试文件basic.spec.js
-   
+
    ```js
    const { sum } = require("../source/basic")
    
@@ -862,23 +863,23 @@ Nginx 提供了几种分配方式，默认为**轮询**，有以下几种分配�
      });
    }  
    ```
-   
+
    我们是用一下命令运行下看看效果
-   
+
    ```shell
    yarn run  test
    ```
-   
+
    ![1](./images/jest-1.png)
-   
+
    <center>图2-12</center>
-   
+
    测试用例通过。从这个用例可以看出，测试分为三步：导入测试内容、运行测试内容，断言进行比较。上面的require部分为导入测试内容，sum(1,3)为运行测试内容，expect为断言部分，判断是否是预期的效果。
-   
+
    jest的单元测试用，使用test（或者it，it是test的别名）定义一个测试用例，使用expect定一个断言，判断total值是否和4相等。describe用来定义一组相关的测试用例，对一个功能进行测试，只有这一组用例都测试通过之后，才能说明这个功能是好的。
-   
+
    对这个测试用例我们在扩展一下，再增加几个和数字相关断言，toBeGreaterThan，toBeGreaterThanOrEqual，toBeLessThan，toBeLessThanOrEqual，从字面也容易判断出分别代表的意思：大于，大于等于，小于，小于等于。
-   
+
    ```js
    test('adds 1 + 3 to equal 4', () => {
        const total = sum(1,3)
@@ -889,27 +890,27 @@ Nginx 提供了几种分配方式，默认为**轮询**，有以下几种分配�
        expect(total).toBeLessThanOrEqual(4.5);
      });
    ```
-   
+
    为了验证测试用例失败的情况，我们也稍微改下第一个断言结果，看jest能给我们一个什么样的测试结果。再次运行测试：
-   
+
    ![2](./images/jest-2.png)
-   
+
    <center>图2-13</center>
-   
+
    测试结果如我们所料，第一个断言执行失败，并且通过红色字体提示了错误用例位置，期望值和实际得到的值
-   
+
    ```
     basic test › adds 1 + 3 to equal 4
    ```
-   
+
    这条信息表示断言判断失败的用例位置。
-   
+
    ```
    expect(received).toBe(expected)
    Expected: 2
    Received: 4
    ```
-   
+
    这条消息提示了断言中的期望值和实际获得的值，更方便我们定位具体的错误信息。
 
 我们再定义一个新的基本测试用例，对已有对象赋值后判断两个对象是否相等
@@ -922,6 +923,99 @@ test('object assignment', () => {
 });
 ```
 
+```
+PASS  __test__/basic.spec.js
+  basic test
+    ✓ adds 1 + 3 to equal 4 (2 ms)
+    ✓ object assignment (1 ms)
 
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        0.482 s, estimated 2 s
+Ran all test suites.
+✨  Done in 1.43s.
+```
 
+依然是正常的。第一个实例我们列举了数字型匹配，下面看一个boolen型测试用例，
 
+```js
+test('null test cases', () => {
+    const n = null;
+    expect(n).toBeNull();
+    expect(n).toBeDefined();
+    expect(n).not.toBeUndefined();
+    expect(n).not.toBeTruthy();
+    expect(n).toBeFalsy();
+  });
+```
+
+null值在JavaScript中表示false在这个测试用例中也得到了印证。
+
+jest的测试不近仅可以判断具体的值，还可以使用toMatch判断字符串的子串，使用toContain判断数组是否包含某个元素。
+
+```javascript
+test('string matches ', () => {
+    expect('administration').toMatch(/admin/);
+})
+```
+
+```js
+  const shoppingList = [
+    'apple',
+    'orange',
+    'fish',
+    'biscuit',
+    'milk'
+  ];
+
+  test('the shopping list has apple on it', () => {
+  	expect(shoppingList).toContain('apple');
+  }); 
+```
+
+这两个match对于前端开发在接口调试中判断是否返回关键字段将会起到重大的作用。数组的expect甚至提供了可以对整个集合是否匹配来判断。
+
+```
+test('test array', () => {
+    expect(shoppingList).toEqual(
+      expect.arrayContaining(['tea', "rice"])
+    )
+})
+```
+
+介绍了基本测试方法后，下面看下怎么测试异步运行的代码。在web开发中，异步代码随处可见，所以对这部分代码的测试是要重点介绍的。
+
+我们先实现一个axios的请求方法，首先需要安装该npm包，再借助公共的ajax服务来进行测试。
+
+> 公共ajax服务地址：https://jsonplaceholder.typicode.com/todos/1'
+
+```javascript
+let url = 'https://jsonplaceholder.typicode.com/todos/1';
+function fetchData() {  
+  return axios.get(url)
+      .then(res => res.data)
+      .catch(error => console.log(error));
+}
+```
+
+下面开始构造ajax的测试用例，jest中异步代码测试有三中测试形式：
+
+- 回调函数
+- Promise式验证
+- 使用async/await
+
+先看下第一种回调函数式，
+
+```javascript
+const { fetchData } = require("../source/basic")
+
+test('test asyn code with cb', () => {
+  function callback(data) {
+    expect(data.userId).toBe(1);
+  }
+  fetchData(callback);
+});
+```
+
+这种测试方法是最容易想到的。可以达到预想的测试目的。但是不推荐使用，原因是这种测试方法增加了对其他其他函数的依赖，职责不够单一

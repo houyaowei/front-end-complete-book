@@ -27,30 +27,37 @@ describe("basic test", ()=> {
     expect(data).toEqual({name: "hyw", age: 24});
   });
 
-  // test('null test cases', () => {
-  //   const n = null;
-  //   expect(n).toBeNull();
-  //   expect(n).toBeDefined();
-  //   expect(n).not.toBeUndefined();
-  //   expect(n).not.toBeTruthy();
-  //   expect(n).toBeFalsy();
-  // });
+  test('null test cases', () => {
+    const n = null;
+    expect(n).toBeNull();
+    expect(n).toBeDefined();
+    expect(n).not.toBeUndefined();
+    expect(n).not.toBeTruthy();
+    expect(n).toBeFalsy();
+  });
 
-  // test('string matches ', () => {
-  //   expect('Christoph').toMatch(/stop/);
+  test('string matches ', () => {
+    expect('administration').toMatch(/admin/);
+  })
+
+  const shoppingList = [
+    'apple',
+    'orange',
+    'fish',
+    'biscuit',
+    'milk'
+  ];
+  const toTestArray = ['tea', "rice"]
+  test('the shopping list has apple on it', () => {
+    expect(shoppingList).toContain('apple');
+    
+  }); 
+  // test('test array', () => {
+  //   expect(shoppingList).toEqual(
+  //     expect.arrayContaining(['tea', "rice"])
+  //   )
   // })
-
-  // const shoppingList = [
-  //   'apple',
-  //   'orange',
-  //   'fish',
-  //   'biscuit',
-  //   'milk'
-  // ];
-  // test('the shopping list has apple on it', () => {
-  //   expect(shoppingList).toContain('apple');
-  // }); 
-
+  
   // test('test exception', () => {
   //   expect(testException).toThrow('no cookies');
   // })
