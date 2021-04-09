@@ -1030,5 +1030,49 @@ test('test asyn code with cb', done => {
 });
 ```
 
-如果 done 永远不会被调用，那么该测试将会失败，这才是正常的执行流程。
+如果 done 永远不会被调用，那么该测试将会失败，这才符合完整的测试流程。
+
+再看第二种Promise式验证。
+
+Promise设计的初衷是使用链式解决回调炼狱(callback hell)的问题，在jest的单元测试中也同样适用，也让测试也变得更加简单。jest的断言可以放到Promise的回调中，等Promise被resolve时再执行。形式如下面所示：
+
+```js
+test('should return data when fetchData request success', () => {
+    expect.assertions(1);
+    fetchData().then(data => {
+      expect(data).toEqual({
+        "userId": 1,
+        "id": 1,
+        "title": "delectus aut autem",
+        "completed": false
+      })
+      expect(data.completed).toBeFalsy();
+    });
+  })
+```
+
+异步测试中，需要增加一个配置：
+
+```javascript
+expect.assertions(number);
+```
+
+该配置用来验证在测试期间是否调用了一定数量的断言，如果未调用到指定的数量会测试失败。如上面的测试用例中把expect.assertions设置成了1，但是却有两个断言, 看下结果会是怎么样的。
+
+![2](./images/jest-3.png)
+
+ <center>图2-14</center>
+
+还可以在 expect 语句中使用resolves matcher, Jest 等待该 promise 被resolve。如果 promise 被reject，测试将自动失败。
+
+```javascript
+test('should return data when fetchData with request ', () => {
+      return expect(fetchData()).resolves.toEqual({
+        "userId": 1,
+        "id": 1,
+        "title": "delectus aut autem",
+        "completed": false
+    }) 
+  })
+```
 
