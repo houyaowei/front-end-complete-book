@@ -13,7 +13,10 @@ describe("ajax functions test cases", ()=> {
   //       "completed": false
   //   }) 
   // })
-  
+  // test('fetchData fails with an error', () => {
+  //   expect.assertions(1);
+  //   return expect(fetchData()).rejects.toMatch('error');
+  // });
   // test('should return data when fetchData request success', () => {
   //   //是否调用了一点数量的断言
   //   expect.assertions(1);

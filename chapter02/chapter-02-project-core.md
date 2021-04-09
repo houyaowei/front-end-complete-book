@@ -1063,7 +1063,7 @@ expect.assertions(number);
 
  <center>图2-14</center>
 
-还可以在 expect 语句中使用resolves matcher, Jest 等待该 promise 被resolve。如果 promise 被reject，测试将自动失败。
+还可以在 expect 语句中使用resolves matcher（匹配器）, Jest 等待该 promise 被resolve。
 
 ```javascript
 test('should return data when fetchData with request ', () => {
@@ -1075,4 +1075,58 @@ test('should return data when fetchData with request ', () => {
     }) 
   })
 ```
+
+如果 promise 被reject，测试将自动失败。
+
+```
+test('fetchData fails with an error', () => {
+  expect.assertions(1);
+  return expect(fetchData()).rejects.toMatch('error');
+});
+```
+
+最后看下第三种async/await。
+
+async/await彻底解放了异步代码，可以让异步代码的执行看起来像同步代码一样。测试的时候只需要在传递给 test 的函数前加上 async 关键字。
+
+```js
+test("test fetchData function with async/await ", async ()=> {
+    const res = await fetchData()
+    expect(res.completed).toBeFalsy()
+})
+```
+
+
+
+##### setup和teardown
+
+setUp：前置函数，是在众多函数最先被调用的函数，而且每执行完一个函数都要从setUp()调用开始后再执行下一个函数，有几个函数就调用他几次，与位置无关，随便放在哪里都是他先被调用。
+
+在jest中对应的函数式beforeEach和beforeAll。
+
+```js
+beforeEach(()=> {
+   console.log("before each")
+})
+```
+
+每个测试用例执行前会打印**before each**, 如果想执行一次可以使用beforeAll。
+
+tearDown：后置函数，是在众多函数执行完后他才被执行，意思就是不管这个类里面有多少函数，他总是最后一个被执行的，与位置无关，放在那里效果都一样。
+
+在jest中对应的函数式afterEach和afterAll。
+
+```js
+afterEach(()=> {
+   console.log("after each")
+})
+```
+
+每个测试用例执行前会打印**after each**, 如果想执行一次可以使用afterAll。
+
+
+
+##### Mock
+
+开发过程中
 
