@@ -1108,6 +1108,9 @@ setUp：前置函数，是在众多函数最先被调用的函数，而且每执
 beforeEach(()=> {
    console.log("before each")
 })
+beforeAll(() => {
+  console.log("before all")
+});
 ```
 
 每个测试用例执行前会打印**before each**, 如果想执行一次可以使用beforeAll。
@@ -1120,6 +1123,9 @@ tearDown：后置函数，是在众多函数执行完后他才被执行，意思
 afterEach(()=> {
    console.log("after each")
 })
+afterAll(() => {
+  console.log("after all")
+});
 ```
 
 每个测试用例执行前会打印**after each**, 如果想执行一次可以使用afterAll。
@@ -1128,5 +1134,57 @@ afterEach(()=> {
 
 ##### Mock
 
-开发过程中
+开发过程中实现一个方法要依赖另一个或者几个方法是很常见的场景。但是从单元测试的角度讲我们只关心要测试的方法，依赖的方法要怎么处理才能进行顺利的测试呢？这时候通用的选择是用Mock的方法实现依赖。
+
+先看一个例子，循环遍历一个数组，该方法有一个依赖项：callback。每次循环都要执行一次回调方法。
+
+```js
+function forEach(arr, callback) {
+  for (let index = 0,iLen=arr.length; index < iLen; index++) {
+    callback(arr[index]);
+  }
+}
+```
+
+我们第一步要做的首先把这个callback方法模拟出来，可以使用jest提供的fn方法。
+
+```js
+const mockCallback = jest.fn();
+```
+
+forEach的方法表用就变成了
+
+```js
+forEach(["hou", "yw"], mockCallback); 
+```
+
+下面就可以实现测试用例了。
+
+```js
+test('mock function calls test cases ', () => {
+      const mockCallback = jest.fn();
+      forEach(["hou", "yw"], mockCallback); 
+      console.log(mockCallback.mock.instances)
+      //调用两次
+      expect(mockCallback.mock.calls.length).toBe(2);
+      // 第一次调用函数时的第一个参数是 hou
+      expect(mockCallback.mock.calls[0][0]).toBe('hou');
+  })
+```
+
+Mock Function都带有 mock属性，它保存了函数被调用的信息：函数实例，calls。
+
+```json
+{
+        calls: [ [ 'hou' ], [ 'yw' ] ],
+        instances: [ undefined, undefined ],
+        invocationCallOrder: [ 4, 5 ],
+        results: [
+          { type: 'return', value: undefined },
+          { type: 'return', value: undefined }
+        ]
+  }
+```
+
+ jest的mock函数还可以
 

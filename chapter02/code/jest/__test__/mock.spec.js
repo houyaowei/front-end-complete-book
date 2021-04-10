@@ -33,14 +33,21 @@ describe("mock function test",()=> {
     // 断言mockFn执行后返回100
     expect(mockFn(10, 10)).toBe(1);
   })
-  test('mock calls test cases ', () => {
+  test('mock function calls test cases ', () => {
       const mockCallback = jest.fn();
-      forEach([0, 1], mockCallback); //mock函数代替真实的回调函数
-
+      forEach(["hou", "yw"], mockCallback); 
+      console.log(mockCallback.mock)
       //调用两次
       expect(mockCallback.mock.calls.length).toBe(2);
       // 第一次调用函数时的第一个参数是 0
-      expect(mockCallback.mock.calls[0][0]).toBe(0);
+      expect(mockCallback.mock.calls[0][0]).toBe('hou');
+
+     
+  })
+  test("mock attribute test", ()=> {
+    const mockCallback = jest.fn();
+    mockCallback.bind({})
+    // console.log(mockCallback.mock.instances)
   })
   
 })

@@ -31,10 +31,10 @@ describe("ajax functions test cases", ()=> {
   //   });
   // })
 
-  // test("test fetchData function with async/await ", async ()=> {
-  //   const res = await fetchData()
-  //   expect(res.completed).toBeFalsy()
-  // })
+  test("test fetchData function with async/await ", async ()=> {
+    const res = await fetchData()
+    expect(res.completed).toBeFalsy()
+  })
   // test("test fetchDataWithAwait function", async ()=> {
   //   const res = fetchDataWithAwait()
   //   expect(res.completed).toBeFalsy()
