@@ -7,12 +7,14 @@ module.exports = {
   ],
   themeConfig : {
     nav : [
-        { text: '接口定义', link: '/web' },
-        { text: '接口字段定义', link: '/api' },
-        { text: '附录：错误码', link: '/error' }
+        // { text: '接口定义', link: '/web' },
+        // { text: '接口字段定义', link: '/api' },
+        // { text: '附录：错误码', link: '/error' }
     ],
     sidebar: [
-      ['/', '介绍']
+      ['/', '介绍'],
+      ['/guide/web/', 'web'],
+      ['/guide/ts/', 'TS'],
     ],
     sidebarDepth: 2,
     lastUpdated: 'Last Updated',
