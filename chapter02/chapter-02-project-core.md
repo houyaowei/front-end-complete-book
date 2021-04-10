@@ -1172,7 +1172,7 @@ test('mock function calls test cases ', () => {
   })
 ```
 
-Mock Function都带有 mock属性，它保存了函数被调用的信息：函数实例，calls。
+Mock Function都带有 mock属性，它保存了函数被调用的信息：函数实例，calls等。
 
 ```json
 {
@@ -1186,5 +1186,134 @@ Mock Function都带有 mock属性，它保存了函数被调用的信息：函�
   }
 ```
 
- jest的mock函数还可以
+jest的mock函数还可以具体附带具体实现。
+
+```
+test('test jest.fn with implement', () => {
+    let mockFn = jest.fn((num1, num2) => {
+      return num1 / num2;
+    })
+    // 断言mockFn执行后返回1
+    expect(mockFn(10, 10)).toBe(1);
+})
+```
+
+如果测试的环境需要依赖函数返回的参数，也可以给mock function 指定返回值来模拟。
+
+```js
+test('test jest.fn with default value', () => {
+    let mockFn = jest.fn().mockReturnValue('houyw');
+    // 断言mockFn执行后返回值为default
+    expect(mockFn()).toBe('houyw');
+})
+```
+
+我们再来思考一个问题，在实际的开发中，一个文件中有多个方法，一个方法mock一次显得有些笨拙，有没有更好的方法可以一次性进行mock？如下面的代码：
+
+```js
+//mockUtil.js
+exports.getName = () => { name: "123"};
+exports.subtract = (a, b) => a -b;
+exports.multiply = (a, b) => a * b;
+```
+
+jest 提供了一个mock()方法，第一个参数是要mock的模块，可以自动mock这个模块。自动mock模块是什么意思呢？就是把模块暴露出来的方法，全部自动转换成mock函数jest.fn()。
+
+```
+jest.mock("../source/mockUtil.js")
+```
+
+相当于变成如下：
+
+```js
+exports.getName = jest.fn();
+exports.subtract = jest.fn();
+exports.multiply = jest.fn();
+```
+
+现在看下测试用例怎么实现。
+
+```javascript
+jest.mock("../source/mockUtil.js")
+
+const { getName } = require("../source/mockUtil")
+describe("mock functions continued",()=> {
+  test('getName function test case ', () => {
+    getName.mockReturnValueOnce({name: "123"})
+    expect(getName()).toEqual({name: "123"})
+  })
+})
+```
+
+需要注意的是需要为每个需要测试的方法mock返回值。用这样的方法也可以mock整个ajax请求，检查ajax请求是否正常，而不是真正去发请求。
+
+```js
+// funcList.js
+const axios = require("axios")
+function listApps() {
+  return axios.get("http://sss.test.socm/getApps")
+      .then(res => res.data)
+      .catch(error => console.log(error));
+}
+module.exports = {
+  getApplist: listApps
+}
+```
+
+测试用例如下：
+
+```js
+const axios = require("axios")
+const { getApplist} = require("../source/funcList")
+jest.mock('axios');
+
+describe("function test cases", ()=> { 
+  expect.assertions(1); 
+  test('getApplist  should return value ', async ()=> {
+    const apps = [{
+      appId: '1',
+      appName: 'android'
+    },{
+      appId: '2',
+      appName: 'ios'
+    }]
+    //模拟返回数据
+    const resData = {
+      status: 0,
+      data: apps
+    }
+    axios.get.mockResolvedValue(resData); //get方法mock返回值
+    const data = await getApplist();
+    expect(data).toEqual(apps)
+  })
+  
+})
+```
+
+上面我们总结了mock返回值的场景，除了返回值也可以指定输入参数。
+
+```js
+test('jest.fn should be invoked ', () => {
+      let mockFn = jest.fn();
+      let result = mockFn('houyw', 2, false);
+      // 断言mockFn的执行后返回undefined
+      expect(result).toBeUndefined();
+      // 断言mockFn被调用
+      expect(mockFn).toBeCalled();
+      // 断言mockFn被调用了一次
+      expect(mockFn).toBeCalledTimes(1);
+      // 断言mockFn传入的参数为1, 2, 3
+      expect(mockFn).toHaveBeenCalledWith('houyw', 2, false);
+  })
+```
+
+
+
+
+
+
+
+
+
+
 

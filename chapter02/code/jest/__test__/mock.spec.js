@@ -30,7 +30,7 @@ describe("mock function test",()=> {
     let mockFn = jest.fn((num1, num2) => {
       return num1 / num2;
     })
-    // 断言mockFn执行后返回100
+    // 断言mockFn执行后返回1
     expect(mockFn(10, 10)).toBe(1);
   })
   test('mock function calls test cases ', () => {
