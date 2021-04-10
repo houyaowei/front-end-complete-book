@@ -36,7 +36,7 @@ describe("mock function test",()=> {
   test('mock function calls test cases ', () => {
       const mockCallback = jest.fn();
       forEach(["hou", "yw"], mockCallback); 
-      console.log(mockCallback.mock)
+      // console.log(mockCallback.mock)
       //调用两次
       expect(mockCallback.mock.calls.length).toBe(2);
       // 第一次调用函数时的第一个参数是 0

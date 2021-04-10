@@ -1,5 +1,5 @@
 TN:
-SF:utils/basic.js
+SF:source/basic.js
 FN:4,sum
 FN:14,fetchData
 FN:16,(anonymous_2)
@@ -7,13 +7,13 @@ FN:17,(anonymous_3)
 FN:20,fetchDataWithAwait
 FN:25,testException
 FNF:6
-FNH:4
+FNH:3
 FNDA:1,sum
 FNDA:1,fetchData
 FNDA:1,(anonymous_2)
 FNDA:0,(anonymous_3)
 FNDA:0,fetchDataWithAwait
-FNDA:1,testException
+FNDA:0,testException
 DA:1,2
 DA:2,2
 DA:5,1
@@ -24,10 +24,10 @@ DA:16,1
 DA:17,0
 DA:21,0
 DA:22,0
-DA:26,1
+DA:26,0
 DA:29,2
 LF:12
-LH:9
+LH:8
 BRDA:5,0,0,1
 BRDA:5,0,1,0
 BRDA:6,1,0,1
@@ -36,7 +36,7 @@ BRF:4
 BRH:2
 end_of_record
 TN:
-SF:utils/funcList.js
+SF:source/funcList.js
 FN:7,listApps
 FN:9,(anonymous_1)
 FN:10,(anonymous_2)
@@ -56,7 +56,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:utils/mockUtil.js
+SF:source/mockUtil.js
 FN:1,(anonymous_0)
 FN:2,(anonymous_1)
 FN:3,(anonymous_2)
