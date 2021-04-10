@@ -1348,4 +1348,86 @@ jest提供了coverage的功能，
 
 文档的生成的目的是为了知识传递，特别是规范类的需要文档化，完整、准确，不容易产生歧义，降低了团队的协作成本和维护成本，提高开发效率和质量，保证不会因为开发人员的变动而产生较大的影响。
 
-前端生成的文档有
+前端生成的文档还是有不少，如jsdoc，tj大神的dox，以 Markdown 为中心的vuepress，docsify。我们选择简单易上手的vuepress做为前端，它有几个比较大的优点：
+
+- 界面简洁
+- 容易上手
+- 更好的兼容、扩展 Markdown 语法
+- 响应式布局，支持PC端、手机端
+- Google Analytics 集成
+- 支持 PWA
+
+下面，我们新建一个vuepress工程来看下前端文档的创建过程。
+
+```shell
+mkdir fe-doc
+cd fe-doc
+yarn init -y 
+yarn add vuepress
+```
+
+配置前端开发脚本,
+
+```json
+"scripts": {
+    "dev": "vuepress dev docs",
+    "build": "vuepress build docs"
+ }
+```
+
+我们把 `docs` 目录作为 `targetDir` 。新建相应的目录，如下示例所示：
+
+```json
+├── README.md           //项目说明
+├── deploy.sh           //部署脚本
+├── docs                //文档主目录
+|  ├── .vuepress        //存放全局的配置、组件、静态资源等
+|  |  ├── components    //该目录中的 Vue 组件将会被自动注册为全局组件
+|  |  ├── config.js     //配置文件的入口文件
+|  |  ├── enhanceApp.js //客户端应用的增强
+|  |  ├── public        //静态资源目录
+|  |  ├── styles        //样式文件
+|  |  ├── templates     //模板
+|  |  └── theme         //主题文件
+|  ├── README.md        //主目录文档配置
+|  └── guide            //模块文档配置
+|     ├── ts            //模块
+|     └── web           //模块
+├── index.html          
+├── package.json
+└── yarn.lock
+```
+
+接下来修改docs/.vuepress/config.js文件，增加相关配置，
+
+```
+  title: '前端组件接口文档', 
+  description : 'fe doc',
+  base : '/',
+  head: [
+    ['link', { rel: 'icon', href: '/favicon.ico' }] 
+  ],
+  themeConfig : {
+    nav : [
+        // { text: '接口定义', link: '/web' },
+        // { text: '接口字段定义', link: '/api' },
+        // { text: '附录：错误码', link: '/error' }
+    ],
+    sidebar: [
+      ['/', '介绍'],
+      ['/guide/web/', 'web'],
+      ['/guide/ts/', 'TS'],
+    ],
+    sidebarDepth: 2,
+    lastUpdated: 'Last Updated',
+  }
+```
+
+
+
+
+
+
+
+
+
