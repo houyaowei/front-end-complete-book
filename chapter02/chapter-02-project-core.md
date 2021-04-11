@@ -1400,8 +1400,8 @@ yarn add vuepress
 
 接下来修改docs/.vuepress/config.js文件，增加相关配置，
 
-```
-  title: '前端组件接口文档', 
+```js
+  title: '前端资源文档', 
   description : 'fe doc',
   base : '/',
   head: [
@@ -1409,9 +1409,9 @@ yarn add vuepress
   ],
   themeConfig : {
     nav : [
-        // { text: '接口定义', link: '/web' },
-        // { text: '接口字段定义', link: '/api' },
-        // { text: '附录：错误码', link: '/error' }
+        { text: 'W3c', link: '/guide/w3c/' },
+        { text: '前端牛人', link: '/guide/superman/' },
+        { text: '社区网站', link: '/guide/community/' }
     ],
     sidebar: [
       ['/', '介绍'],
@@ -1423,11 +1423,64 @@ yarn add vuepress
   }
 ```
 
+title用来说明网站的title，base表示部署站点的基础路径，head表示需要被注入到当前页面的 HTML `<head>` 中的标签，themeConfig表示网站当前主题的配置。themeConfig/nav用来配置导航菜单，themeConfig/sidebar表示侧边栏功能项配置，themeConfig/sidebarDepth表示侧边栏功能项目深度配置(显示几级)。
 
+为了看到效果，我们先在guide/web和guide/ts下分别建立README.md文件，分别输入一下内容：
 
+```markdown
+## web 历史及概述
 
+- web 发展史
+- web 核心要素
 
+```
 
+```markdown
+## Number
+
+- **属性说明:**
+  - 数字类型
+- **类型:**
+  - Number
+- **示例:**
+  - let aa: number = 6;
+
+## Array
+
+- **属性说明:**
+  - 数组类型
+- **类型:**
+  - Array
+- **示例:**
+  - let arr: number[] = [1, 2]
+```
+
+并在docs/README.md输入以下内容：
+
+```markdown
+## 主页
+
+## 功能介绍
+
+- JavaScript 概述
+- JavaScript VS Typescript
+- JavaScript 基本 API
+- ES2015
+- ES2016
+- ES2020
+```
+
+先用命令**yarn run dev**启动下项目看下效果，如图2-17所示。
+
+![2](./images/doc-2.png)
+
+ <center>图2-17</center>
+
+markdown是一种轻量级标记语言，排版语法简洁，让人们更多地关注内容本身而非排版。对web开发者更加友好，学习成本低。它使用易读易写的纯文本格式编写文档，可与HTML混编，还可导出 HTML、PDF格式的文件。简洁、高效、易读、易写。
+
+vuepress内置了markdown loader，将 markdown 转成 Vue，再通过 vue-loader 解析为最终的 HTML。
+
+我们也对
 
 
 
