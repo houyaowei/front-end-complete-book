@@ -17,7 +17,8 @@ module.exports = {
       ['/guide/ts/', 'TS'],
       ['/guide/w3c/', 'W3C'],
       ['/guide/superman/','前端牛人'],
-      ['/guide/community/','社区']
+      ['/guide/community/','社区'],
+      ['/guide/examples/','嵌入vue组件'],
     ],
     sidebarDepth: 2,
     lastUpdated: 'Last Updated',

@@ -1476,11 +1476,64 @@ title用来说明网站的title，base表示部署站点的基础路径，head�
 
  <center>图2-17</center>
 
+从效果可以看出vuepress会读取docs目录下的README.md做为主目录，guide中的md文件会作为侧边栏。
+
 markdown是一种轻量级标记语言，排版语法简洁，让人们更多地关注内容本身而非排版。对web开发者更加友好，学习成本低。它使用易读易写的纯文本格式编写文档，可与HTML混编，还可导出 HTML、PDF格式的文件。简洁、高效、易读、易写。
 
-vuepress内置了markdown loader，将 markdown 转成 Vue，再通过 vue-loader 解析为最终的 HTML。
+vuepress内置了markdown loader，将 markdown 转成 Vue，再通过 vue-loader 解析为最终的 HTML。正是因为如此，在markdown中也可以嵌入vue逻辑。
 
-我们也对
+我们先编辑docs/.vuepress/components下的books.vue文件，计划输出books列表，前面我们说过，该目录下的Vue 组件将会被自动注册为全局组件。
 
+输入以下内容：
 
+```javascript
+<template>
+  <div id="app">
+    <div v-for="book in books" :key="book.name">
+      <span>书名：{{book.name}}</span>
+      <span>作者：{{book.author}}</span>
+    </div>
+  </div>
+</template>
+<script>
+  export default {
+    name: 'app',
+    data () {
+      return {
+        books: [
+          {
+            name: "Typescript编程",
+            author: "Boris Cherny"
+          },
+          {
+            name: "Go web编程",
+            author: "郑兆熊"
+          }
+        ]
+      }
+    }
+  }
+</script>
+
+<style>
+</style>
+```
+
+在guide目录下新建examples文件夹、README.md文件。在md文件中直接引入**boos**组件，同时嵌入代码。
+
+```markdown
+## 嵌入 vue 组件
+
+<Books />
+
+​```javascript
+ 这里输入books.vue的源码
+​```
+```
+
+效果如下：
+
+![2](./images/doc-3.png)
+
+vuepress是对前端开发比较友好的文档生成工具，只要对markdown和vue稍微属性，就可以开发出比较完善的前端文档，入门门槛极低，大家可以一试，让团队的文档规范起来。
 
