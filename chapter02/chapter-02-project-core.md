@@ -14,7 +14,7 @@ web工程化在前端日常开发的重要性不言而喻，因为涉及到多�
 
    
 
-   #### 3.1 概述
+   #### 2.1 概述
 
    前端开发队伍越大，工程化就越能发挥它的作用，规范开发、测试、部署等环节。避免开发过程中在这些过程中过多的自我发挥而引起了不可控。
 
@@ -522,18 +522,121 @@ tiny-cli create demo
 
 
 
-#### 3.2 自动化部署
+#### 2.2 自动化部署
+
+前端的部署方式很大程度依赖公司的运维和公司的资源投入的方式，这个我们稍作解释。现在大部分公司都有自己的服务器，这样的话就比较灵活了，服务可以部署到公司内部服务器上，也可以部署到三方（阿里云、华为云、腾讯云等）云。但是有些公司没有自己的服务器资源，所以只能在三方云服务上部署了。
+
+三方服务给开发提供了完整的功能，代码库、集成服务、代码检查，自动部署等服务。其中自动部署就可以完成咱们这部分要介绍的功能。如果服务器是自己维护的，代码自动部署方面jenkins、gitlab依然是主力军，做为前端能够干预的依然很少，并且配置比较繁琐。
+
+还有一种部署服务是做成Docker镜像，该方式请参考6.3章节，前端和docker是怎么结合的。
+
+这部分我们从前端的角色出发，是否能提供一站式的代码部署服务。
+
+代码的部署流程大概是这样的：
+
+- 前端工程打包
+- 配置服务器（如nginx）
+- 确定服务器地址、端口、用户名、密码
+- 拷贝包到服务器指定目录
+- 解压
+- 重启前端服务
+
+这是一个挺繁琐的过程，如果有一个服务能提供一站式的服务，配置好需要的参数后一键完成部署，极大提高前端的效率。
+
+下面我们借助**deploy-cli-service** 看下是如何实现的。
+
+首先安装npm服务：
+
+```shell
+yarn add deploy-cli-service -D
+```
+
+查看下help，看下具体用法：
+
+![1](./images/deploy-1.png)
+
+<center>图2-10</center>
+
+配置scripts脚本：
+
+```js
+"build-deploy-config": "deploy-cli-service i"
+```
+
+先生成配置文件：
+
+![1](./images/deploy-2.png)
+
+<center>图2-11</center>
+
+根据选择的环境配置部署参数项目名称、密钥地址、打包命令、服务地址，端口、用户名、密码、本地打包目录、配置部署目录等。部署后在项目跟目录下生成deploy.config.js。
+
+```js
+module.exports = {
+  projectName: "my-vue",
+  privateKey: "./.ssh/id_rsa",
+  passphrase: "123456",
+  cluster: [],
+  dev: {
+    name: "dev",
+    script: "npm run build",
+    host: "192.168.0.54",
+    port: 22,
+    username: "root",
+    password: "123456",
+    distPath: "dist",
+    webDir: "/usr/local/nginx/html/test",
+    bakDir: "/usr/local/nginx/backup",
+    isRemoveRemoteFile: false,
+    isRemoveLocalFile: true
+  },
+  test: {
+    name: "test",
+    script: "npm run build",
+    host: "192.168.0.55",
+    port: 22,
+    username: "root",
+    password: "123456",
+    distPath: "dist",
+    webDir: "/usr/local/nginx/html/test",
+    bakDir: "/usr/local/nginx/backup",
+    isRemoveRemoteFile: true,
+    isRemoveLocalFile: true
+  }
+};
+
+```
+
+> 也可以手动创建该文件，只要字段能对应上即可
+
+部署文件初始化时，会根据选择的环境生成相应的配置字段。
+
+有了配置文件就可以用下面的命令部署服务了。
+
+```shell
+deploy-cli-service deploy --mode
+```
+
+```
+"deploy:dev": "deploy-cli-service deploy --mode dev",
+"deploy:test": "deploy-cli-service deploy --mode test",
+"deploy:prod": "deploy-cli-service deploy --mode prod"
+```
+
+> --mode 后的参数需要和deploy.config.js的key一致。
+
+运行部署命令开始打包、部署。
 
 
 
-#### 3.3 Nginx
+#### 2.3 Nginx
 
 nginx是一种轻量级、高性能、低内存的web服务器和反向代理服务器。传统的web服务器对于客户端的每一个连接都会创建一个新的进程/线程来处理，也创建了新的运行时，消耗额外的内存，随着连接的增多，web服务器响应变慢，延迟增加。Nginx对传统服务而言，优化了服务器资源的使用，也支持连接的动态增加。
 
 Nginx有如下几个比较显著的优点：
 
 - 热部署：因为Nginx的mastar进程和worker进程是独立设计的（一个mastar多个worker进程），所以在不间断服务的前提下升级可执行文件、配置文件等等
-- 高并发：Nginx支持的连接数官方测试能够支撑5万并发连接，实际生产环境中可以支撑2~4万并发连接数。如果是clustered，支持的连接说会更高。
+- 高并发：Nginx支持的连接数官方测试能够支撑5万并发连接，实际生产环境中可以支撑2~4万并发连接数。如果是clustered，支持的连接数会更高。
 - 内存消耗少
 - 高可靠性
 - 响应迅速。
