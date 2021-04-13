@@ -1,0 +1,1 @@
+console.log("scripts: before index.js ")

@@ -54,7 +54,9 @@
 
 package.json做为web工程的入口到底有多少配置是和我们的日常相关？又有什么配置会和其他三方工具有交集？怎么和三方工具配合能给日常开发提供便利？下面我们一点一点来剖析这个文件。
 
-先使用npm或者yarn生成一个最简单的package.json文件
+先使用npm或者yarn生成一个最简单的package.json文件:
+
+> 备注：笔者npm版本为 6.12.0
 
 ```shell
 yarn init -y
@@ -78,7 +80,7 @@ yarn init -y
 这是一个JSON对象，每一项都是该项目的配置。各个配置代表的意思如下：
 
 - name：项目名称，必须字段。 
-- version：项目版本，必须字段。遵守语义化版本 2.0.0规范。格式为： 主版本号.次版本号.修订号。主版本号表示做了不兼容的 API 修改，次版本号表示做了向下兼容的功能性新增，修订号表示做了向下兼容的bug修复。
+- version：项目版本，必须字段。
 - main：入口文件
 - license: 项目遵守的许可证
 - scripts： 可运行的npm命令
@@ -86,7 +88,7 @@ yarn init -y
 - author：作者
 - description: 项目描述
 
-我们需要对name字段做以下说明：
+package.json中有两个字段比较特殊，name和version，规范要求是必须字段。需要对这两个字段做下详细说明。先看下name字段：
 
 - 长度须小于等于214个字符，不能以"."或者"_"开头，不能包含大写字母。
 
@@ -100,7 +102,69 @@ yarn init -y
 
 <center>图1-1</center>      
 
-如果npm上有对应的包，会显示包的详细信息
+如果npm上有对应的包，会显示包的详细信息:
 
 ![](./images/pj-2.png)
+
+<center>图1-2</center>
+
+再看下version字段：
+
+- 遵守语义化版本 2.0.0（ SemVer）规范。格式为： **主版本号.次版本号.修订号**。主版本号表示做了不兼容的 API 修改，次版本号表示做了向下兼容的功能性新增，修订号表示做了向下兼容的bug修复。
+- 如果某个版本改动比较大、并且不稳定，可能无法满足预期的兼容性需求时，还是要先发布先行版本。
+- 先行版本号可以加到**主版本号.次版本号.修订号**的后面，通过 `-` 号连接以点分隔的标识符和版本编译信息：内部版本(alpha)，公测版本(beta)，候选版本rc（即 Release candiate），如图1-3所示的vue发布的版本号：
+
+![](./images/pj-3.png)
+
+<center>图1-3</center>
+
+- 查看npm包的版本信息，以vue包为例：
+
+  查看最新版本：npm view vue version
+
+  查看所有版本：npm view vue versions
+
+keywords： 包关键字，会对包中的 `description` 字段和 `keywords` 字段进行匹配，写好 `package.json`中的 `description` 和 `keywords` 将有利于增加包的曝光率。
+
+依赖包：
+
+npm包声明会添加到dependencies或者devDependencies中，dependencies中的包指定了项目在生产运行所必须的包。devDependencies中声明的是开发阶段需要的包，如webpack，eslint，babel等，用来辅助开发，打包上线时并不需要这些包。所以大家要根据包的实际用处声明到适当的位置。
+
+scripts脚本：
+
+package.json内置脚本入口，是stage-value键值对配置，key为可运行的命令，通过npm run <stage>执行命令。除了运行基本的scripts命令，还可以结合pre和post完成前置、后续操作，该操作可以类比单元测试用的setUp和tearDown。我们先看一组scripts：
+
+```javascript
+"scripts": {
+    "dev": "node index.js",
+    "predev": "node beforeIndex.js",
+    "postdev": "node afterIndex.js"
+ },
+```
+
+这三个文件中都只有一句console语句：
+
+```javascript
+//index.js
+console.log("scripts : index.js")
+
+//beforeIndex.js
+console.log("scripts: before index.js ")
+
+//afterIndex.js
+console.log("scripts: after index.js ")
+```
+
+现在我们只执行`npm run dev`,看下效果是什么样的：
+
+```shell
+$ node beforeIndex.js
+scripts: before index.js 
+$ node index.js
+scripts : index.js
+$ node afterIndex.js
+scripts: after index.js 
+```
+
+这三个script都执行了，执行的顺序是 `predev-> dev -> postdev`。如果scripts命令存在一定的先后关系，采取这种pre&post scripts不失为一种好的方案。
 

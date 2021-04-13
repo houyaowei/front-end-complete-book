@@ -1,0 +1,1 @@
+console.log("scripts: after index.js ")

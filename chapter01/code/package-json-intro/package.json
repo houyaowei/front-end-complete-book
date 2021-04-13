@@ -4,7 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node index.js",
+    "predev": "node beforeIndex.js",
+    "postdev": "node afterIndex.js"
   },
   "keywords": [],
   "author": "",
