@@ -168,3 +168,7 @@ scripts: after index.js
 
 这三个script都执行了，执行的顺序是 `predev-> dev -> postdev`。如果scripts命令存在一定的先后关系，采取这种pre&post scripts不失为一种好的方案。
 
+入口文件main：
+
+用来指定加载的入口文件。如果项目发布成了`npm` 包，用户安装后并且使用require('my-module')` 返回的就是 `main` 字段中所列出文件的 `module.exports` 属性。如果不指定该字段，node会尝试加载根目录的`index.js、index.json或index.node`，如果都没有找到，就会报错，只能通过require('my-module/dist/xxx.js')这种方式加载。
+
