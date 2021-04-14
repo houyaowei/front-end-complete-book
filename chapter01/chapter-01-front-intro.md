@@ -52,7 +52,7 @@
 
 这么多的配置项不知道和你预想的有没有差距？
 
-package.json做为web工程的入口到底有多少配置是和我们的日常相关？又有什么配置会和其他三方工具有交集？怎么和三方工具配合能给日常开发提供便利？下面我们一点一点来剖析这个文件。
+package.json做为web工程的入口到底有多少配置是和我们的日常相关？哪些配置是和npm包相关的？又有什么配置会和其他三方工具有交集？怎么和三方工具配合能给日常开发提供便利？下面我们一点一点来剖析这个文件。
 
 先使用npm或者yarn生成一个最简单的package.json文件:
 
@@ -168,7 +168,33 @@ scripts: after index.js
 
 这三个script都执行了，执行的顺序是 `predev-> dev -> postdev`。如果scripts命令存在一定的先后关系，采取这种pre&post scripts不失为一种好的方案。
 
+files
+
+files是一个数组配置，用来描述作为依赖包安装时所描述的文件列表。当npm包release时，files指定哪些文件会被推送到npm服务器，如果指定的是文件夹，那么该文件夹下面的所有的文件都会被提交。
+
+如果有文件不想提交，可以在.npmignore中说明。我们看下vue包中的配置：
+
+```json
+"files": [
+    "src",
+    "dist/*.js",
+    "types/*.d.ts"
+ ],
+```
+
+![](./images/pj-4.png)
+
+<center>图1-4</center>
+
 入口文件main：
 
-用来指定加载的入口文件。如果项目发布成了`npm` 包，用户安装后并且使用require('my-module')` 返回的就是 `main` 字段中所列出文件的 `module.exports` 属性。如果不指定该字段，node会尝试加载根目录的`index.js、index.json或index.node`，如果都没有找到，就会报错，只能通过require('my-module/dist/xxx.js')这种方式加载。
+用来指定加载的入口文件，browser 、 node 环境均可使用。如果项目发布成了`npm` 包，用户安装后并且使用require('my-module')` 返回的就是 `main` 字段中所列出文件的 `module.exports` 属性。如果不指定该字段，node会尝试加载根目录的`index.js、index.json或index.node`，如果都没有找到，就会报错，只能通过require('my-module/dist/xxx.js')这种方式加载。
+
+module配置：
+
+定义 npm 包的 ESM 规范的入口文件，browser 环境和 node 环境均可使用。
+
+browser配置：
+
+npm 包在 browser 环境下的入口文件。
 
