@@ -168,7 +168,7 @@ scripts: after index.js
 
 这三个script都执行了，执行的顺序是 `predev-> dev -> postdev`。如果scripts命令存在一定的先后关系，采取这种pre&post scripts不失为一种好的方案。
 
-files
+files配置：
 
 files是一个数组配置，用来描述作为依赖包安装时所描述的文件列表。当npm包release时，files指定哪些文件会被推送到npm服务器，如果指定的是文件夹，那么该文件夹下面的所有的文件都会被提交。
 
@@ -204,4 +204,112 @@ npm 包在 browser 环境下的入口文件。
 
 我们之所以把main、module、browser三者放在一起介绍，是因为这几项间还是有差别的，特别是在不同的使用场景下。
 
-在web环境下，如果使用loader加载的是ESM（ES module），那么这三项配置加载的顺序是browser > module > main，如果使用require加载的commonjs模块，加载的顺序就变成了module > main；如果是在node环境中，加载commonjs模块，那么只有main字段有效；
+在web环境下，如果使用loader加载的是ESM（ES module），那么这三项配置加载的顺序是browser > module > main，如果使用require加载的commonjs模块，加载的顺序并没有什么变化； 
+
+webpack在进行项目构建的时候，有一个target选项，默认为 web，即构建web 应用。如果我们需要编译一些同构项目，如node 项目，我们只需要将 webpack.config.js的 `target` 选项设置为 `node` 进行构建即可。
+
+如果是在node环境中，加载commonjs模块或者ESM，只有main字段有效；
+
+engines配置：
+
+我们平时在维护一些遗留项目都时候，对npm版本或者node的版本可能会有特殊的要求。如果不满足条件可能会出现各种各样奇怪的问题。为了让项目能开箱即用，可以在engines中说明具体的版本号。
+
+```json
+"engines": {
+    "node": ">=8.10.3 <12.13.0",
+    "npm": ">= 6.9.0"
+ }
+```
+
+需要注意的是，engines属性仅起到说明的作用，即使用户安装的版本不符合也不影响依赖包的安装。
+
+bin配置：
+
+许多包都有一个或多个可执行文件，这鞋可以使用**npm link**命令导入到全局路径里面,可以在任意目录下执行。如脚手架工具create-react-app工具中react-scripts，
+
+```js
+"bin": {
+    "react-scripts": "./bin/react-scripts.js"
+ }
+```
+
+还有vue-cli脚手架中的@vue包，
+
+```
+"bin": {
+    "vue": "bin/vue.js"
+},
+```
+
+都是这样可以的道理。如上面两个配置在package.json提供一个映射到本地本地文件名的bin字段，定义后npm将软链接这个文件到prefix/bin里面,以便于全局引入,或者链接到本地的./node_modules/.bin/目录里在本项目中使用。
+
+config配置：
+
+该对象字段用来配置scripts运行的配置参数，如图:
+
+```js
+{
+  "name": "package-json-intro",
+  "scripts": {
+    "dev": "node server.js"
+  },
+  "config": {
+    "port": 9002
+  }
+}
+```
+
+如果运行**yarn run start**, 该port字段会映射到 npm_package_config_port环境变量，
+
+```js
+const http = require("http")
+console.log(process.env.npm_package_config_port)
+http.createServer(function (req, res) {
+	res.end('Hello World\n');
+}).listen(process.env.npm_package_config_port);
+```
+
+如果像改其他端口，可以使用：
+
+```shell
+npm config set foo:port 80
+```
+
+author、license、repository、homepage、bugs配置：
+
+author：指明作者
+
+license：该包或者工程需要遵守的协议。
+
+repository：是一个对象配置，type说明是git库还是svn库，url说明该包或者工程源代码地址。
+
+bugs：指明该包或者工程的bug地址。
+
+
+
+unpkg配置：
+
+sideEffects配置
+
+typings配置：
+
+
+
+lint-staged配置：
+
+gitHooks配置：
+
+jsdelivr配置：
+
+os、cpu配置：
+
+publicConfig配置：
+
+
+
+其他配置：
+
+.npmrc：
+
+shrinkWrap.json:
+
