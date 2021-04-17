@@ -1,4 +1,4 @@
-## 第1章 前端工程核心
+## 第1章 前端开发基础
 
 先省略，还没想好内容。
 
@@ -198,3 +198,10 @@ browser配置：
 
 npm 包在 browser 环境下的入口文件。
 
+不知道读者有没有发现，main、module、browser这三项配置都是和入口文件相关，
+
+
+
+我们之所以把main、module、browser三者放在一起介绍，是因为这几项间还是有差别的，特别是在不同的使用场景下。
+
+在web环境下，如果使用loader加载的是ESM（ES module），那么这三项配置加载的顺序是browser > module > main，如果使用require加载的commonjs模块，加载的顺序就变成了module > main；如果是在node环境中，加载commonjs模块，那么只有main字段有效；
