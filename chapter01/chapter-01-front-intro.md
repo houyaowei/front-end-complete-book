@@ -283,7 +283,34 @@ license：该包或者工程需要遵守的协议。
 
 repository：是一个对象配置，type说明是git库还是svn库，url说明该包或者工程源代码地址。
 
-bugs：指明该包或者工程的bug地址。
+bugs：指明该包或者工程的bug地址或者反馈问题的email，可以指定一个或者两个，便于author快速搜集、处理问题。
+
+```
+{ 
+  "url" : "https://github.com/owner/project/issues",
+  "email" : "project@hostname.com"
+}
+```
+
+os、cpu配置：
+
+os:  如果我们开发的npm包只希望运行在darwin 系统下，避免发生不必要的异常windows用户不要安装，这时候os配置就可以帮我们实现这样的效果
+
+```json
+"os" : [ "darwin", "linux" ] #适用的系统
+"os" : [ "!win32" ]          #黑名单系统
+```
+
+cup：该配置和os对配置类似，用 cpu字段更精准的限制用户安装环境。
+
+```json
+"cpu" : [ "x64", "AMD64" ] # 适用用
+"cpu" : [ "!arm", "!mips" ] # 黑名单
+```
+
+publicConfig配置：
+
+一组配置值，发布时使用。比如使用registry指定发布的地址，发布指定的tag，access（public，restricted）等配置。
 
 
 
@@ -293,17 +320,13 @@ sideEffects配置
 
 typings配置：
 
-
-
 lint-staged配置：
 
 gitHooks配置：
 
 jsdelivr配置：
 
-os、cpu配置：
 
-publicConfig配置：
 
 
 
