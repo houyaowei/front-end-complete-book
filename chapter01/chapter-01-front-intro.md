@@ -481,3 +481,38 @@ module.exports = { presets, plugins };
 
 这四种添加配置文件的方式中，我们最常用的还是babel.config.js和.babelrc这两种方式，更加babel官方建议，推荐babel.config.js配置。因为该配置是项目级别的配置，会影响整个项目中的代码，包含node_modules，有了babel.config.js 就不会在去执行.babelrc的配置。.babelrc只影响本项目中的代码。
 
+我们也采用babel.config.js的方式
+
+```js
+module.exports = function (api) {
+  api.cache(true);
+  const presets = ["@babel/preset-env"];
+  const plugins = [];
+  return {presets, plugins};
+}
+```
+
+接下来在src目录下新建一个文件，并输入基本的测试代码，箭头函数：
+
+```js
+let compare= (a,b)=> {
+  return a > b;
+}
+```
+
+在package.json中配置scripts脚本
+
+```
+"build": "babel src --out-dir lib"
+```
+
+使用@babel/cli提供的babel命令，编译src目录下的js文件，将编译后的文件输出到lib目录下；
+
+```shell
+npm run build
+```
+
+![](./images/babel-2.png)
+
+<center>图1-6</center>
+
