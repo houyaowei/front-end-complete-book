@@ -340,7 +340,7 @@ ts的入口文件，作用同main配置。
 
 lint-staged配置：
 
-lint-staged 是一个在git暂存文件上运行linters的工具，配置后每次修改一个文件就给所有文件执行一次lint检查。
+lint-staged 是一个在git暂存文件上运行linters的工具，配置后每次修改一个文件就给所有文件执行一次lint检查，通常配合githooks一起使用，并且配置好检查工具。
 
 ```json
 "lint-staged": {
@@ -351,17 +351,15 @@ lint-staged 是一个在git暂存文件上运行linters的工具，配置后每�
  }
 ```
 
-针对js文件
-
 gitHooks配置：
 
+定义一个钩子，在提交(commit)之前执行eslint检查。当执行 lint 命令后，会自动修复暂存区的文件。修复之后的文件并不存在于暂存区中，所以需要用 `git add` 将修复后的文件重新加入到暂存区。`"pre-commit"` 执行完成后，如果没有错误，就会执行 `git commit` 操作。
+
+```json
+"gitHooks": {
+    "pre-commit": "lint-staged",
+}
+```
 
 
-
-
-其他配置：
-
-.npmrc：
-
-shrinkWrap.json:
 
