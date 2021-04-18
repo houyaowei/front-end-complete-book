@@ -361,5 +361,123 @@ gitHooks配置：
 }
 ```
 
+standard配置：
 
+standard是一个js代码检查和优化的工具库。也可以再package.json中增加相应的配置来优化代码。
+
+```json
+{
+  "standard": {
+    "parser": "babel-eslint",
+    "ignore": [
+      "**/out/",
+      "/lib/xx/",
+      "/lib2/xx/"
+    ]
+  }
+}
+```
+
+browserlist配置：
+
+设置浏览器的兼容情况
+
+babel配置：
+
+babel编译配置:
+
+```json
+"babel": {
+    "presets": ["@babel/preset-env"],
+    "plugins": [...]
+}
+```
+
+
+
+
+
+#### 1.2 Babel7
+
+babel是前端开发中最常见的三方工具了。功能就是转义ECMAScript2015+语法的代码，保证比较新的语法也可以旧版本的浏览器中运行，再者就是可以通过 `Polyfill`方式在目标环境中添加缺失的特性，第三就是源码转换功能。掌握babel的详细配置对我们日常开发和定位问题是大有裨益。
+
+该部分我们详细介绍Babel的配置和用法，介绍每项配置的引入的原因，搞清楚@babel/runtime，`@babel/polyfill`，`@babel/plugin-transform-runtime`这些库到底是用来做什么的，介绍preset和plugin配置是什么作用。
+
+babel官方了简单的界面操作，通过一个简单的compare函数看下简单的转换结果,如1-5所示：
+
+![](./images/babel-1.png)
+
+<center>图1-5</center>
+
+我们输入的是最基本的箭头函数，经过babel的转换后，转换成了基本的function。就是这么简单，它不会运行我们的代码，也不会去打包我们的代码。
+
+我们搭建一个本地环境，先建立根目录并生成package.json文件。
+
+```shell
+~ mkdir babel-intro && cd babel-intro
+~ npm init -y
+```
+
+先安装@babel/core和@babel/cli包，core是babel核心包，其他的@babel/cli、@babel/polyfill包都要在核心包上才能正常工作。@babel/cli是babel 提供的命令行工具，主要是提供 `babel` 命令。
+
+```shell
+npm install --save-dev @babel/core @babel/cli
+```
+
+接着安装@babel/preset-env和@babel/polyfill。@babel/preset-env 会根据你配置的目标环境，生成插件列表来编译。目标环境可以通过在package.json中的browserslist进行配置。Babel默认只转换新的JavaScript语法，但是不转换新的API，比如Iterator、Generator、Set、Maps、Proxy、Reflect、Symbol、Promise等全局对象，以及一些定义在Object对象上的方法（比如`Object.assign`）都不会转换。如果还想正常执行，就需要使用polyfill了。
+
+```shell
+npm install --save-dev @babel/preset-env @babel/polyfill
+```
+
+下一步在package.json统计目录下建一个配置文件，babel中配置文件有几种：
+
+第一种是babel.config.js，配置内容格式大致如下：
+
+```js
+module.exports = function (api) {
+  api.cache(true);
+
+  const presets = [ ... ];
+  const plugins = [ ... ];
+
+  return {
+    presets,
+    plugins
+  };
+}
+```
+
+第二种是.babelrc，配置文件内容为json数据结构
+
+```json
+{
+  "presets": [...],
+  "plugins": [...]
+}
+```
+
+第三种是在package.json中配置babel字段，该配置我们再1.1章节已经介绍过
+
+```json
+{
+  "name": "babel-intro",
+  "version": "1.0.0",
+  "babel": {
+    "presets": [ ... ],
+    "plugins": [ ... ],
+  }
+}
+```
+
+最后一种是.babelrc.js，配置同.babelrc，但是需要使用JavaScript实现。
+
+```js
+const presets = [ ... ];
+const plugins = [ ... ];
+
+module.exports = { presets, plugins };
+```
+
+这四种添加配置文件的方式中，我们最常用的还是babel.config.js和.babelrc这两种方式，更加babel官方建议，推荐babel.config.js配置。因为该配置是项目级别的配置，会影响整个项目中的代码，包含node_modules，有了babel.config.js 就不会在去执行.babelrc的配置。.babelrc只影响本项目中的代码。
 
