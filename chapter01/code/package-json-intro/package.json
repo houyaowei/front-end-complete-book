@@ -18,5 +18,17 @@
   },
   "config": {
     "port": 9002
+  },
+  "devDependencies": {
+    "lint-staged": "^10.5.4"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "eslint": "^7.24.0"
   }
 }
