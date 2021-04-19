@@ -652,3 +652,17 @@ parse过程分为两个部分：词法分析、语法分析
 }
 ```
 
+这里，我们需要解释一下AST树中的关键字段，"type": "VariableDeclaration"表示变量声明，"declarations": [ ]表示具体的声明。
+
+```json
+{
+    "type": "Identifier",
+    "start": 5,
+    "end": 12,
+    "name": "compare"
+ }
+```
+
+表示这是一个完整的标识符。name表示函数名或者变量名。
+
+`ArrowFunctionExpression`表示箭头函数表达式，params表示该函数表达式中的参数列表，每个元素又是一个标识符。body是块级声明（BlockStatement），表示函数体部分。ReturnStatement表示函数返回体，argument是返回体，type为BinaryExpression，二项式，表示数字计算，在left和right中定义操作符的左操作数和右操作数，operator就是操作符（加、减、乘除）
