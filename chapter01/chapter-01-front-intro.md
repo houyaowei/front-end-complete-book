@@ -516,3 +516,139 @@ npm run build
 
 <center>图1-6</center>
 
+有人可能会有疑问"babel是怎么实现代码转换的呢？怎么才能快速掌握babel的编译过程呢？" 下面我们一点点介绍。
+
+babel同大多数的编译器一样，它的工作过程也分成三部分：
+
+- 解析（Parse）：将源代码转换成抽象语法树（abstract syntax tree），抽象语法树是源代码的抽象语法结构的树状表示形式，树上的每个节点都表示源代码中的一种结构。
+- 转换（transfrom）：对AST做一些特殊处理，使其符合编译器的期望，babel中主要使用转换插件来实现。
+- 代码生成（generate）：将第二步经过转换过的（抽象语法树）生成新的代码。
+
+接下来就从上面简单的例子来说明下babel的工作工程。
+
+```js
+let { parse } = require("@babel/parser");
+let {default: generate} = require('@babel/generator');
+
+let code = "let compare= (a,b)=> {" +
+  "return a > b;" +
+"}";
+
+let ast = parse(code);
+let targetCode = generate(ast)
+```
+
+parse过程分为两个部分：词法分析、语法分析
+
+词法分析：
+
+编译器读取我们的代码，然后把按照预定的规则把分词后的内容合并成一个个的标识tokens。同时，移除掉空白符，注释等。最后，整个代码将被分割进一个tokens列表。compare函数被分割的token列表，如下：
+
+```js
+[
+    { "type": "Keyword", "value": "let"},
+    { "type": "Identifier", "value": "compare"},
+    { "type": "Punctuator", "value": "="},
+    { "type": "Punctuator", "value": "(" },
+    { "type": "Identifier", "value": "a"},
+    { "type": "Punctuator", "value": ","},
+    { "type": "Identifier", "value": "b"},
+    { "type": "Punctuator", "value": ")"},
+    { "type": "Punctuator", "value": "=>"},
+    { "type": "Punctuator", "value": "{" },
+    { "type": "Keyword", "value": "return"},
+    { "type": "Identifier", "value": "a" },
+    { "type": "Punctuator", "value": ">"},
+    { "type": "Identifier", "value": "b"},
+    { "type": "Punctuator", "value": ";"},
+    { "type": "Punctuator", "value": "}" }
+]
+```
+
+语法分析：
+
+也叫解析器。它会将词法分析出来的数组转化成树形的表达形式。同时，验证语法，语法如果有错的话，抛出语法错误。
+
+```json
+{
+  "type": "Program",
+  "start": 0,
+  "end": 41,
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "start": 1,
+      "end": 41,
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "start": 5,
+          "end": 41,
+          "id": {
+            "type": "Identifier",
+            "start": 5,
+            "end": 12,
+            "name": "compare"
+          },
+          "init": {
+            "type": "ArrowFunctionExpression",
+            "start": 14,
+            "end": 41,
+            "id": null,
+            "expression": false,
+            "generator": false,
+            "async": false,
+            "params": [
+              {
+                "type": "Identifier",
+                "start": 15,
+                "end": 16,
+                "name": "a"
+              },
+              {
+                "type": "Identifier",
+                "start": 17,
+                "end": 18,
+                "name": "b"
+              }
+            ],
+            "body": {
+              "type": "BlockStatement",
+              "start": 22,
+              "end": 41,
+              "body": [
+                {
+                  "type": "ReturnStatement",
+                  "start": 26,
+                  "end": 39,
+                  "argument": {
+                    "type": "BinaryExpression",
+                    "start": 33,
+                    "end": 38,
+                    "left": {
+                      "type": "Identifier",
+                      "start": 33,
+                      "end": 34,
+                      "name": "a"
+                    },
+                    "operator": ">",
+                    "right": {
+                      "type": "Identifier",
+                      "start": 37,
+                      "end": 38,
+                      "name": "b"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "kind": "let"
+    }
+  ],
+  "sourceType": "module"
+}
+```
+
