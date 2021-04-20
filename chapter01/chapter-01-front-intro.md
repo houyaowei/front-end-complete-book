@@ -652,17 +652,24 @@ parse过程分为两个部分：词法分析、语法分析
 }
 ```
 
-这里，我们需要解释一下AST树中的关键字段，"type": "VariableDeclaration"表示变量声明，"declarations": [ ]表示具体的声明。
+这里，我们需要解释一下AST树中的关键字段，根节点"type": "VariableDeclaration"表示变量声明，"declarations": [ ]表示具体的声明，kind声明变量类型。
+
+接着看declarations内部，声明了一个变量，并且知道了它的内部属性（id、init，start，end），然后我们再以此访问每一个属性以及它们的子节点。`id` 是一个 Idenrifier，name 属性表示变量名。
 
 ```json
 {
-    "type": "Identifier",
-    "start": 5,
-    "end": 12,
-    "name": "compare"
- }
+    type: 'Identifier',
+    name: 'add'
+}
 ```
 
-表示这是一个完整的标识符。name表示函数名或者变量名。
+以上结构表示一个标识符。
 
-`ArrowFunctionExpression`表示箭头函数表达式，params表示该函数表达式中的参数列表，每个元素又是一个标识符。body是块级声明（BlockStatement），表示函数体部分。ReturnStatement表示函数返回体，argument是返回体，type为BinaryExpression，二项式，表示数字计算，在left和right中定义操作符的左操作数和右操作数，operator就是操作符（加、减、乘除）
+接着看之后是init部分，init 也有好几个内部属性组成：
+
+- type是`ArrowFunctionExpression`，表示这是一个箭头函数。
+- `params` 是这个箭头函数的入参，其中每一个参数都是一个 `Identifier` 类型的节点。
+- `body` 属性是这个箭头函数的主体，type是BlockStatement，表示这是一个块级声明BlockStatement。
+- 内层的body的type为ReturnStatement,表示返回内容声明。
+- argument这是一个 BinaryExpression二项式：lef`、operator、right，分别表示二项式的左边变量、运算符以及右边变量。
+

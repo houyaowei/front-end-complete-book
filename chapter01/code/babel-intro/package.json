@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "babel src --out-dir lib",
-    "build-ast": "node AstTest.js"
+    "build-ast": "node AstTest.js",
+    "ast" : "node AstTest2.js"
   },
   "keywords": [],
   "author": "",
