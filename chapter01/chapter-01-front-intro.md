@@ -728,4 +728,27 @@ console.log(targetCode)
 
 <center>图1-7</center>
 
-转换后代代码可以交付浏览器执行了。以上过程的核心在在于代码转换
+转换后代代码可以交付浏览器执行了。以上过程的核心在在于代码转换，转换过程的核心在于插件。所以在开发中，babel的插件配置就是非常关键的一环。
+
+```js
+module.exports = function (api) {
+  const presets = [];
+  const plugins = ["@babel/plugin-transform-arrow-functions",
+                    "@babel/plugin-transform-runtime"
+                  ];
+
+  return {presets, plugins};
+}
+```
+
+
+
+#### @babel/runtime
+
+#### @babel/plugin-transform-runtime
+
+##### preset配置
+
+##### Polyfill配置
+
+#### 
