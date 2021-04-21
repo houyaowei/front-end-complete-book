@@ -530,15 +530,14 @@ babel同大多数的编译器一样，它的工作过程也分成三部分：
 let { parse } = require("@babel/parser");
 let {default: generate} = require('@babel/generator');
 
-let code = "let compare= (a,b)=> {" +
-  "return a > b;" +
-"}";
+let code = "let compare=(a,b)=> a > b";
 
-let ast = parse(code);
-let targetCode = generate(ast)
+let ast = parse(code,{
+  sourceType: "module"
+});
 ```
 
-parse过程分为两个部分：词法分析、语法分析
+parse过程分为两个部分：词法分析、语法分析。
 
 词法分析：
 
@@ -546,22 +545,18 @@ parse过程分为两个部分：词法分析、语法分析
 
 ```js
 [
-    { "type": "Keyword", "value": "let"},
-    { "type": "Identifier", "value": "compare"},
-    { "type": "Punctuator", "value": "="},
+    { "type": "Keyword", "value": "const" },
+    { "type": "Identifier", "value": "compare" },
+    { "type": "Punctuator", "value": "=" },
     { "type": "Punctuator", "value": "(" },
-    { "type": "Identifier", "value": "a"},
-    { "type": "Punctuator", "value": ","},
-    { "type": "Identifier", "value": "b"},
-    { "type": "Punctuator", "value": ")"},
-    { "type": "Punctuator", "value": "=>"},
-    { "type": "Punctuator", "value": "{" },
-    { "type": "Keyword", "value": "return"},
     { "type": "Identifier", "value": "a" },
-    { "type": "Punctuator", "value": ">"},
-    { "type": "Identifier", "value": "b"},
-    { "type": "Punctuator", "value": ";"},
-    { "type": "Punctuator", "value": "}" }
+    { "type": "Punctuator", "value": "," },
+    { "type": "Identifier", "value": "b" },
+    { "type": "Punctuator", "value": ")" },
+    { "type": "Punctuator", "value": "=>" },
+    { "type": "Identifier", "value": "a" },
+    { "type": "Punctuator", "value": ">" },
+    { "type": "Identifier", "value": "b" }
 ]
 ```
 
@@ -573,74 +568,62 @@ parse过程分为两个部分：词法分析、语法分析
 {
   "type": "Program",
   "start": 0,
-  "end": 41,
+  "end": 25,
   "body": [
     {
       "type": "VariableDeclaration",
-      "start": 1,
-      "end": 41,
+      "start": 0,
+      "end": 24,
       "declarations": [
         {
           "type": "VariableDeclarator",
-          "start": 5,
-          "end": 41,
+          "start": 4,
+          "end": 24,
           "id": {
             "type": "Identifier",
-            "start": 5,
-            "end": 12,
+            "start": 4,
+            "end": 11,
             "name": "compare"
           },
           "init": {
             "type": "ArrowFunctionExpression",
-            "start": 14,
-            "end": 41,
+            "start": 13,
+            "end": 24,
             "id": null,
-            "expression": false,
+            "expression": true,
             "generator": false,
             "async": false,
             "params": [
               {
                 "type": "Identifier",
-                "start": 15,
-                "end": 16,
+                "start": 14,
+                "end": 15,
                 "name": "a"
               },
               {
                 "type": "Identifier",
-                "start": 17,
-                "end": 18,
+                "start": 16,
+                "end": 17,
                 "name": "b"
               }
             ],
             "body": {
-              "type": "BlockStatement",
-              "start": 22,
-              "end": 41,
-              "body": [
-                {
-                  "type": "ReturnStatement",
-                  "start": 26,
-                  "end": 39,
-                  "argument": {
-                    "type": "BinaryExpression",
-                    "start": 33,
-                    "end": 38,
-                    "left": {
-                      "type": "Identifier",
-                      "start": 33,
-                      "end": 34,
-                      "name": "a"
-                    },
-                    "operator": ">",
-                    "right": {
-                      "type": "Identifier",
-                      "start": 37,
-                      "end": 38,
-                      "name": "b"
-                    }
-                  }
-                }
-              ]
+              "type": "BinaryExpression",
+              "start": 21,
+              "end": 24,
+              "left": {
+                "type": "Identifier",
+                "start": 21,
+                "end": 22,
+                "name": "a"
+              },
+              "operator": ">",
+              "right": {
+                "type": "Identifier",
+                "start": 23,
+                "end": 24,
+                "name": "b"
+              }
             }
           }
         }
@@ -670,6 +653,79 @@ parse过程分为两个部分：词法分析、语法分析
 - type是`ArrowFunctionExpression`，表示这是一个箭头函数。
 - `params` 是这个箭头函数的入参，其中每一个参数都是一个 `Identifier` 类型的节点。
 - `body` 属性是这个箭头函数的主体，type是BlockStatement，表示这是一个块级声明BlockStatement。
-- 内层的body的type为ReturnStatement,表示返回内容声明。
-- argument这是一个 BinaryExpression二项式：lef`、operator、right，分别表示二项式的左边变量、运算符以及右边变量。
+- 内层的body的type为一个 BinaryExpression二项式：lef`、operator、right，分别表示二项式的左边变量、运算符以及右边变量。
 
+下面开始进行语法转换，前面我们介绍过，babel的语法转换是通过插件完成的。没有插件，AST经过生成器生成的代码是和原来的源码一摸一样。babel默认提供了许多插件，让我们方便进行AST的操作。下面介绍两个比较重要的插件，同时用这两个实现一个比较简单的操作ast过程。
+
+```js
+let types = require('@babel/types');
+```
+
+第一个是@babel/types，它的作用是创建、修改、删除、查找AST节点。AST的节点也是分为多种类型，比如ExpressionStatement是表达式、ClassDeclaration是类声明、VariableDeclaration是变量声明等，同样的这些类型都有对应的创建方法：t.expressionStatement、t.classDeclaration、t.variableDeclaration。types也提供了对应的判断方法：t.isExpressionStatement、t.isClassDeclaration、t.isVariableDeclaration。
+
+不过，这些插件需要和traverse遍历插件一起使用，因为types只能对单一节点进行操作。所以第二个介绍的插件就是@babel/traverse。
+
+```js
+let traverse = require("@babel/traverse").default;
+```
+
+这个插件是对AST所有节点进行遍历，并使用指定Visitor来处理相关的节点。
+
+我们继续接着本小节最初的例子继续补充转换过程。
+
+```js
+let { parse } = require("@babel/parser");
+let traverse = require("@babel/traverse").default;
+let types = require('@babel/types');
+let generate = require('@babel/generator').default;
+
+let code = "let compare=(a,b)=> a > b"
+
+let ast = parse(code,{
+  sourceType: "module"
+});
+
+traverse(ast, {
+  ArrowFunctionExpression: (path, state) => {
+    let node = path.node;
+    let id = path.parent.id;
+    let params = node.params;
+    let body= types.blockStatement([
+      types.returnStatement(node.body)
+    ]);
+    let functionExpression = types.functionExpression(id,params,body,false,false);
+    path.replaceWith(functionExpression);
+  }
+})
+
+let targetCode = generate(ast)
+```
+
+当有一个 `Identifier(ArrowFunctionExpression)` 成员方法的Visitor时，访问的路径而非节点。所以需要通过`path.node`找到对应的节点。通过node.params获得方法的参数。使用`types.blockStatement`创建“{ }”的结构，使用 `types.returnStatement(node.body)`返回'return a > b'这样的结构。使用`types.functionExpression(id,params,body,false,false)`创建一个形式如
+
+```js
+function(a,b){
+  return a > b
+}
+```
+
+的结构。到现在已经完成了新结构的创建。剩下要做的工作就是把原来的节点替换成新生成的节点。
+
+```js
+path.replaceWith(functionExpression);
+```
+
+下一步就是进入到编译的最后一步，代码生成。
+
+经过了代码转换，AST已经变成期望的结构，现在需要@babel/generator插件做代码合成，生成需要的代码。
+
+```js
+let targetCode = generate(ast)
+console.log(targetCode)
+```
+
+![](./images/babel-3.png)
+
+<center>图1-7</center>
+
+转换后代代码可以交付浏览器执行了。以上过程的核心在在于代码转换
