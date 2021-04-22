@@ -731,6 +731,7 @@ console.log(targetCode)
 转换后代代码可以交付浏览器执行了。以上过程的核心在在于代码转换，转换过程的核心在于插件。所以在开发中，babel的插件配置就是非常关键的一环。
 
 ```js
+//babel.config.js
 module.exports = function (api) {
   const presets = [];
   const plugins = ["@babel/plugin-transform-arrow-functions",
@@ -741,14 +742,106 @@ module.exports = function (api) {
 }
 ```
 
+如果配了多个插件，那么执行顺序是按照从前到后依次执行。
+
+#### @babel/polyfill
+
+polyfill，中文名称叫垫片，在计算机科学中，指的是对未能实现的客户端上进行的"兜底"操作。对前端开发而言，如果部分js特性在个别浏览器（特别是IE）上不支持，但是这些浏览器又要需要兼容，那么就需要提供一种机制能够正常运行。
+
+例如ES6 的 object.assign 方法，即使是在IE11中运行也会报错
+
+```
+Object doesn't support propery or method 'assign'
+```
+
+对于这样独立的polyfill包有很多可以选择，如core-js，object-assign包，babel的transform-object-assign，babel-loader，也可以选择使用Polyfill.io服务，服务器会判断浏览器 UA 返回不同的 polyfill 文件，你所要做的仅仅是在页面上引入这个文件，polyfill 这件事就自动以最优雅的方式解决了。
+
+当然@babel/polyfill(7.4.0版本后已经废弃)也是一种选择，直接提供了通过改变全局来兼容新API。可以在入口文件中引入
+
+```js
+import "@babel/polyfill";
+```
+
+或者添加在webpack.config.js的entry数组中
+
+```js
+module.exports = {
+  entry: ["@babel/polyfill", "./app/js"],
+};
+```
+
+该包会在项目代码前插入所有的 polyfill 代码，因为它带来的改变是全局的。
+
+> 7.4以后可以使用
+>
+> import "core-js/stable";
+>
+>  import "regenerator-runtime/runtime";
+
+#### @babel/runtime和@babel/plugin-transform-runtime
+
+当全局导入polyfill包时，会造成全局污染，这显然不是一个很好的解决方案。因为在浏览器支持特性时，polyfill也就不是必须的。
+
+@babel/plugin-transform-runtime是对 Babel 编译过程中产生的 helper 方法进行重新利用(聚合)，以达到减少打包体积的目的。此外还有个作用是为了避免全局补丁污染，对打包过的 bunler 提供"沙箱"式的补丁。
+
+```shell
+npm install --save-dev @babel/plugin-transform-runtime
+```
+
+需要在生产环境中加入@babel/runtime，
+
+```shell
+npm install --save @babel/runtime
+```
+
+在babel的配置文件中增加配置
+
+```json
+"plugins": ["@babel/plugin-transform-runtime"]
+```
+
+也可以带具体的参数
+
+```json
+{
+  "plugins": [
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "absoluteRuntime": false,
+        "corejs": false,
+        "helpers": true,
+        "regenerator": true,
+        "version": "7.0.0-beta.0"
+      }
+    ]
+  ]
+}
+```
 
 
-#### @babel/runtime
-
-#### @babel/plugin-transform-runtime
 
 ##### preset配置
 
-##### Polyfill配置
+`@babel/preset-env` 这是一个预设的插件集合，包含了一组相关的插件，会根据目标环境来进行编译和打补丁。具体来讲，是根据参数 `targets` 来确定目标环境，默认情况下它编译为ES2015，可以根据项目需求进行配置
+
+```json
+resets: [
+       [
+         '@babel/preset-env',
+         {
+           // 支持chrome 58+ 及 IE 11+
+           targets: {
+             chrome: '58',
+             ie: '11',
+             edge: "17",
+             safari: "11.1"
+           }
+         },
+       ],
+]
+```
+
+在预设配置中以targets指定了es6向后兼容的浏览器的最低版本，根据兼容的浏览器的最低版本对es6最新语法的支持性提供需要的转换插件
 
 #### 
