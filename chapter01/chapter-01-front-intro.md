@@ -842,6 +842,35 @@ resets: [
 ]
 ```
 
-在预设配置中以targets指定了es6向后兼容的浏览器的最低版本，根据兼容的浏览器的最低版本对es6最新语法的支持性提供需要的转换插件
+在预设配置中以targets指定了es6向后兼容的浏览器的最低版本，根据兼容的浏览器的最低版本对es6最新语法的支持性提供需要的转换插件。
 
-#### 
+
+
+#### 1.3 ES规范
+
+截止到2021年3月9日，EcmaScript规范已经发布到了2021版的候选版本，6月份发布GA版。该版本也包含了几个实用的特性。本章，我们总结下从2016（ES7）-2021各个规范的新增特性，便于大家综合参考。
+
+##### ES2021
+
+String.prototype.replaceAll
+
+在replaceAll方法出现前，字符串替换可以使用replace配合正则使用，看两个例子：
+
+```js
+'aabbcc'.replace(/b/g, '_'); // aa__cc
+
+const queryString = 'q=b+c+d';
+ueryString.replace(/\+/g, ''); //q=bcd
+```
+
+将所有的b替换成下滑线，如果不加正则，则替换第一个字符。
+
+使用replaceAll实现相同的功能
+
+```js
+'aabbcc'.replaceAll('b', '_'); // aa__cc
+const queryString = 'q=b+c+d';
+ueryString.replaceAll('+', ''); //q=bcd
+```
+
+使用新api后，好处有两点：代码的可读性更好，特殊符号不需要再转义。

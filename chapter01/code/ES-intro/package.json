@@ -1,0 +1,15 @@
+{
+  "name": "es-intro",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "es2021": "babel ./src/es2021/index.js --out-dir target/es2021"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.13.16",
+    "@babel/core": "^7.13.16",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.13.15"
+  }
+}
