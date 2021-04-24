@@ -1394,3 +1394,152 @@ Object.getOwnPropertyDescriptors(person)
 }
 ```
 
+
+
+#### 1.4 Deno开发入门
+
+ deno是nodejs作者Ryan Dahl在2017年创立的项目，到现在已经发布到了1.9.2版本。这是一个安全的TS/js运行时，该运行时仍然是在V8的基础上使用rust开发，同时也内置了tsc引擎，用来解释typescript。event-loop由tokio提供支持。由于Rust原生支持WebAssembly，所以也能直接运行 WebAssembly。
+
+deno主要有如下几个特性：
+
+- 默认安全，外部代码没有文件系统、网络、环境的访问权限，除非显式开启。
+
+- 支持开箱即用的 TypeScript的环境。
+
+- 只分发一个独立的可执行文件（deno）。
+
+- 有内建的工具箱，比如依赖信息查看器（deno info）和代码格式化工具（deno fmt）。
+
+- 有一组经过审计的标准模块，保证能在 Deno 上工作。
+
+- 脚本代码能被打包为一个单独的 JavaScript 文件。
+
+Deno和node虽然出自一个人的手笔，但是是面向的对象是不同的。众所周知，node面向的是服务端，而Deno是要面向浏览器生态的。所以，Deno并不是要取代 Node.js，也不是下一代 Node.js，也不是要放弃 npm 重建 Node 生态。下面我们通过一个表格来对两者进行简单的对比。
+
+|          | nodejs           | Deno                   |
+| -------- | ---------------- | ---------------------- |
+| API引入  | 模块导入         | 全局                   |
+| 模块类型 | commonjs，ESM    | ESM,也可以是远程的模块 |
+| 安全策略 | 默认无安全限制   | 默认安全               |
+| TS支持   | 需要其他模块支持 | 开箱即用               |
+| 包管理   | npm包            | 原生ESM支持，不需要npm |
+| 包分发   | npm 仓库         | 去中心话               |
+| 入口文件 | package.json     | 直接引入文件           |
+
+先通过一个例子看下看下Deno是怎么运行的：
+
+```js
+//hello-world.js
+function say(){
+  console.log("hello,world")
+}
+say()
+```
+
+使用`deno run <文件名>`运行文件
+
+```js
+hello,world
+```
+
+下面再测试一下TS，验证下是否是开箱即用，新建一个ts-test.ts文件，输入一下内容：
+
+```typescript
+interface Person {
+  name: string;
+  age: number;
+}
+
+function greeter(person: Person) {
+  return "I'm " + person.name + ", age: " + person.age;
+}
+
+let _name: string = "houyw";
+let _age: number = 18;
+
+let info = greeter({
+  name: _name,
+  age: _age
+});
+
+console.log(info)
+//输出： I'm houyw, age: 18
+```
+
+经测试，不需要对TS文件进行任何配置即可正常执行。
+
+Deno是如何import，export呢？我们前面介绍过，Deno是遵从ES module规范的，所以可以通过export暴露模块，使用import导入模块。先在module中暴露add和multiply两个方法。
+
+```typescript
+export function add(a: number, b: number): number {
+  return a + b;
+}
+export function multiply(a: number, b: number): number {
+  return a * b;
+}
+```
+
+在入口文件中导入该模块
+
+```typescript
+import { add, multiply } from "../libs/utils.ts";
+
+console.log(add(19, 51));      //70
+console.log(multiply(10, 10)); //100
+```
+
+
+
+下面看下Deno怎么读取文件，新建person.json、readx.ts文件：
+
+```json
+{
+  "name": "houyw",
+  "age": "12",
+  "children": [{
+    "name": "侯xx",
+    "age": 9
+  },{
+    "name": "侯xx",
+    "age": 3
+  }]
+}
+```
+
+```typescript
+const text = Deno.readTextFile("./person.json");
+
+text.then((response) => console.log(response));
+```
+
+我们先按照上面的执行方法执行下readx.ts文件,看能否正常执行
+
+```shell
+deno run readx.ts
+```
+
+![](./images/deno-1.png)
+
+<center>图1-8</center>
+
+结果和我们想象的结果不一样。前面我们介绍过，Demo默认没有模块、文件、网络权限。所以在执行的时候添加需要开启读文件权限。
+
+```
+deno run --allow-read readx.ts
+```
+
+![](./images/deno-2.png)
+
+<center>图1-9</center>
+
+在Deno中除了读权限，还有其他的权限：
+
+- **-A, --allow-all** 开启所有权限，屏蔽了所有的权限
+- **--allow-env** 设置环境变量权限，例如读取和设置环境变量。
+- **--allow-hrtime** 允许高精度时间测量，高精度时间能够在计时攻击和特征识别中使用。
+- **--allow-net=<allow-net>** 允许网络访问权限。、多个域名用逗号分隔，来提供域名白名单。
+- **--allow-plugin** 允许加载插件权限
+- **--allow-read=<allow-read>** 允许读取文件系统权限。多个目录或文件用逗号分隔，来提供文件系统白名单。
+- **--allow-run** 运行执行子进程权限，需要注意的是子进程并不是在沙箱中执行，所以需要特别注意。
+- **--allow-write=<allow-write>** 允许写入文件系统。多个目录或文件用逗号分隔，来提供文件系统白名单。
+
