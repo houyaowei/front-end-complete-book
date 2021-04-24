@@ -6,8 +6,12 @@
   "scripts": {
     "es2021": "babel ./src/es2021/index.js --out-dir target/es2021",
     "es2020": "babel ./src/es2020/index.js --out-dir target/es2020",
+    "es2019": "babel ./src/es2019/index.js --out-dir target/es2019",
+    "es2018": "babel ./src/es2018/index.js --out-dir target/es2018",
     "exec21": "node ./target/es2021/index.js",
-    "exec20": "node ./target/es2020/index.js"
+    "exec20": "node ./target/es2020/index.js",
+    "exec19": "node ./target/es2019/index.js",
+    "exec18": "node ./target/es2018/index.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.16",

@@ -1190,3 +1190,139 @@ Promise.allSettled(promises).
 
 #### ES2019
 
+Array.flat Array.flatMap
+
+如果数组的成员还是数组，`flat()`将嵌套的数组“拉平”，变成一维的数组，参数指定。该方法返回一个新数组，对原数据没有影响。
+
+```js
+let origin = [1, ['aa','bb'], [3, ['cc','dd']]]
+let _flat = origin.flat(2);
+console.log(_flat)  //[ 1, 'aa', 'bb', 3, 'cc', 'dd' ]
+console.log(origin) // [ 1, [ 'aa', 'bb' ], [ 3, [ 'cc', 'dd' ] ] ]
+```
+
+`flatMap()`只能展开一层数组
+
+```js
+const duplicate = (x) => [x, x];
+let result = [2, 3, 4].flatMap(duplicate); // [ 2, 2, 3, 3, 4, 4 ]
+```
+
+
+
+Object.fromEntries
+
+Object.fromEntries()，将键值对数组转为对象
+
+```js
+let _entry = Object.entries({ name:"ass", age:22})
+console.log(_entry) //[ [ 'name', 'ass' ], [ 'age', 22 ] ]
+
+let putorigin = Object.fromEntries(_entry);
+console.log(putorigin) //{ name: 'ass', age: 22 }
+```
+
+
+
+String.trimStart   String.trimEnd
+
+trimStart 去掉字符串头部的空格，`trimEnd去掉尾部的空格。它们都返回新字符串，不影响原始字符串。
+
+```js
+const s = "  houyw  ";
+
+console.log(s.trim()); //houyw
+console.log(s.trimStart()); // 'houyw  '
+console.log(s.trimEnd()); // '  houyw'
+```
+
+
+
+Arrary.sort
+
+```js
+const doggos = [
+  { name: 'Abby',   rating: 12 },
+  { name: 'Bandit', rating: 13 },
+  { name: 'Choco',  rating: 14 },
+  { name: 'Daisy',  rating: 12 },
+  { name: 'Elmo',   rating: 12 }
+];
+doggos.sort((a, b) => b.rating - a.rating);
+```
+
+
+
+JSON.stringfy改造
+
+如果遇到 `0xD800` 到 `0xDFFF` 之间的单个码点，或者不存在的配对形式，会返回转义字符串。
+
+
+
+Symbol description属性
+
+ES2019为Symbol 提供了一个实例属性`description`，可以查看Symbol 的描述。
+
+```js
+const sym = Symbol("des");
+
+sym.description; // "des"
+```
+
+
+
+##### ES2018
+
+对象的Rest/Spread
+
+ES6中 为数组引入了扩展运算符的功能，从ES2018 中，对象也开始支持。
+
+```js
+const person = {
+  firstName: 'yw',
+  lastName: 'hou',
+  country: 'henan',
+  state: 'cn',
+};
+const { firstName, lastName, ...rest } = person;
+console.log(firstName); //yw
+console.log(lastName); //hou
+console.log(rest); //{ country: 'henan', state: 'cn' }
+
+// Spread properties for object literals:
+const personCopy = { firstName, lastName, ...rest };
+console.log(personCopy); //{ firstName: 'yw', lastName: 'hou', country: 'henan', state: 'cn' }
+```
+
+Promise.finally
+
+ 该方法用于指定不管 Promise 对象最后状态如何，都会执行的操作。
+
+```js
+fetch(url)
+.then(result => {···})
+.catch(error => {···})
+.finally(() => {···});
+```
+
+
+
+正则表达式
+
+ES2018 引入 `s `修饰符(`dotAll`模式)，使.`可以匹配任意单个字符。
+
+```js
+/obj.name/s.test("obj\nname"); // true
+```
+
+ES2018 为正则也引入了具名组匹配（Named Capture Groups），为每一组匹配指定一个名字，既便于阅读代码，又便于引用。
+
+```js
+const RE_DATE = /(?<year>\d{4})-(?<month>\d{1,2})-(?<day>\d{2})/;
+
+let matchObj = RE_DATE.exec("2021-4-24");
+console.log(matchObj.groups.year); //2021
+console.log(matchObj.groups.month); //4
+console.log(matchObj.groups.day); //24
+```
+
