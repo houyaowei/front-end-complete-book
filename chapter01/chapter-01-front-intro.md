@@ -1309,7 +1309,7 @@ fetch(url)
 
 正则表达式
 
-ES2018 引入 `s `修饰符(`dotAll`模式)，使.`可以匹配任意单个字符。
+ES2018 引入 `s `修饰符(`dotAll`模式)，使`.`可以匹配任意单个字符。
 
 ```js
 /obj.name/s.test("obj\nname"); // true
@@ -1324,5 +1324,73 @@ let matchObj = RE_DATE.exec("2021-4-24");
 console.log(matchObj.groups.year); //2021
 console.log(matchObj.groups.month); //4
 console.log(matchObj.groups.day); //24
+```
+
+
+
+#### ES2017
+
+Object.values/Object.entries
+
+`Object.values` 方法返回一个数组，返回对象自身的（不含继承的）所有可遍历（enumerable）属性的值。
+
+```js
+const obj = { foo: "bar", baz: 42 };
+console.log(Object.values(obj)); //[ 'bar', 42 ]
+```
+
+`Object.entries`方法返回一个数组，返回对象自身的（不含继承的）所有可遍历（enumerable）属性的键值对数组，该方法也适合数组。
+
+```js
+const person = { name: "houyw", age: 19 };
+console.log(Object.entries(person));
+
+const people = ['Fred', 'Tony']
+console.log(Object.entries(people)) //[ [ '0', 'Fred' ], [ '1', 'Tony' ] ]
+```
+
+
+
+字符串补全
+
+`padStart(targetLength [, padString)`用于头部补全，`padEnd(targetLength [, padString)`用于尾部补全
+
+```js
+"x".padStart(4, "ab"); // 'abax'
+"x".padEnd(5, "ab"); // '
+```
+
+
+
+异步函数（asnyc）
+
+异步函数是 promises 和 generators(生成器) 的组合，简化了 promises 调用，提高了代码的可读性。
+
+```js
+async function getData() {
+  const res = await fakeRequest();
+  console.log(res);
+}
+```
+
+
+
+Object.getOwnPropertyDescriptors
+
+该方法返回对象的自身属性，不包括继承的。
+
+```js
+const person = { name: "houyw", age: 19 };
+Object.getOwnPropertyDescriptors(person)
+//输出
+{
+  name: {
+    value: 'houyw',
+    writable: true,
+    enumerable: true,
+    configurable: true
+  },
+  age: { value: 19, writable: true, enumerable: true, configurable: true }
+}
 ```
 
