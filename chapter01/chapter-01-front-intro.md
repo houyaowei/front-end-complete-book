@@ -1134,3 +1134,59 @@ console.log(undefined ?? []); // => []
 
 
 
+globalThis
+
+获取不同环境的`this`,在ES2020规范之前，可以封装一层：
+
+```js
+const getGlobalThis = () => {
+  // 适用webworker、service worker
+  if (typeof self !== "undefined") return self;
+
+  // 浏览器
+  if (typeof window !== "undefined") return window;
+
+  // Node.js
+  if (typeof global !== "undefined") return global;
+
+  // JavaScript shell
+  if (typeof this !== "undefined") return this;
+
+  throw new Error("Unable to locate global object");
+};
+```
+
+现在就可以按照如下使用：
+
+```js
+const theGlobalThis = getGlobalThis();
+```
+
+
+
+##### 模块命名空间导出（module namespace export）
+
+```js
+import * as utils from './utils.mjs';
+export { utils };
+```
+
+
+
+##### Promise.allSettled
+
+Promise.allSettled 接受一组 Promise，返回新的 Promise 实例。等到所有这些参数实例都返回结果，不管是`fulfilled`还是`rejected`。
+
+```js
+const promise1 = Promise.resolve(3);
+const promise2 = new Promise((resolve, reject) => setTimeout(reject, 100, 'foo'));
+const promises = [promise1, promise2];
+
+Promise.allSettled(promises).
+  then((results) => results.forEach((result) => console.log(result.status)));
+```
+
+
+
+#### ES2019
+

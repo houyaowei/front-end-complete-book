@@ -39,3 +39,11 @@ console.log(0 ?? 1);         // => 0
 console.log('' ?? 'default');  // => ''
 console.log(null ?? []);      // =>[]
 console.log(undefined ?? []); // => []
+
+console.log("--------Promise.allSettled----------")
+const promise1 = Promise.resolve(3);
+const promise2 = new Promise((resolve, reject) => setTimeout(reject, 100, 'foo'));
+const promises = [promise1, promise2];
+
+Promise.allSettled(promises).
+  then((results) => results.forEach((result) => console.log(result.status)));

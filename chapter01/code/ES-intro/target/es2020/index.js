@@ -2,13 +2,9 @@
 
 require("core-js/modules/es.array.slice.js");
 
-require("core-js/modules/es.object.to-string.js");
-
 require("core-js/modules/es.function.name.js");
 
 require("core-js/modules/es.array.from.js");
-
-require("core-js/modules/es.string.iterator.js");
 
 require("core-js/modules/es.symbol.js");
 
@@ -16,15 +12,29 @@ require("core-js/modules/es.symbol.description.js");
 
 require("core-js/modules/es.symbol.iterator.js");
 
-require("core-js/modules/es.array.iterator.js");
-
-require("core-js/modules/web.dom-collections.iterator.js");
-
 require("core-js/modules/es.array.is-array.js");
 
 require("core-js/modules/es.number.max-safe-integer.js");
 
 require("core-js/modules/es.number.constructor.js");
+
+require("core-js/modules/es.object.to-string.js");
+
+require("core-js/modules/es.promise.js");
+
+require("core-js/modules/web.timers.js");
+
+require("core-js/modules/es.array.iterator.js");
+
+require("core-js/modules/es.promise.all-settled.js");
+
+require("core-js/modules/es.string.iterator.js");
+
+require("core-js/modules/web.dom-collections.iterator.js");
+
+require("core-js/modules/es.array.for-each.js");
+
+require("core-js/modules/web.dom-collections.for-each.js");
 
 require("core-js/modules/es.string.match-all.js");
 
@@ -82,6 +92,18 @@ console.log((_ = 0) !== null && _ !== void 0 ? _ : 1); // => 0
 
 console.log((_ref = '') !== null && _ref !== void 0 ? _ref : 'default'); // => ''
 
-console.log((_ref2 = null) !== null && _ref2 !== void 0 ? _ref2 : []); // => []
+console.log((_ref2 = null) !== null && _ref2 !== void 0 ? _ref2 : []); // =>[]
 
-console.log(undefined !== null && undefined !== void 0 ? undefined : []);
+console.log(undefined !== null && undefined !== void 0 ? undefined : []); // => []
+
+console.log("--------Promise.allSettled----------");
+var promise1 = Promise.resolve(3);
+var promise2 = new Promise(function (resolve, reject) {
+  return setTimeout(reject, 100, 'foo');
+});
+var promises = [promise1, promise2];
+Promise.allSettled(promises).then(function (results) {
+  return results.forEach(function (result) {
+    return console.log(result.status);
+  });
+});
