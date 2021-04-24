@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "es2021": "babel ./src/es2021/index.js --out-dir target/es2021",
-    "exec21": "node ./target/es2021/index.js"
+    "es2020": "babel ./src/es2020/index.js --out-dir target/es2020",
+    "exec21": "node ./target/es2021/index.js",
+    "exec20": "node ./target/es2020/index.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.16",

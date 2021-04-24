@@ -870,7 +870,7 @@ ueryString.replace(/\+/g, ''); //q=bcd
 ```js
 'aabbcc'.replaceAll('b', '_'); // aa__cc
 const queryString = 'q=b+c+d';
-ueryString.replaceAll('+', ''); //q=bcd
+queryString.replaceAll('+', ''); //q=bcd
 ```
 
 使用新api后，好处有两点：代码的可读性更好，特殊符号不需要再转义。
@@ -891,7 +891,7 @@ ueryString.replaceAll('+', ''); //q=bcd
 
 ```js
 const deleteUsers = () => {
-  return "";
+  return "users is empty";
 };
 
 const user = {
@@ -899,7 +899,7 @@ const user = {
   name: "houyw",
   isAdmin: true
 };
-let users = user.isAdmin &&= deleteUsers();
+let users = user.isAdmin &&= deleteUsers(); // users is empty
 ```
 
 ```js
@@ -909,7 +909,7 @@ const user2 = {
   name: "houyw",
   isSuperMan: false
 };
-let status = user2.isSuperMan &&= goCode;
+let status = user2.isSuperMan ||= goCode;
 console.log(status); // " I go to coding"
 ```
 
@@ -922,5 +922,215 @@ console.log((x = x ?? y)); // "hello
 
 
 
-弱引用和销毁
+WeakRef
+
+通常说，对js的对象都是强引用。就是说一旦保持对某个对象的引用，这个对象就不会被垃圾回收。但是在ES6中引入了WeakMap，WeakSet，这两者中的对象都是弱引用，垃圾回收机制不考虑 WeakSet 、WeakMap对集合中对象的引用，如果这些对象只要不再被引用，垃圾回收机制会自动回收该对象的内存，不考虑该对象是否还存在于 Weak集合之中。
+
+```js
+const wm = new WeakMap();
+
+const ref = {};
+const metaData = 'foo';
+wm.set(ref, metaData);
+wm.get(ref);
+// → metaData
+```
+
+此时，在该代码块中不再保持对象ref的引用，垃圾回收机制随时可以对它进行回收。
+
+WeakMap和WeakSet不是真正的弱引用，只要key是活动的，还是会保持这强引用。 一旦key被垃圾回收，Weak集合仅弱引用其内容。
+
+WeakRef是一个高级api提供了真正的弱引用，允许创建对象的弱引用，跟踪现有对象时不会阻止对其进行垃圾回收。对于缓存和对象映射非常有用。浏览器需要运行垃圾回收时，如果对该对象的唯一引用是来自WeakRef变量，则JavaScript引擎可以安全地从内存中删除该对象并释放空间。
+
+```js
+const myWeakRef = new WeakRef({ 
+  name: 'Cache', 
+  size: 'unlimited' 
+}) 
+console.log(myWeakRef.deref()) 
+```
+
+使用WeakRef的构造方法构造一个实例，通过实例的deref方法访问变量。
+
+`FinalizationRegistry` 接收一个注册器回调函数，可以利用该注册器为指定对象注册一个事件监听器，当对象被垃圾回收之后，会触发监听的事件。首先，创建一个注册器：
+
+```js
+const registry = new FinalizationRegistry((v) => {
+  // ....
+});
+```
+
+接着，注册一个指定对象，同时指定给注册器回调传递的参数：
+
+```js
+registry.register(taget, "some value");
+```
+
+
+
+数字分隔符
+
+数字分隔符提供了一种能使大数字更易于阅读和使用的简单方法。
+
+```
+1000000000000      1_000_000_000_000
+1019436871.42      1_019_436_871.42
+```
+
+
+
+Promise.any
+
+接收几个Promise 对象，只要其中任意一个 promise 成功，就返回那个已经成功的 promise。如果所有的promise都失败，就返回一个失败的 promise。
+
+```js
+const promise1 = new Promise((resolve, reject) => {
+  reject("失败");
+});
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 500, "slower");
+});
+const promise3 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 100, "faster");
+});
+
+const promises = [promise1, promise2, promise3];
+Promise.any(promises).then((value)=>console.log(value));
+// faster
+```
+
+和Promise.all 和Promise.race做下简单对比。Promise.all：只要有一个promise失败，就会返回失败；当所有的promise都成功后才会返回成功。Promise.race: 只要有一个promise状态发生改变，就会返回该promise。
+
+
+
+##### ES2020
+
+String.protype.matchAll
+
+matchAll方法返回一个正则表达式在字符串的所有匹配。先实现一个例子匹配16进制的字符：
+
+```js
+const string = 'Magic hex numbers: DEADBEEF CAFE';
+const regex = /\b\p{ASCII_Hex_Digit}+\b/gu;
+for (const match of string.matchAll(regex)) {
+  console.log(match);
+}
+```
+
+返回结果：
+
+```js
+[
+  'DEADBEEF',
+  index: 19,
+  input: 'Magic hex numbers: DEADBEEF CAFE',
+  groups: undefined
+]
+[
+  'CAFE',
+  index: 28,
+  input: 'Magic hex numbers: DEADBEEF CAFE',
+  groups: undefined
+]
+```
+
+
+
+动态导入（dynamic import）
+
+动态导入提供了一种类似函数的新导入形式，与静态导入相比，有更多的新功能。
+
+先看下静态导入：
+
+```js
+//utils.mjs
+export default () => {
+  console.log('Hi from the default export!');
+};
+
+// Named export `doStuff`
+export const doStuff = () => {
+  console.log('do something');
+};
+```
+
+接下来就可以在script中导入
+
+```js
+<script type="module">
+  import * as module from './utils.mjs';
+  module.default();
+  // 'Hi from the default export!'
+  module.doStuff();
+  // 'do something'
+</script>
+```
+
+这种导入模块的语法形式是一个静态声明：它仅接受字符串文字作为模块标识，通过运行前的“链接”过程，引入bindings到本地作用域中。 静态导入只能在文件的顶层使用。
+
+`import(specifier)`函数，支持动态加载模块, `import` 函数的参数 `specifier`，指定所要加载的模块的位置，返回promise对象。
+
+```js
+<script type="module">
+  const moduleSpecifier = './utils.mjs';
+  import(moduleSpecifier)
+    .then((module) => {
+      
+    });
+</script>
+```
+
+
+
+##### BigInt 
+
+它提供了一种方法来表示大于 `2^53 - 1` 的整数，可以表示任意大的整数。具体用法是在一个整数字面量后面加 `n` 的方式定义一个 `BigInt`类型。
+
+```js
+let bn = BigInt(Number.MAX_SAFE_INTEGER) + 2n;
+console.log(bn) // 9007199254740993n
+const alsoHuge = BigInt(9007199254740991);
+console.log(alsoHuge) //9007199254740991n
+const hugeString = BigInt("9007199254740991");
+console.log(hugeString) //9007199254740991n
+const hugeHex = BigInt("0x1fffffffffffff");
+console.log(hugeHex) //9007199254740991n
+
+console.log("is BigInt:", typeof 2n === 'bigint')
+```
+
+
+
+##### Optional Chaining(可选链操作符)
+
+?.` 也叫链判断运算符。允许开发读取深度嵌套在对象链中的属性值，而不必验证每个属性是否都存在。当引用为空时，返回 `undefined
+
+```js
+var travelPlans = {
+  destination: "xi'an",
+  monday: {
+    location: "shangxi",
+    time: "23:20",
+    no: "mu5716"
+  },
+};
+console.log(travelPlans.tuesday?.location); //undefined
+console.log(travelPlans.monday?.location); //shangxi
+```
+
+
+
+##### Nullish coalescing(空位操作符)
+
+`??` 运算符被称为空位操作符。如果第一个参数不是 falsely，将返回第一个参数，否则返回第二个参数。
+
+```js
+console.log(false ?? true);   // => false
+console.log(0 ?? 1);         // => 0
+console.log('' ?? 'default');  // => ''
+console.log(null ?? []);      // =>[]
+console.log(undefined ?? []); // => []
+```
+
+
 
