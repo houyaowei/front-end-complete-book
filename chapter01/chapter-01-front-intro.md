@@ -889,3 +889,38 @@ ueryString.replaceAll('+', ''); //q=bcd
 
 这个操作符也同样遵守逻辑短路（Short-circuiting）。当将逻辑操作与赋值组合起来时，因为赋值可能会导致副作用（side-effect），所以赋值操作应该是在某种条件下才进行赋值。无条件地造成副作用会对程序的性能甚至正确性产生负面影响。
 
+```js
+const deleteUsers = () => {
+  return "";
+};
+
+const user = {
+  id: "71002",
+  name: "houyw",
+  isAdmin: true
+};
+let users = user.isAdmin &&= deleteUsers();
+```
+
+```js
+let goCode =" I go to coding"
+const user2 = {
+  id: "71002",
+  name: "houyw",
+  isSuperMan: false
+};
+let status = user2.isSuperMan &&= goCode;
+console.log(status); // " I go to coding"
+```
+
+```js
+let x = null;
+let y = "hello";
+console.log((x ??= y)); // "hello"
+console.log((x = x ?? y)); // "hello
+```
+
+
+
+弱引用和销毁
+
