@@ -1305,6 +1305,25 @@ fetch(url)
 .finally(() => {···});
 ```
 
+异步迭代器
+
+循环遍历异步可迭代对象以及同步可迭代对象，包括: 内置的 `String`, `Array`，类似数组对象 (例如 arguments或 `NodeList`，`TypedArray`,`Map`, `Set` 和用户定义的异步/同步迭代器。
+
+```
+async function* asyncGenerator() {
+  var i = 10;
+  while (i < 3) {
+    yield i++;
+  }
+}
+
+(async function() {
+  for await (num of asyncGenerator()) {
+    console.log(num);
+  }
+})();
+```
+
 
 
 正则表达式
@@ -1660,4 +1679,25 @@ $2a$10$NPIstDpWGv90.99/Xjz3euey/eVvyjKpDC6cys508aiqT3NIWCaKi
 ```
 
 引用三方库的时候，先从资源库中下载文件，然后执行。
+
+
+
+创建服务器
+
+Deno中也有和web相关的模块，即http服务。该模块和node的http模块功能相同，都是提供一套封装级别很低的API，仅仅是流控制和简单的解析。
+
+```typescript
+import { serve } from "https://deno.land/std@0.95.0/http/server.ts";
+const server = serve({ port: 9001 });
+console.log("http://localhost:9001/");
+for await (const req of server) {
+  req.respond({ body: "Hello, this is from deno server" });
+}
+```
+
+首先导入serve模块，并指定端口`9001`,在返回的Server实例中遍历出req对象，指定返回的内容体内容。
+
+![](./images/deno-5.png)
+
+<center>图1-12</center>
 
