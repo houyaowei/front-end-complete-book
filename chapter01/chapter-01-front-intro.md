@@ -1543,3 +1543,121 @@ deno run --allow-read readx.ts
 - **--allow-run** 运行执行子进程权限，需要注意的是子进程并不是在沙箱中执行，所以需要特别注意。
 - **--allow-write=<allow-write>** 允许写入文件系统。多个目录或文件用逗号分隔，来提供文件系统白名单。
 
+再来看下几个需要制定权限的例子。
+
+先看个使用fetch方法请求Deno REST API的例子，如下面的代码：
+
+```js
+//fetch.js
+const res = await fetch("https://api.github.com/users/denoland");
+const data = await res.json();
+console.log(data);
+```
+
+运行该文件：
+
+```shell
+deno run fetch.js
+```
+
+![](./images/deno-3.png)
+
+<center>图1-10</center>
+
+加上必要的参数。
+
+```shell
+deno run --allow-net fetch.js
+```
+
+```json
+{
+  login: "denoland",
+  id: 42048915,
+  node_id: "MDEyOk9yZ2FuaXphdGlvbjQyMDQ4OTE1",
+  avatar_url: "https://avatars.githubusercontent.com/u/42048915?v=4",
+  gravatar_id: "",
+  url: "https://api.github.com/users/denoland",
+  html_url: "https://github.com/denoland",
+  followers_url: "https://api.github.com/users/denoland/followers",
+  following_url: "https://api.github.com/users/denoland/following{/other_user}",
+  gists_url: "https://api.github.com/users/denoland/gists{/gist_id}",
+  starred_url: "https://api.github.com/users/denoland/starred{/owner}{/repo}",
+  subscriptions_url: "https://api.github.com/users/denoland/subscriptions",
+  organizations_url: "https://api.github.com/users/denoland/orgs",
+  repos_url: "https://api.github.com/users/denoland/repos",
+  events_url: "https://api.github.com/users/denoland/events{/privacy}",
+  received_events_url: "https://api.github.com/users/denoland/received_events",
+  type: "Organization",
+  site_admin: false,
+  name: "Deno Land",
+  company: null,
+  blog: "https://deno.land",
+  location: "NYC, USA",
+  email: "deploy@deno.com",
+  hireable: null,
+  bio: null,
+  twitter_username: "deno_land",
+  public_repos: 26,
+  public_gists: 0,
+  followers: 0,
+  following: 0,
+  created_at: "2018-08-02T22:47:41Z",
+  updated_at: "2021-03-31T14:25:32Z"
+}
+```
+
+从这个例子可以知道，如果需要网络权限，必须显示指定。如果不指定具体的域名，默认可以访问全部的域名。如果指定，表示只能访问指定的域名。
+
+```shell
+deno run --allow-net=api.github.com fetch.js
+```
+
+接下面看下怎么设置环境变量：
+
+```js
+//read_env.ts
+Deno.env.set('APPLICATION_NAME', 'deno_test');
+console.log(Deno.env.get("APPLICATION_NAME"))
+```
+
+```
+deno run read_env.ts
+```
+
+![](./images/deno-4.png)
+
+<center>图1-11</center>
+
+```
+deno run --allow-env read_env.ts
+```
+
+打印出`deno_test`.
+
+
+
+##### 加载三方包
+
+在前面比较Deno和nodejs的时候说过，Deno没有包管理工具。所以不需要创建package.json。Deno提供了通过URL引入三方包的形式。Deno提供官方的资源库：https://deno.land/x，到目前为止，已经有2170个模块可以选择。
+
+我们用BCrypt为例，说明下怎么引入三方库。
+
+```typescript
+import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+const hash = await bcrypt.hash("hello,world");
+console.log(hash)
+```
+
+需要说明的是，三方库都是以“https://deno.land/x”开头，后面跟三方库标识和入口文件。
+
+```shell
+➜  deno-intro git:(master) ✗ deno run --allow-net --unstable module.ts
+Check file:///Users/eason/Desktop/github/front-end-complete-book/chapter01/code/deno-intro/module.ts
+Download https://deno.land/x/bcrypt@v0.2.4/src/worker.ts
+Check https://deno.land/x/bcrypt@v0.2.4/src/worker.ts
+$2a$10$NPIstDpWGv90.99/Xjz3euey/eVvyjKpDC6cys508aiqT3NIWCaKi
+```
+
+引用三方库的时候，先从资源库中下载文件，然后执行。
+
