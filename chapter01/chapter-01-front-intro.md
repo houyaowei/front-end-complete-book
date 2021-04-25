@@ -1695,9 +1695,75 @@ for await (const req of server) {
 }
 ```
 
-首先导入serve模块，并指定端口`9001`,在返回的Server实例中遍历出req对象，指定返回的内容体内容。
+首先导入serve模块，并指定端口`9001`,在返回的Server实例中遍历出Listener对象，为每个请求指定返回的内容体。
 
 ![](./images/deno-5.png)
 
 <center>图1-12</center>
+
+Deno web开发
+
+做过 Node.js web开发的朋友对 Express、Koa 这些 Web 应用开发框架都不会陌生。同样在 Deno 平台中如果你也想做 Web 应用开发，可以考虑使用以下现成的框架：
+
+- oak
+- deno-drash
+- pogo
+- deno-express
+
+我们使用oak作为目标工具，因为它更的灵感来自于 Koa，而路由中间件的灵感来源于 koa-router 。如果你以前使用过 Koa 的话，那么你会很容易就能上手 oak。
+
+> This middleware framework is inspired by [Koa](https://github.com/koajs/koa) and middleware router inspired by [@koa/router](https://github.com/koajs/router/). -来自oak官网
+
+oak使用mod.ts中的Application声明一个应用。
+
+```typescript
+import { Application } from "https://deno.land/x/oak/mod.ts";
+const app = new Application();
+```
+
+初始化后，就可以使用app.use引用我们需要的中间件，使用app.listen注册端口。
+
+先声明路由模块：
+
+```typescript
+import { Router } from "https://deno.land/x/oak/mod.ts";
+import sayHello from "./handlers/hello.ts";
+const router = new Router();
+
+router.get("/", sayHello);
+export default router;
+```
+
+引入oak的路由模块，并制定主页面路由。然后看下主路由模块的实现：
+
+```typescript
+import { Response, RouteParams } from "https://deno.land/x/oak/mod.ts";
+export default async ({
+  params,
+  response
+}: {
+  params: RouteParams;
+  response: Response;
+}) => {
+  response.body = { msg: "hello,oak router" };
+};
+```
+
+在入口文件中引入router文件,并以中间件的方法加入到应用中。
+
+```typescript
+import router from "./routing.ts";
+app.use(router.routes());
+await app.listen({ port: 9002 });
+```
+
+现在启动页面进行测试
+
+```shell
+deno run --allow-net web/index.ts
+```
+
+
+
+![](./images/deno-6.png)
 
