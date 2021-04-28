@@ -394,7 +394,7 @@ runTransformation(
 generator.injectRootOptions(generator.entryFile, `router`)
 ```
 
-generator.injectRootOptions把router配置注入到入口文件 `src/main.js` 的 new Vue() 注入 router配置。
+generator.injectRootOptions把router实例注入到入口文件src/main.js中。
 
 ```js
 generator.extendPackage({
@@ -406,15 +406,15 @@ generator.extendPackage({
 
 把router的依赖也加入到package.json中。generator.render负责渲染模板。
 
-具体的渲染过程可以用下图的图进行抽象概括
+具体的渲染过程可抽象概括成图2-5所示。
 
 ![4](./images/4.png)
 
-<center>图2-4</center>
+<center>图2-5</center>
 
 提取babel配置，生成babel.config.js。
 
-在前面生成package.json配置时，我们把
+在前面生成package.json配置时，我们把下面的代码也写了进去：
 
 ```json
 babel: {
@@ -422,7 +422,7 @@ babel: {
 }
 ```
 
-也写了进去，其实把该项配置放到babel的配置文件才比较标准。所以需要提取一下。我们可以调用 `generator.extractConfigFiles()` 将内容提取出来并生成 `babel.config.js` 文件中
+实际上把该项配置放到babel的配置文件才比较标准，所以需要提取一下。我们可以调用 `generator.extractConfigFiles()` 将内容提取出来并生成 `babel.config.js` 文件中。
 
 ```js
 module.exports = {
@@ -432,7 +432,7 @@ module.exports = {
 }
 ```
 
-模板文件渲染后还在内存中，需要进一步把文件写到硬盘。utils也提供了writeFileTree()方法来写文件
+模板文件渲染后还在内存中，需要进一步把文件写到硬盘。utils也提供了writeFileTree()方法来写文件：
 
 ```js
 async function writeFileTree(dir, files) {
@@ -446,7 +446,7 @@ async function writeFileTree(dir, files) {
 
 下载依赖
 
-下载依赖我们使用比较execa，调用子进程来安装依赖包。
+我们使用execa调用子进程来安装依赖包：
 
 ```js
 function executeCommand(command, cwd) {
@@ -469,7 +469,7 @@ function executeCommand(command, cwd) {
 }
 ```
 
-最后，我们进行下测试，
+最后进行测试，如图2-6所示。
 
 ```shell
 tiny-cli create demo
@@ -477,33 +477,33 @@ tiny-cli create demo
 
 ![1](./images/tiny-1.png)
 
-<center>图2-5</center>
+<center>图2-6</center>
 
-空格选择这三项后，按回车
+空格选择这三项后，按“Enter”键，如图2-7所示。
 
 ![1](./images/tiny-2.png)
 
-<center>图2-6</center>
+<center>图2-7</center>
 
-输入Y，继续回车
+输入Y，继续，按“Enter”键，如图2-8所示。
 
 ![1](./images/tiny-3.png)
 
-<center>图2-7</center>
+<center>图2-8</center>
 
-选择一项eslint校验规则，回车：
+选择一项ESLint校验规则，按“Enter”键，如图2-9所示。
 
 ![1](./images/tiny-4.png)
 
-<center>图2-8</center>
+<center>图2-9</center>
 
-选择规则生效时间，继续回车：
+选择规则生效时间，继续按“Enter”键，如图2-10所示。
 
 ![1](./images/tiny-5.png)
 
-<center>图2-9</center>
+<center>图2-10</center>
 
-到这一步脚手架生成，npm包安装完成。
+至此脚手架生成，npm包安装完成。
 
 
 
