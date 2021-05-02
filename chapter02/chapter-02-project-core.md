@@ -831,46 +831,43 @@ Nginx提供了以下几种分配方式：
 
 3. **ip_hash**，每个请求按访问 IP 地址的 hash 结果分配，这样每个访客固定访问一个后端服务器，可以解决动态网页的session共享问题。
 
-  
+   
 
-     
+Nginx配置动静分离
 
-   Nginx配置动静分离
-
-   把静态文件独立成单独的域名，放在独立的服务器上，实现资源共享。需要搭配expire配置使用。
+动静分离是指把静态文件独立成单独的域名，然后放在独立的服务器上，实现资源共享。需要搭配expire配置使用。
 
    
 
-   ##### 图片防盗配置
+图片防盗配置
 
-   由于图片链接可以跨域访问，所以图片被其他网站引用，无形就增加服务器负担
-   
-   ```
-   server {
-     # 图片防盗链
-     location ~* \.(jpg|jpeg|png|gif)$ {
-       valid_referers none blocked server_names ~\.test\. ~\.test2\. *.qq.com; 
-       if ($invalid_referer){
-         return 403;
-       }
+由于图片链接可以跨域访问，所以当图片被其他网站引用时，无形中就增加了服务器的负担。
+
+   ```js
+server {
+  # 图片防盗链
+  location ~* \.(jpg|jpeg|png|gif)$ {
+    valid_referers none blocked server_names ~\.test\. ~\.test2\. *.qq.com; 
+    if ($invalid_referer){
+        return 403;
+      }
      }
-}
+   }
    ```
 
-   ##### 过滤请求
-   
-   ```
-   # 非指定请求全返回 403
-   if ( $request_method !~ ^(GET|POST|HEAD)$ ) {
-     return 403;
-   }
-   
-   location / {
-     # IP访问限制（只允许IP是 192.168.0.2 机器访问）
-     allow 192.168.0.2;
-     deny all;
+过滤请求
+
+```js
+# 非指定请求全返回 403
+if ( $request_method !~ ^(GET|POST|HEAD)$ ) {
+  return 403;
 }
-   ```
+location / {
+ # IP访问限制（只允许IP是 192.168.0.2 机器访问）
+  allow 192.168.0.2;
+  deny all;
+}
+```
 
    
 
@@ -909,11 +906,11 @@ Nginx提供了以下几种分配方式：
    
 
    下面我们先看下用jest怎么测试基本的功能，先生成package.json和安装jest核心库
-   
+
    ```shell
    yarn init -y 
    
-yarn install jest
+   yarn install jest
    ```
 
    并配置scripts命令：
