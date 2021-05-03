@@ -961,7 +961,7 @@ Jest 在运行测试用例的时候，提供一种机制，在整个项目会查
 
 Jest的单元测试用，使用test（或者it，it是test的别名）定义一个测试用例，使用expect定一个断言，判断total值是否和4相等。describe用来定义一组相关的测试用例，对一个功能进行测试，只有这一组用例都测试通过之后，才能说明这个功能是好的。
 
-   对这个测试用例我们在扩展一下，再增加几个和数字相关断言，toBeGreaterThan，toBeGreaterThanOrEqual，toBeLessThan，toBeLessThanOrEqual，从字面也容易判断出分别代表的意思：大于，大于等于，小于，小于等于。
+​    下面我们扩展一下这个测试用例，再增加几个和数字相关的断言，如toBeGreaterThan、toBeGreaterThanOrEqual、toBeLessThan和toBeLessThanOrEqual，分别表示大于、大于等于、小于和小于或等于。
 
    ```js
    test('adds 1 + 3 to equal 4', () => {
@@ -974,11 +974,11 @@ Jest的单元测试用，使用test（或者it，it是test的别名）定义一�
      });
    ```
 
-   为了验证测试用例失败的情况，我们也稍微改下第一个断言结果，看jest能给我们一个什么样的测试结果。再次运行测试：
+为了验证测试用例失败的情况，这里改一下第一个断言结果，再次运行测试，结果如图2-16所示。
 
    ![2](./images/jest-2.png)
 
-   <center>图2-13</center>
+   <center>图2-16</center>
 
    测试结果如我们所料，第一个断言执行失败，并且通过红色字体提示了错误用例位置，期望值和实际得到的值
 
@@ -994,9 +994,9 @@ Jest的单元测试用，使用test（或者it，it是test的别名）定义一�
    Received: 4
    ```
 
-   这条消息提示了断言中的期望值和实际获得的值，更方便我们定位具体的错误信息。
+这条消息提示了断言中的期望值和实际获得的值，更方便我们定位具体的错误信息。
 
-我们再定义一个新的基本测试用例，对已有对象赋值后判断两个对象是否相等
+我们再定义一个新的基本测试用例，对已有对象赋值后判断两个对象是否相等：
 
 ```js
 test('object assignment', () => {
@@ -1020,7 +1020,7 @@ Ran all test suites.
 ✨  Done in 1.43s.
 ```
 
-依然是正常的。第一个实例我们列举了数字型匹配，下面看一个boolen型测试用例，
+依然是正常的。第一个测试用例是数字型的，下面看一个布尔型测试用例：
 
 ```js
 test('null test cases', () => {
@@ -1033,9 +1033,9 @@ test('null test cases', () => {
   });
 ```
 
-null值在JavaScript中表示false在这个测试用例中也得到了印证。
+null值在JavaScript中表示false，在这个测试用例中也得到了印证。
 
-jest的测试不近仅可以判断具体的值，还可以使用toMatch判断字符串的子串，使用toContain判断数组是否包含某个元素。
+Jest的测试不近仅可以判断具体的值，还可以使用toMatch判断字符串的子串，使用toContain判断数组是否包含某个元素：
 
 ```javascript
 test('string matches ', () => {
@@ -1067,11 +1067,9 @@ test('test array', () => {
 })
 ```
 
-介绍了基本测试方法后，下面看下怎么测试异步运行的代码。在web开发中，异步代码随处可见，所以对这部分代码的测试是要重点介绍的。
+在介绍了基本测试方法后，下面介绍如何测试异步运行的代码。在Web开发中，异步代码随处可见，所以重点介绍对这部分代码的测试。
 
-我们先实现一个axios的请求方法，首先需要安装该npm包，再借助公共的ajax服务来进行测试。
-
-> 公共ajax服务地址：https://jsonplaceholder.typicode.com/todos/1'
+首先实现一个axios的请求方法，安装该npm包，再借助公共的AJAX服务进行测试。
 
 ```javascript
 let url = 'https://jsonplaceholder.typicode.com/todos/1';
@@ -1082,13 +1080,13 @@ function fetchData() {
 }
 ```
 
-下面开始构造ajax的测试用例，jest中异步代码测试有三中测试形式：
+下面开始构造AJAX的测试用例，在Jest中异步代码测试有三种测试形式：
 
-- 回调函数
+- 回调函数。
 - Promise式验证
-- 使用async/await
+- 使用async/await。
 
-先看下第一种回调函数式，
+（1）回调函数：
 
 ```javascript
 const { fetchData } = require("../source/basic")
@@ -1101,7 +1099,7 @@ test('test asyn code with cb', () => {
 });
 ```
 
-这种测试方法是最容易想到的。可以达到预想的测试目的。但是不推荐使用，原因是这种测试方法增加了对其他其他函数的依赖，职责不够单一，还有一个问题就是当fetchData执行完成，测试也就执行完成，然后才去执行回调函数。这不是我们所期望的结果。正常的测试结果是等断言执行完成才能代表这个测试用例的完成。所以我们需要对这个测试用例做下改造。
+这种测试方法是最容易想到的，可以达到预想的测试目的，但是不推荐使用，因为这种测试方法增加了对其他其他函数的依赖，职责不够单一。另外，当fetchData执行完成时，测试也执行完成了，然后才去执行回调函数。这不是我们所期望的结果。正常的测试结果是等断言执行完成后才能代表这个测试用例的完成。所以我们需要对这个测试用例做一下改造。
 
 ```
 test('test asyn code with cb', done => {
@@ -1113,11 +1111,11 @@ test('test asyn code with cb', done => {
 });
 ```
 
-如果 done 永远不会被调用，那么该测试将会失败，这才符合完整的测试流程。
+如果“done”永远不被调用，那么该测试将失败，这才符合完整的测试流程。
 
-再看第二种Promise式验证。
+（2）Promise式验证。
 
-Promise设计的初衷是使用链式解决回调炼狱(callback hell)的问题，在jest的单元测试中也同样适用，也让测试也变得更加简单。jest的断言可以放到Promise的回调中，等Promise被resolve时再执行。形式如下面所示：
+Promise设计的初衷是使用链式解决回调炼狱（callback hell）的问题，在Jest的单元测试中同样适用，也让测试变得更加简单。Jest的断言可以放到Promise的回调中，等Promise被resolve时再执行。代码如下所示：
 
 ```js
 test('should return data when fetchData request success', () => {
@@ -1134,17 +1132,17 @@ test('should return data when fetchData request success', () => {
   })
 ```
 
-异步测试中，需要增加一个配置：
+在异步测试中，需要增加一个配置：
 
 ```javascript
 expect.assertions(number);
 ```
 
-该配置用来验证在测试期间是否调用了一定数量的断言，如果未调用到指定的数量会测试失败。如上面的测试用例中把expect.assertions设置成了1，但是却有两个断言, 看下结果会是怎么样的。
+该配置用来验证在测试期间是否调用了一定数量的断言，如果未调用到指定的数量则测试失败。例如，在上面的测试用例中，把expect.assertions设置成了1，但是却有两个断言,，结果如图2-17所示。
 
 ![2](./images/jest-3.png)
 
- <center>图2-14</center>
+ <center>图2-17</center>
 
 还可以在 expect 语句中使用resolves matcher（匹配器）, Jest 等待该 promise 被resolve。
 
