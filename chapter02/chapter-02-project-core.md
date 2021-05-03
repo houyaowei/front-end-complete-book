@@ -1144,7 +1144,7 @@ expect.assertions(number);
 
  <center>图2-17</center>
 
-还可以在 expect 语句中使用resolves matcher（匹配器）, Jest 等待该 promise 被resolve。
+还可以在 expect 语句中使用resolves matcher（匹配器）， Jest 等待该 promise 被resolve。
 
 ```javascript
 test('should return data when fetchData with request ', () => {
@@ -1157,7 +1157,7 @@ test('should return data when fetchData with request ', () => {
   })
 ```
 
-如果 promise 被reject，测试将自动失败。
+如果 promise 被reject，则测试将自动失败。
 
 ```
 test('fetchData fails with an error', () => {
@@ -1166,9 +1166,9 @@ test('fetchData fails with an error', () => {
 });
 ```
 
-最后看下第三种async/await。
+（3）使用async/await。
 
-async/await彻底解放了异步代码，可以让异步代码的执行看起来像同步代码一样。测试的时候只需要在传递给 test 的函数前加上 async 关键字。
+async/await彻底解放了异步代码，它可以让异步代码的执行看起来像同步代码一样。在测试时只需要在传递给test的函数前加上async关键字即可。
 
 ```js
 test("test fetchData function with async/await ", async ()=> {
@@ -1181,9 +1181,9 @@ test("test fetchData function with async/await ", async ()=> {
 
 ##### setup和teardown
 
-setUp：前置函数，是在众多函数最先被调用的函数，而且每执行完一个函数都要从setUp()调用开始后再执行下一个函数，有几个函数就调用他几次，与位置无关，随便放在哪里都是他先被调用。
+setUp：前置函数，是众多函数中最先被调用的函数，而且每执行完一个函数都要从setUp()调用开始后再执行下一个函数，有几个函数就调用它几次，与位置无关，无论放在哪里都是它先被调用。
 
-在jest中对应的函数式beforeEach和beforeAll。
+在Jest中对应的函数是beforeEach和beforeAll。
 
 ```js
 beforeEach(()=> {
@@ -1194,11 +1194,11 @@ beforeAll(() => {
 });
 ```
 
-每个测试用例执行前会打印**before each**, 如果想执行一次可以使用beforeAll。
+每个测试用例在执行前都会打印***\*before each\****， 如果只想执行一次，则可以使用beforeAll。
 
-tearDown：后置函数，是在众多函数执行完后他才被执行，意思就是不管这个类里面有多少函数，他总是最后一个被执行的，与位置无关，放在那里效果都一样。
+tearDown：后置函数，是在众多函数执行完后它才被执行，即不管这个类里面有多少函数，它总是最后一个被执行的，与位置无关。
 
-在jest中对应的函数式afterEach和afterAll。
+在Jest中对应的函数是afterEach和afterAll。
 
 ```js
 afterEach(()=> {
@@ -1209,15 +1209,15 @@ afterAll(() => {
 });
 ```
 
-每个测试用例执行前会打印**after each**, 如果想执行一次可以使用afterAll。
+每个测试用例在执行前都会打印***\*after each\****， 如果只想执行一次，则可以使用afterAll。
 
 
 
-##### Mock
+##### Mock方法
 
-开发过程中实现一个方法要依赖另一个或者几个方法是很常见的场景。但是从单元测试的角度讲我们只关心要测试的方法，依赖的方法要怎么处理才能进行顺利的测试呢？这时候通用的选择是用Mock的方法实现依赖。
+在开发过程中，一个方法依赖另一个或者几个方法是很常见的场景。但是从单元测试的角度来看，我们只关心要测试的方法和依赖的方法要怎样处理才能顺利进行测试，这时候通用的选择是用Mock方法实现依赖。
 
-先看一个例子，循环遍历一个数组，该方法有一个依赖项：callback。每次循环都要执行一次回调方法。
+先看一个循环遍历一个数组的例子，该方法有一个依赖项——callback，即每次循环都要执行一次回调方法。
 
 ```js
 function forEach(arr, callback) {
@@ -1227,19 +1227,19 @@ function forEach(arr, callback) {
 }
 ```
 
-我们第一步要做的首先把这个callback方法模拟出来，可以使用jest提供的fn方法。
+首先使用Jest提供的fn方法把这个callback方法模拟出来。
 
 ```js
 const mockCallback = jest.fn();
 ```
 
-forEach的方法表用就变成了
+此时，forEach的方法就变成了下面的样子：
 
 ```js
 forEach(["hou", "yw"], mockCallback); 
 ```
 
-下面就可以实现测试用例了。
+接下来就可以实现测试用例了。
 
 ```js
 test('mock function calls test cases ', () => {
@@ -1253,7 +1253,7 @@ test('mock function calls test cases ', () => {
   })
 ```
 
-Mock Function都带有 mock属性，它保存了函数被调用的信息：函数实例，calls等。
+mock 函数带有 mock属性，它保存了函数被调用的信息，如函数实例、calls等。
 
 ```json
 {
@@ -1267,9 +1267,9 @@ Mock Function都带有 mock属性，它保存了函数被调用的信息：函�
   }
 ```
 
-jest的mock函数还可以具体附带具体实现。
+Jest的mock函数还可以附带具体实现。
 
-```
+```javascript
 test('test jest.fn with implement', () => {
     let mockFn = jest.fn((num1, num2) => {
       return num1 / num2;
@@ -1279,7 +1279,7 @@ test('test jest.fn with implement', () => {
 })
 ```
 
-如果测试的环境需要依赖函数返回的参数，也可以给mock function 指定返回值来模拟。
+如果测试的环境需要依赖函数返回的参数，也可以通过给mock函数 指定返回值来模拟。
 
 ```js
 test('test jest.fn with default value', () => {
@@ -1289,7 +1289,7 @@ test('test jest.fn with default value', () => {
 })
 ```
 
-我们再来思考一个问题，在实际的开发中，一个文件中有多个方法，一个方法mock一次显得有些笨拙，有没有更好的方法可以一次性进行mock？如下面的代码：
+我们再来思考一个问题，在实际开发中，一个文件中通常有多个方法，每个方法都mock一次显得有些笨拙，有没有更好的方法可以一次性完成mock呢？当然有，例如下面的代码：
 
 ```js
 //mockUtil.js
@@ -1298,7 +1298,7 @@ exports.subtract = (a, b) => a -b;
 exports.multiply = (a, b) => a * b;
 ```
 
-jest 提供了一个mock()方法，第一个参数是要mock的模块，可以自动mock这个模块。自动mock模块是什么意思呢？就是把模块暴露出来的方法，全部自动转换成mock函数jest.fn()。
+Jest 提供了一个mock方法，第一个参数是要mock的模块，可以自动mock这个模块。自动mock模块是什么意思呢？就是把模块暴露出来的方法，全部自动转换成mock函数jest.fn()。
 
 ```
 jest.mock("../source/mockUtil.js")
@@ -1312,7 +1312,7 @@ exports.subtract = jest.fn();
 exports.multiply = jest.fn();
 ```
 
-现在看下测试用例怎么实现。
+现在看一下测试用例的实现。
 
 ```javascript
 jest.mock("../source/mockUtil.js")
@@ -1326,7 +1326,7 @@ describe("mock functions continued",()=> {
 })
 ```
 
-需要注意的是需要为每个需要测试的方法mock返回值。用这样的方法也可以mock整个ajax请求，检查ajax请求是否正常，而不是真正去发请求。
+需要注意的是，我们需要为每个需要测试的方法mock返回值。用这样的方法也可以mock整个AJAX请求，检查AJAX请求是否正常，而不是真正去发请求。
 
 ```js
 // funcList.js
@@ -1371,7 +1371,7 @@ describe("function test cases", ()=> {
 })
 ```
 
-上面我们总结了mock返回值的场景，除了返回值也可以指定输入参数。
+前面我们总结了mock返回值的场景，除返回值外，还可以指定输入参数。
 
 ```js
 test('jest.fn should be invoked ', () => {
@@ -1390,17 +1390,17 @@ test('jest.fn should be invoked ', () => {
 
 ##### 测试覆盖率
 
-有了单元测试后，我们需要有一种方法统计出来各个模块的语句覆盖率（%stmts），分支覆盖率（%Branch）、函数覆盖率（%Funcs）和行覆盖率（%Lines）的情况，这几个指标分别代表了以下意思：
+有了单元测试后，我们需要用一种方法统计出来各个模块的语句覆盖率（%stmts）、分支覆盖率（%Branch）、函数覆盖率（%Funcs）和行覆盖率（%Lines）的情况，这几个指标的含义如下：
 
-- %stmts是语句覆盖率（statement coverage）：每个语句是否都执行了
+- 语句覆盖率（%stmts）：每个语句是否都执行了。
 
-- %Branch分支覆盖率（branch coverage）：每个if代码块是否都执行
+- 分支覆盖率（%Branch）：每个if代码块是否都执行了。
 
-- %Funcs函数覆盖率（function coverage）：每个函数是否都执行
+- 函数覆盖率（%Funcs）：每个函数是否都执行了。
 
-- %Lines行覆盖率（line coverage）：每一行是否都执行了
+- 行覆盖率（%Lines）：每一行是否都执行了。
 
-jest提供了coverage的功能，
+Jest提供了测试覆盖率的功能：
 
 ```
 "scripts": {
@@ -1409,17 +1409,17 @@ jest提供了coverage的功能，
 }
 ```
 
-执行**yarn run build-coverage**后，命令行生成的报告
+执行**yarn run build-coverage**后，命令行生成的报告如图2-18所示。
 
 ![2](./images/jest-4.png)
 
- <center>图2-15</center>
+ <center>图2-18</center>
 
-同样也会再coverage/icov-report文件夹中生成html文件，可以可视化查看，更直观。
+同时会在coverage/icov-report文件夹中生成html文件，如图2-19所示，可以用可视化的方式查看，更直观。
 
 ![2](./images/jest-5.png)
 
- <center>图2-16</center>
+ <center>图2-19</center>
 
 
 
@@ -1427,16 +1427,16 @@ jest提供了coverage的功能，
 
 #### 2.5前端文档
 
-文档的生成的目的是为了知识传递，特别是规范类的需要文档化，完整、准确，不容易产生歧义，降低了团队的协作成本和维护成本，提高开发效率和质量，保证不会因为开发人员的变动而产生较大的影响。
+文档的生成的目的是为了知识传递，特别是规范类的需要文档化，完整、准确，不容易产生歧义，降低了团队的协作成本和维护成本，提高了开发效率和质量，保证不会因为开发人员的变动而产生较大的影响。
 
-前端生成的文档还是有不少，如jsdoc，tj大神的dox，以 Markdown 为中心的vuepress，docsify。我们选择简单易上手的vuepress做为前端，它有几个比较大的优点：
+前端生成的文档还是有不少，如jsdoc、tj大神的dox，以 Markdown 为中心的vuepress、docsify。我们选择简单易上手的vuepress作为前端方根，它的优点如下：
 
-- 界面简洁
-- 容易上手
-- 更好的兼容、扩展 Markdown 语法
-- 响应式布局，支持PC端、手机端
-- Google Analytics 集成
-- 支持 PWA
+- 界面简洁。
+- 容易上手。
+- 可以更好地兼容、扩展 Markdown 语法。
+- 响应式布局，支持PC端和手机端。
+- Google Analytics 集成。
+- 支持 PWA。
 
 下面，我们新建一个vuepress工程来看下前端文档的创建过程。
 
@@ -1447,7 +1447,7 @@ yarn init -y
 yarn add vuepress
 ```
 
-配置前端开发脚本,
+配置前端开发脚本。
 
 ```json
 "scripts": {
@@ -1456,7 +1456,7 @@ yarn add vuepress
  }
 ```
 
-我们把 `docs` 目录作为 `targetDir` 。新建相应的目录，如下示例所示：
+我们把 `docs` 目录作为 targetDir，并新建相应的目录，如图2-20所示。
 
 ```json
 ├── README.md           //项目说明
@@ -1479,7 +1479,9 @@ yarn add vuepress
 └── yarn.lock
 ```
 
-接下来修改docs/.vuepress/config.js文件，增加相关配置，
+ <center>图2-20</center>
+
+接下来修改docs/.vuepress/config.js文件，增加相关配置。
 
 ```js
   title: '前端资源文档', 
@@ -1506,13 +1508,13 @@ yarn add vuepress
 
 title用来说明网站的title，base表示部署站点的基础路径，head表示需要被注入到当前页面的 HTML `<head>` 中的标签，themeConfig表示网站当前主题的配置。themeConfig/nav用来配置导航菜单，themeConfig/sidebar表示侧边栏功能项配置，themeConfig/sidebarDepth表示侧边栏功能项目深度配置(显示几级)。
 
-为了看到效果，我们先在guide/web和guide/ts下分别建立README.md文件，分别输入一下内容：
+为了看到效果，我们先在guide/web和guide/ts下分别建立README.md文件，分别输入以下内容：
 
 ```markdown
-## web 历史及概述
+## Web 历史及概述
 
-- web 发展史
-- web 核心要素
+- Web 发展史
+- Web 核心要素
 
 ```
 
@@ -1544,26 +1546,26 @@ title用来说明网站的title，base表示部署站点的基础路径，head�
 ## 功能介绍
 
 - JavaScript 概述
-- JavaScript VS Typescript
+- JavaScript VS TypeScript
 - JavaScript 基本 API
 - ES2015
 - ES2016
 - ES2020
 ```
 
-先用命令**yarn run dev**启动下项目看下效果，如图2-17所示。
+先用命令yarn run dev 命令启动项目，如图2-21所示。
 
 ![2](./images/doc-2.png)
 
- <center>图2-17</center>
+ <center>图2-21</center>
 
-从效果可以看出vuepress会读取docs目录下的README.md做为主目录，guide中的md文件会作为侧边栏。
+从图2-22中可以看出，vuepress会读取docs目录下的README.md，并把它作为主目录，把guide中的md文件作为侧边栏。
 
-markdown是一种轻量级标记语言，排版语法简洁，让人们更多地关注内容本身而非排版。对web开发者更加友好，学习成本低。它使用易读易写的纯文本格式编写文档，可与HTML混编，还可导出 HTML、PDF格式的文件。简洁、高效、易读、易写。
+markdown是一种轻量级标记语言，排版语法简洁，让人们更多地关注内容本身而非排版。对web开发者更加友好，学习成本低。它使用易读易写的纯文本格式编写文档，不仅可以与HTML混编，还可以导出 HTML、PDF格式的文件，简洁、高效、易读、易写。
 
-vuepress内置了markdown loader，将 markdown 转成 Vue，再通过 vue-loader 解析为最终的 HTML。正是因为如此，在markdown中也可以嵌入vue逻辑。
+vuepress内置了markdown loader，可以方便地把 markdown 转成 Vue，再通过 vue-loader 解析为最终的 HTML。因此，在markdown中也可以嵌入vue逻辑。
 
-我们先编辑docs/.vuepress/components下的books.vue文件，计划输出books列表，前面我们说过，该目录下的Vue 组件将会被自动注册为全局组件。
+我们先编辑docs/.vuepress/components下的books.vue文件，计划输出books列表。前面介绍过，该目录下的Vue 组件会被自动注册为全局组件。输入以下内容：
 
 输入以下内容：
 
@@ -1583,12 +1585,12 @@ vuepress内置了markdown loader，将 markdown 转成 Vue，再通过 vue-loade
       return {
         books: [
           {
-            name: "Typescript编程",
+            name: "TypeScript编程",
             author: "Boris Cherny"
           },
           {
-            name: "Go web编程",
-            author: "郑兆熊"
+            name: "Go Web编程",
+            author: "Sau Sheong Chang"
           }
         ]
       }
@@ -1600,7 +1602,7 @@ vuepress内置了markdown loader，将 markdown 转成 Vue，再通过 vue-loade
 </style>
 ```
 
-在guide目录下新建examples文件夹、README.md文件。在md文件中直接引入**boos**组件，同时嵌入代码。
+在guide目录下新建examples文件夹和README.md文件。在md文件中直接引入**boos**组件，同时嵌入代码。
 
 ```markdown
 ## 嵌入 vue 组件
@@ -1612,9 +1614,11 @@ vuepress内置了markdown loader，将 markdown 转成 Vue，再通过 vue-loade
 ​```
 ```
 
-效果如下：
+效果如图2-23所示。
 
 ![2](./images/doc-3.png)
 
-vuepress是对前端开发比较友好的文档生成工具，只要对markdown和vue稍微属性，就可以开发出比较完善的前端文档，入门门槛极低，大家可以一试，让团队的文档规范起来。
+<center>图2-22</center>
+
+vuepress是对前端开发比较友好的文档生成工具，只需熟悉markdown和vue，就可以开发出比较完善的前端文档，入门门槛极低，大家可以一试，让团队的开发文档规范起来。
 
