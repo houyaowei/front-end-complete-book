@@ -734,7 +734,7 @@ module.exports = function (api) {
 
 #### @babel/polyfill
 
-polyfill，中文名称叫垫片，在计算机科学中，指的是对未能实现的客户端上进行的"兜底"操作。对前端开发而言，如果部分js特性在个别浏览器（特别是IE）上不支持，但是这些浏览器又要需要兼容，那么就需要提供一种机制能够正常运行。
+polyfill的中文名称叫作垫片，在计算机中指的是对未能实现的客户端进行的“兜底”操作。对前端开发而言，如果部分js特性在个别浏览器（特别是IE）上不支持，但是这些浏览器又需要兼容，那么就需要提供一种机制使其能够正常运行。例如，ES6 的 object.assign 方法，即使在IE11中运行也会报错。
 
 例如ES6 的 object.assign 方法，即使是在IE11中运行也会报错
 
@@ -742,15 +742,15 @@ polyfill，中文名称叫垫片，在计算机科学中，指的是对未能实
 Object doesn't support propery or method 'assign'
 ```
 
-对于这样独立的polyfill包有很多可以选择，如core-js，object-assign包，babel的transform-object-assign，babel-loader，也可以选择使用Polyfill.io服务，服务器会判断浏览器 UA 返回不同的 polyfill 文件，你所要做的仅仅是在页面上引入这个文件，polyfill 这件事就自动以最优雅的方式解决了。
+对于这样独立的polyfill包有很多选择，如core-js、object-assign包、babel的transform-object-assign、babel-loader，也可以选择使用Polyfill.io服务，服务器会判断浏览器 UA 返回不同的 polyfill 文件，你所要做的仅仅是在页面上引入这个文件，polyfill 这件事就自动以最优雅的方式解决了。
 
-当然@babel/polyfill(7.4.0版本后已经废弃)也是一种选择，直接提供了通过改变全局来兼容新API。可以在入口文件中引入
+当然，@babel/polyfill（7.4.0版本后已经废弃）也是一种选择，它直接提供了通过改变全局来兼容新API，可以在入口文件中引入下面的代码：
 
 ```js
 import "@babel/polyfill";
 ```
 
-或者添加在webpack.config.js的entry数组中
+或者添加在webpack.config.js的entry数组中：
 
 ```js
 module.exports = {
@@ -758,19 +758,17 @@ module.exports = {
 };
 ```
 
-该包会在项目代码前插入所有的 polyfill 代码，因为它带来的改变是全局的。
+该包会在项目代码前插入所有的 polyfill 代码，因为它带来的改变是全局的，在7.4.0版本以后可以使用：
 
-> 7.4以后可以使用
->
 > import "core-js/stable";
 >
->  import "regenerator-runtime/runtime";
+> import "regenerator-runtime/runtime";
 
 #### @babel/runtime和@babel/plugin-transform-runtime
 
-当全局导入polyfill包时，会造成全局污染，这显然不是一个很好的解决方案。因为在浏览器支持特性时，polyfill也就不是必须的。
+当全局导入polyfill包时，会造成全局污染，这显然不是一个很好的解决方案。因为当浏览器支持特性时，polyfill也就不是必需的。
 
-@babel/plugin-transform-runtime是对 Babel 编译过程中产生的 helper 方法进行重新利用(聚合)，以达到减少打包体积的目的。此外还有个作用是为了避免全局补丁污染，对打包过的 bunler 提供"沙箱"式的补丁。
+@babel/plugin-transform-runtime是对 Babel 编译过程中产生的 helper 方法进行重新利用（聚合），以达到减少打包体积的目的。此外还有个作用是为了避免全局补丁污染，对打包过的 bunler 提供“沙箱”式的补丁。
 
 ```shell
 npm install --save-dev @babel/plugin-transform-runtime
@@ -782,13 +780,13 @@ npm install --save-dev @babel/plugin-transform-runtime
 npm install --save @babel/runtime
 ```
 
-在babel的配置文件中增加配置
+在Babel的配置文件中增加如下所示配置：
 
 ```json
 "plugins": ["@babel/plugin-transform-runtime"]
 ```
 
-也可以带具体的参数
+也可以带具体的参数：
 
 ```json
 {
@@ -811,7 +809,7 @@ npm install --save @babel/runtime
 
 ##### preset配置
 
-`@babel/preset-env` 这是一个预设的插件集合，包含了一组相关的插件，会根据目标环境来进行编译和打补丁。具体来讲，是根据参数 `targets` 来确定目标环境，默认情况下它编译为ES2015，可以根据项目需求进行配置
+`@babel/preset-env` 这是一个预设的插件集合，它包含了一组相关的插件，会根据目标环境进行编译和打补丁。具体来讲，是根据参数 targets 来确定目标环境，在默认情况下它可编译为ES2015，可以根据项目需求进行配置。
 
 ```json
 resets: [
@@ -830,19 +828,17 @@ resets: [
 ]
 ```
 
-在预设配置中以targets指定了es6向后兼容的浏览器的最低版本，根据兼容的浏览器的最低版本对es6最新语法的支持性提供需要的转换插件。
+在预设配置中以targets指定了ES6向后兼容的浏览器的最低版本，根据兼容的浏览器的最低版本对ES6的最新语法的支持性提供需要的转换插件。
 
 
 
 #### 1.3 ES规范
 
-截止到2021年3月9日，EcmaScript规范已经发布到了2021版的候选版本，6月份发布GA版。该版本也包含了几个实用的特性。本章，我们总结下从2016（ES7）-2021各个规范的新增特性，便于大家综合参考。
+截止到2021年3月9日，EcmaScript规范已经发布到了2021版的候选版本，6月份将发布GA版。该版本包含了几个实用的特性。本节我们总结一下从2016（ES7）到2021各个规范的新增特性，便于大家综合参考。
 
 ##### ES2021
 
-`String.prototype.replaceAll`
-
-在replaceAll方法出现前，字符串替换可以使用replace配合正则使用，看两个例子：
+（1）String.prototype.replaceAll：在replaceAll方法出现之前，字符串替换可以使用replace配合正则使用，看下面两个例子。
 
 ```js
 'aabbcc'.replace(/b/g, '_'); // aa__cc
@@ -851,9 +847,9 @@ const queryString = 'q=b+c+d';
 ueryString.replace(/\+/g, ''); //q=bcd
 ```
 
-将所有的b替换成下滑线，如果不加正则，则替换第一个字符。
+上面的代码可将所有的b替换成下画线，如果不加正则，则替换第一个字符。
 
-使用replaceAll实现相同的功能
+下面使用replaceAll实现相同的功能：
 
 ```js
 'aabbcc'.replaceAll('b', '_'); // aa__cc
@@ -861,13 +857,11 @@ const queryString = 'q=b+c+d';
 queryString.replaceAll('+', ''); //q=bcd
 ```
 
-使用新api后，好处有两点：代码的可读性更好，特殊符号不需要再转义。
+使用新API后，好处有两点：代码的可读性更好，特殊符号不需要再转义。
 
 
 
-`逻辑运算符`
-
-逻辑赋值运算符结合了逻辑运算符和赋值表达式。逻辑赋值运算符有三种：`&&=`, `||=`, 和??=`
+（2）逻辑赋值运算符。逻辑赋值运算符结合了逻辑运算符和赋值表达式。逻辑赋值运算符有三种：||=、&&= 和??=，如表1-1所示。
 
 | 逻辑运算符 | 等价操作       | a为x时赋值 |
 | ---------- | -------------- | ---------- |
@@ -875,7 +869,9 @@ queryString.replaceAll('+', ''); //q=bcd
 | a &&= b    | a && (a = b)   | Truthy     |
 | a ??= b    | a ?? (a = b)   | Nullish    |
 
-这个操作符也同样遵守逻辑短路（Short-circuiting）。当将逻辑操作与赋值组合起来时，因为赋值可能会导致副作用（side-effect），所以赋值操作应该是在某种条件下才进行赋值。无条件地造成副作用会对程序的性能甚至正确性产生负面影响。
+<center>表1-1</center>
+
+这个操作符也同样遵守逻辑短路（Short-circuiting）。当将逻辑操作与赋值组合起来时，因为赋值可能会导致副作用（side-effect），所以赋值操作应该是在某种条件下才进行赋值的。无条件地造成副作用会对程序的性能甚至正确性产生负面影响。
 
 ```js
 const deleteUsers = () => {
@@ -910,9 +906,7 @@ console.log((x = x ?? y)); // "hello
 
 
 
-WeakRef
-
-通常说，对js的对象都是强引用。就是说一旦保持对某个对象的引用，这个对象就不会被垃圾回收。但是在ES6中引入了WeakMap，WeakSet，这两者中的对象都是弱引用，垃圾回收机制不考虑 WeakSet 、WeakMap对集合中对象的引用，如果这些对象只要不再被引用，垃圾回收机制会自动回收该对象的内存，不考虑该对象是否还存在于 Weak集合之中。
+（3）WeakRef。通常来说，对JavaScript对象的引用都是强引用。也就是说，一旦保持对某个对象的引用，这个对象就不会被垃圾回收。但是在ES6中引入了WeakMap和WeakSet，这两者中的对象都是弱引用，垃圾回收机制不考虑 WeakSet 、WeakMap对集合中对象的引用，只要这些对象不再被引用，垃圾回收机制会自动回收该对象的内存，不考虑该对象是否还存在于 Weak集合中。
 
 ```js
 const wm = new WeakMap();
@@ -924,11 +918,11 @@ wm.get(ref);
 // → metaData
 ```
 
-此时，在该代码块中不再保持对象ref的引用，垃圾回收机制随时可以对它进行回收。
+此时，在该代码块中不再保持对对象ref的引用，垃圾回收机制随时可以对它进行回收。
 
 WeakMap和WeakSet不是真正的弱引用，只要key是活动的，还是会保持这强引用。 一旦key被垃圾回收，Weak集合仅弱引用其内容。
 
-WeakRef是一个高级api提供了真正的弱引用，允许创建对象的弱引用，跟踪现有对象时不会阻止对其进行垃圾回收。对于缓存和对象映射非常有用。浏览器需要运行垃圾回收时，如果对该对象的唯一引用是来自WeakRef变量，则JavaScript引擎可以安全地从内存中删除该对象并释放空间。
+WeakRef是一个高级API，它提供了真正的弱引用，允许创建对象的弱引用，跟踪现有对象时不会阻止对其进行垃圾回收，这对于缓存和对象映射非常有用。当浏览器需要进行垃圾回收时，如果对该对象的唯一引用来自WeakRef变量，则JavaScript引擎可以安全地从内存中删除该对象并释放空间。
 
 ```js
 const myWeakRef = new WeakRef({ 
@@ -940,11 +934,11 @@ console.log(myWeakRef.deref())
 
 使用WeakRef的构造方法构造一个实例，通过实例的deref方法访问变量。
 
-`FinalizationRegistry` 接收一个注册器回调函数，可以利用该注册器为指定对象注册一个事件监听器，当对象被垃圾回收之后，会触发监听的事件。首先，创建一个注册器：
+FinalizationRegistry 接收一个注册器回调函数，可以利用该注册器为指定对象注册一个事件监听器。当对象被垃圾回收之后，会触发监听的事件。首先，创建一个注册器：
 
 ```js
 const registry = new FinalizationRegistry((v) => {
-  // ....
+ 
 });
 ```
 
@@ -956,9 +950,7 @@ registry.register(taget, "some value");
 
 
 
-数字分隔符
-
-数字分隔符提供了一种能使大数字更易于阅读和使用的简单方法。
+（4）数字分隔符。数字分隔符提供了一种能使大数字更易于阅读和使用的简单方法。
 
 ```
 1000000000000      1_000_000_000_000
@@ -967,9 +959,7 @@ registry.register(taget, "some value");
 
 
 
-Promise.any
-
-接收几个Promise 对象，只要其中任意一个 promise 成功，就返回那个已经成功的 promise。如果所有的promise都失败，就返回一个失败的 promise。
+（5）Promise.any。接收几个Promise 对象，只要其中任意一个 promise 成功，就返回那个已经成功的 promise。如果所有的promise都失败，就返回一个失败的 promise。
 
 ```js
 const promise1 = new Promise((resolve, reject) => {
@@ -987,15 +977,13 @@ Promise.any(promises).then((value)=>console.log(value));
 // faster
 ```
 
-和Promise.all 和Promise.race做下简单对比。Promise.all：只要有一个promise失败，就会返回失败；当所有的promise都成功后才会返回成功。Promise.race: 只要有一个promise状态发生改变，就会返回该promise。
+下面对Promise.all 和Promise.race做一个简单对比。。Promise.all：只要有一个promise失败，就返回失败；当所有的promise都成功后才返回成功。Promise.race: 只要有一个promise状态发生改变，就返回该promise。
 
 
 
 ##### ES2020
 
-String.protype.matchAll
-
-matchAll方法返回一个正则表达式在字符串的所有匹配。先实现一个例子匹配16进制的字符：
+（1）String.protype.matchAll，matchAll方法返回一个正则表达式在字符串的所有匹配。下面先实现一个例子匹配十六进制的字符：
 
 ```js
 const string = 'Magic hex numbers: DEADBEEF CAFE';
@@ -1005,7 +993,7 @@ for (const match of string.matchAll(regex)) {
 }
 ```
 
-返回结果：
+返回结果如下：
 
 ```js
 [
@@ -1024,11 +1012,9 @@ for (const match of string.matchAll(regex)) {
 
 
 
-动态导入（dynamic import）
+（2）动态导入（dynamic import）。动态导入提供了一种类似函数的新导入形式，与静态导入相比，有更多的新功能。
 
-动态导入提供了一种类似函数的新导入形式，与静态导入相比，有更多的新功能。
-
-先看下静态导入：
+先看一下静态导入：
 
 ```js
 //utils.mjs
@@ -1042,7 +1028,7 @@ export const doStuff = () => {
 };
 ```
 
-接下来就可以在script中导入
+接下来就可以在script中导入了：
 
 ```js
 <script type="module">
@@ -1056,7 +1042,7 @@ export const doStuff = () => {
 
 这种导入模块的语法形式是一个静态声明：它仅接受字符串文字作为模块标识，通过运行前的“链接”过程，引入bindings到本地作用域中。 静态导入只能在文件的顶层使用。
 
-`import(specifier)`函数，支持动态加载模块, `import` 函数的参数 `specifier`，指定所要加载的模块的位置，返回promise对象。
+import(specifier)函数支持动态加载模块。import 函数的参数 specifier，可指定所要加载的模块的位置，并返回promise对象。
 
 ```js
 <script type="module">
@@ -1070,9 +1056,7 @@ export const doStuff = () => {
 
 
 
-##### BigInt 
-
-它提供了一种方法来表示大于 `2^53 - 1` 的整数，可以表示任意大的整数。具体用法是在一个整数字面量后面加 `n` 的方式定义一个 `BigInt`类型。
+（3）BigInt。它提供了一种表示大于 2^53 - 1 的整数的方法，也就是说，可以表示任意大的整数。具体用法是通过在一个整数字面量后面加 n 的方式定义一个 BigInt类型。
 
 ```js
 let bn = BigInt(Number.MAX_SAFE_INTEGER) + 2n;
@@ -1089,9 +1073,7 @@ console.log("is BigInt:", typeof 2n === 'bigint')
 
 
 
-##### Optional Chaining(可选链操作符)
-
-?.` 也叫链判断运算符。允许开发读取深度嵌套在对象链中的属性值，而不必验证每个属性是否都存在。当引用为空时，返回 `undefined
+（4）Optional Chaining（可选链操作符）。?.也叫作链判断运算符。允许开发人员读取深度嵌套在对象链中的属性值，而不必验证每个属性是否都存在。当引用为空时，返回undefined。
 
 ```js
 var travelPlans = {
@@ -1108,9 +1090,7 @@ console.log(travelPlans.monday?.location); //shangxi
 
 
 
-##### Nullish coalescing(空位操作符)
-
-`??` 运算符被称为空位操作符。如果第一个参数不是 falsely，将返回第一个参数，否则返回第二个参数。
+（5）Nullish coalescing(空位操作符)。?? 运算符被称为空位操作符。如果第一个参数不是 falsely，将返回第一个参数，否则返回第二个参数。
 
 ```js
 console.log(false ?? true);   // => false
@@ -1122,9 +1102,7 @@ console.log(undefined ?? []); // => []
 
 
 
-globalThis
-
-获取不同环境的`this`,在ES2020规范之前，可以封装一层：
+（6）globalThis。获取不同环境的this，在ES2020规范之前，可以封装一层：
 
 ```js
 const getGlobalThis = () => {
@@ -1152,7 +1130,7 @@ const theGlobalThis = getGlobalThis();
 
 
 
-##### 模块命名空间导出（module namespace export）
+（7）模块命名空间导出（module namespace export）。
 
 ```js
 import * as utils from './utils.mjs';
@@ -1161,9 +1139,7 @@ export { utils };
 
 
 
-##### Promise.allSettled
-
-Promise.allSettled 接受一组 Promise，返回新的 Promise 实例。等到所有这些参数实例都返回结果，不管是`fulfilled`还是`rejected`。
+（8）Promise.allSettled。Promise.allSettled 接受一组 Promise，返回新的 Promise 实例。等到所有这些参数实例都返回结果，不管是fulfilled还是rejected。
 
 ```js
 const promise1 = Promise.resolve(3);
