@@ -241,7 +241,7 @@ bin配置：
 
 config配置：
 
-该对象字段用来配置scripts运行的配置参数，如图:
+该对象字段用来配置scripts运行的配置参数，如下所示。
 
 ```js
 {
@@ -255,7 +255,7 @@ config配置：
 }
 ```
 
-如果运行**yarn run start**, 该port字段会映射到 npm_package_config_port环境变量，
+如果运行**yarn run start** ，则该port字段会映射到 npm_**package****_**config_port环境变量:
 
 ```js
 const http = require("http")
@@ -265,19 +265,19 @@ http.createServer(function (req, res) {
 }).listen(process.env.npm_package_config_port);
 ```
 
-如果像改其他端口，可以使用：
+如果像改其他端口一样，则可以使用：
 
 ```shell
 npm config set foo:port 80
 ```
 
-author、license、repository、homepage、bugs配置：
+author、license、repository、homepage、bugs配置。
 
-author：指明作者
+author：指明作者。
 
 license：该包或者工程需要遵守的协议。
 
-repository：是一个对象配置，type说明是git库还是svn库，url说明该包或者工程源代码地址。
+repository：是一个对象配置，type说明是Git库还是svn库，URL说明该包或者工程源代码地址。
 
 bugs：指明该包或者工程的bug地址或者反馈问题的email，可以指定一个或者两个，便于author快速搜集、处理问题。
 
@@ -288,16 +288,16 @@ bugs：指明该包或者工程的bug地址或者反馈问题的email，可以�
 }
 ```
 
-os、cpu配置：
+os配置和CPU配置
 
-os:  如果我们开发的npm包只希望运行在darwin 系统下，避免发生不必要的异常windows用户不要安装，这时候os配置就可以帮我们实现这样的效果
+os:  如果我们开发的npm包只希望运行在darwin 系统下，则为避免发生不必要的异常，建议Windows用户不要安装，这时候os配置就可以帮我们实现这样的效果。
 
 ```json
 "os" : [ "darwin", "linux" ] #适用的系统
 "os" : [ "!win32" ]          #黑名单系统
 ```
 
-cup：该配置和os对配置类似，用 cpu字段更精准的限制用户安装环境。
+cup：该配置和os的配置类似，用 cpu字段可以更精准地限制用户的安装环境。
 
 ```json
 "cpu" : [ "x64", "AMD64" ] # 适用用
@@ -306,15 +306,15 @@ cup：该配置和os对配置类似，用 cpu字段更精准的限制用户安�
 
 publicConfig配置：
 
-一组配置值，发布时使用。比如使用registry指定发布的地址，发布指定的tag，access（public，restricted）等配置。
+一组配置值，在发布时使用。比如使用registry指定发布的地址来发布指定的tag，access（public，restricted）等配置。
 
 
 
-以上咱们介绍的都是package.json的标准配置。但是在开发工程中项目牵涉到很多的三方包，如eslint，typings，webpack等，这些包怎么和package.json配合使用的，下面看下常见的几个配置：
+以上咱们介绍的都是package.json的标准配置。但是在开发过程中，项目很可能涉及很多的第三方包，如eslint、typings、Webpack等，这些包怎样和package.json配合使用的，下面看下常见的几个配置。
 
 unpkg配置：
 
-npm上所有的文件都开启了cdn服务，该CDN服务由unpkg提供。
+npm上所有的文件都开启了CDN服务，该CDN服务由unpkg提供。
 
 ```json
 "unpkg": "dist/vue.js",
@@ -326,15 +326,15 @@ jsdelivr配置：jsdelivr免费CDN服务配置。
 
 sideEffects配置：
 
-该项为webpack的辅助配置，是v4开始新增了一个特性，声明该包/模块是否包含 sideEffects(副作用)。原理是 webpack 能将标记为 side-effects-free 的包由 `import {a} from xx` 转换为 `import {a} from 'xx/a'`，从而自动去掉不必要的模块。如果我们引入的 包/模块标记了 `sideEffects: false`了，那么不管它是否真的有副作用，只要它没有用到，整个模块/包同样都会被完整的移除。
+该项为Webpack的辅助配置，是v4开始新增了一个特性，声明该包或模块是否包含 sideEffects（副作用）。原理是 Webpack 能将标记为 side-effects-free 的包由 import {a} from xx 转换为 import {a} from 'xx/a'，从而自动去掉不必要的模块。如果我们引入的 包或模块标记了 sideEffects: false，那么不管它是否真的有副作用，只要没有被用到，整个包或模块就会被完整地移除。
 
 typings配置：
 
-ts的入口文件，作用同main配置。
+ts的入口文件，作用与main配置相同。
 
 lint-staged配置：
 
-lint-staged 是一个在git暂存文件上运行linters的工具，配置后每次修改一个文件就给所有文件执行一次lint检查，通常配合githooks一起使用，并且配置好检查工具。
+lint-staged 是一个在Git暂存文件上运行linters的工具，配置后每次修改一个文件即可给所有文件执行一次lint检查，通常配合githooks一起使用，配置检查工具。
 
 ```json
 "lint-staged": {
@@ -347,7 +347,7 @@ lint-staged 是一个在git暂存文件上运行linters的工具，配置后每�
 
 gitHooks配置：
 
-定义一个钩子，在提交(commit)之前执行eslint检查。当执行 lint 命令后，会自动修复暂存区的文件。修复之后的文件并不存在于暂存区中，所以需要用 `git add` 将修复后的文件重新加入到暂存区。`"pre-commit"` 执行完成后，如果没有错误，就会执行 `git commit` 操作。
+定义一个钩子，在提交（commit）之前执行eslint检查。当执行 lint 命令后，会自动修复暂存区的文件。修复之后的文件并不存储在暂存区中，所以需要用 git add 命令将修复后的文件重新加入暂存区。在执行完pre-commit 命令后，如果没有错误，就会执行 git commit 命令。
 
 ```json
 "gitHooks": {
@@ -357,7 +357,7 @@ gitHooks配置：
 
 standard配置：
 
-standard是一个js代码检查和优化的工具库。也可以再package.json中增加相应的配置来优化代码。
+standard是一个js代码检查和优化的工具库，也可以在package.json中增加相应的配置来优化代码。
 
 ```json
 {
@@ -372,13 +372,9 @@ standard是一个js代码检查和优化的工具库。也可以再package.json�
 }
 ```
 
-browserlist配置：
+browserlist配置：设置浏览器的兼容情况
 
-设置浏览器的兼容情况
-
-babel配置：
-
-babel编译配置:
+babel配置：这里是指babel编译配置，代码如下。
 
 ```json
 "babel": {
@@ -393,40 +389,40 @@ babel编译配置:
 
 #### 1.2 Babel7
 
-babel是前端开发中最常见的三方工具了。功能就是转义ECMAScript2015+语法的代码，保证比较新的语法也可以旧版本的浏览器中运行，再者就是可以通过 `Polyfill`方式在目标环境中添加缺失的特性，第三就是源码转换功能。掌握babel的详细配置对我们日常开发和定位问题是大有裨益。
+Babel是前端开发中最常见的第三方工具，它的功能有三个。一是转义ECMAScript2015+语法的代码，保证比较新的语法也可以在旧版本的浏览器中运行；二是可以通过 Polyfill方式在目标环境中添加缺失的特性；三是源码转换功能。
 
-该部分我们详细介绍Babel的配置和用法，介绍每项配置的引入的原因，搞清楚@babel/runtime，`@babel/polyfill`，`@babel/plugin-transform-runtime`这些库到底是用来做什么的，介绍preset和plugin配置是什么作用。
+本节详细介绍Babel的配置和用法，并介绍每项配置引入的原因，搞清楚@babel/runtime，`@babel/polyfill和@babel/plugin-transform-runtime`这些库到底是用来做什么的，介绍preset和plugin配置有什么作用。
 
-babel官方了简单的界面操作，通过一个简单的compare函数看下简单的转换结果,如1-5所示：
+下面通过一个简单的compare函数看看转换结果，如1-5所示。
 
 ![](./images/babel-1.png)
 
 <center>图1-5</center>
 
-我们输入的是最基本的箭头函数，经过babel的转换后，转换成了基本的function。就是这么简单，它不会运行我们的代码，也不会去打包我们的代码。
+我们输入的是最基本的箭头函数，经过Babel的转换后，转换成了基本的function。就是这么简单，它不会运行我们的代码，也不会去打包我们的代码。
 
-我们搭建一个本地环境，先建立根目录并生成package.json文件。
+首先，搭建一个本地环境，先建立根目录并生成package.json文件。
 
 ```shell
 ~ mkdir babel-intro && cd babel-intro
 ~ npm init -y
 ```
 
-先安装@babel/core和@babel/cli包，core是babel核心包，其他的@babel/cli、@babel/polyfill包都要在核心包上才能正常工作。@babel/cli是babel 提供的命令行工具，主要是提供 `babel` 命令。
+先安装@babel/core和@babel/cli包，core是babel核心包，@babel/cli包和@babel/polyfill包都要在核心包上才能正常工作。@babel/cli是Babel 提供的命令行工具，主要是提供 Babel 命令。
 
 ```shell
 npm install --save-dev @babel/core @babel/cli
 ```
 
-接着安装@babel/preset-env和@babel/polyfill。@babel/preset-env 会根据你配置的目标环境，生成插件列表来编译。目标环境可以通过在package.json中的browserslist进行配置。Babel默认只转换新的JavaScript语法，但是不转换新的API，比如Iterator、Generator、Set、Maps、Proxy、Reflect、Symbol、Promise等全局对象，以及一些定义在Object对象上的方法（比如`Object.assign`）都不会转换。如果还想正常执行，就需要使用polyfill了。
+其次，安装@babel/preset-env和@babel/polyfill。@babel/preset-env 会根据配置的目标环境生成插件列表来并进行编译。目标环境可以在package.json的browserslist中进行配置。Babel默认只转换新的JavaScript语法，但是不转换新的API，比如Iterator、Generator、Set、Maps、Proxy、Reflect、Symbol和 Promise等全局对象，以及一些定义在Object对象上的方法（比如Object.assign）都不会转换。如果还想正常执行，就需要使用polyfill了。
 
 ```shell
 npm install --save-dev @babel/preset-env @babel/polyfill
 ```
 
-下一步在package.json统计目录下建一个配置文件，babel中配置文件有几种：
+再次，在package.json统计目录下新建一个配置文件，Babel中的配置文件有以下四种。
 
-第一种是babel.config.js，配置内容格式大致如下：
+第一种是babel.config.js，配置内容大致如下：
 
 ```js
 module.exports = function (api) {
@@ -442,7 +438,7 @@ module.exports = function (api) {
 }
 ```
 
-第二种是.babelrc，配置文件内容为json数据结构
+第二种是.babelrc，配置文件内容为JSON数据结构。
 
 ```json
 {
@@ -451,7 +447,7 @@ module.exports = function (api) {
 }
 ```
 
-第三种是在package.json中配置babel字段，该配置我们再1.1章节已经介绍过
+第三种是在package.json中配置babel字段，该配置我们在1.1节已经介绍过。
 
 ```json
 {
@@ -464,7 +460,7 @@ module.exports = function (api) {
 }
 ```
 
-最后一种是.babelrc.js，配置同.babelrc，但是需要使用JavaScript实现。
+最后一种是.babelrc.js，配置与.babelrc相同，但是需要使用JavaScript实现。
 
 ```js
 const presets = [ ... ];
@@ -473,9 +469,9 @@ const plugins = [ ... ];
 module.exports = { presets, plugins };
 ```
 
-这四种添加配置文件的方式中，我们最常用的还是babel.config.js和.babelrc这两种方式，更加babel官方建议，推荐babel.config.js配置。因为该配置是项目级别的配置，会影响整个项目中的代码，包含node_modules，有了babel.config.js 就不会在去执行.babelrc的配置。.babelrc只影响本项目中的代码。
+在这四种添加配置文件的方式中，最常用的是babel.config.js和.babelrc，Babel官方推荐babel.config.js配置。因为该配置是项目级别的配置，会影响整个项目中的代码，包括node_modules。有了babel.config.js 之后，就不会去执行.babelrc的配置。.babelrc只影响本项目中的代码。
 
-我们也采用babel.config.js的方式
+本节采用babel.config.js配置。
 
 ```js
 module.exports = function (api) {
@@ -494,13 +490,13 @@ let compare= (a,b)=> {
 }
 ```
 
-在package.json中配置scripts脚本
+在package.json中配置scripts脚本。
 
 ```
 "build": "babel src --out-dir lib"
 ```
 
-使用@babel/cli提供的babel命令，编译src目录下的js文件，将编译后的文件输出到lib目录下；
+使用@babel/cli提供的babel命令，编译src目录下的JavaScript文件，将编译后的文件输出到lib目录下，如图1-6所示。
 
 ```shell
 npm run build
@@ -510,15 +506,15 @@ npm run build
 
 <center>图1-6</center>
 
-有人可能会有疑问"babel是怎么实现代码转换的呢？怎么才能快速掌握babel的编译过程呢？" 下面我们一点点介绍。
+Babel的工作过程。
 
-babel同大多数的编译器一样，它的工作过程也分成三部分：
+Babel与大多数的编译器一样，它的工作过程可分成三部分：
 
-- 解析（Parse）：将源代码转换成抽象语法树（abstract syntax tree），抽象语法树是源代码的抽象语法结构的树状表示形式，树上的每个节点都表示源代码中的一种结构。
-- 转换（transfrom）：对AST做一些特殊处理，使其符合编译器的期望，babel中主要使用转换插件来实现。
-- 代码生成（generate）：将第二步经过转换过的（抽象语法树）生成新的代码。
+- 解析（Parse）：将源代码转换成抽象语法树（Abstract Syntax Tree，AST），抽象语法树是源代码的抽象语法结构的树状表示形式，树上的每个节点都表示源代码中的一种结构。
+- 转换（transfrom）：对抽象语法树做一些特殊处理，使其符合编译器的期望。在Babel中主要使用转换插件来实现。
+- 代码生成（generate）：将转换过的（抽象语法树）生成新的代码。
 
-接下来就从上面简单的例子来说明下babel的工作工程。
+下面通过一个简单的例子说明一下Babel的工作工程。
 
 ```js
 let { parse } = require("@babel/parser");
@@ -531,11 +527,11 @@ let ast = parse(code,{
 });
 ```
 
-parse过程分为两个部分：词法分析、语法分析。
+解析过程可分为两个部分：词法分析和语法分析。
 
 词法分析：
 
-编译器读取我们的代码，然后把按照预定的规则把分词后的内容合并成一个个的标识tokens。同时，移除掉空白符，注释等。最后，整个代码将被分割进一个tokens列表。compare函数被分割的token列表，如下：
+词法分析：编译器读取代码之后，按照预定的规则把分词后的内容合并成一个个标识（tokens）。同时，移除空白符、注释等。最后，整个代码被分割进一个tokens列表。例如，compare函数被分割的token列表如下：
 
 ```js
 [
@@ -554,9 +550,7 @@ parse过程分为两个部分：词法分析、语法分析。
 ]
 ```
 
-语法分析：
-
-也叫解析器。它会将词法分析出来的数组转化成树形的表达形式。同时，验证语法，语法如果有错的话，抛出语法错误。
+语法分析：也叫解析器。它会将词法分析出来的数组转化成树形的表达形式，同时验证语法。如果语法有错，就抛出语法错误。
 
 ```json
 {
@@ -629,9 +623,9 @@ parse过程分为两个部分：词法分析、语法分析。
 }
 ```
 
-这里，我们需要解释一下AST树中的关键字段，根节点"type": "VariableDeclaration"表示变量声明，"declarations": [ ]表示具体的声明，kind声明变量类型。
+这里，我们需要解释一下抽象语法树中的关键字段，根节点"type": "VariableDeclaration"表示变量声明，"declarations": [ ]表示具体的声明，kind表示声明的变量类型。
 
-接着看declarations内部，声明了一个变量，并且知道了它的内部属性（id、init，start，end），然后我们再以此访问每一个属性以及它们的子节点。`id` 是一个 Idenrifier，name 属性表示变量名。
+接着看declarations内部声明了一个变量，并且知道了它的内部属性（id、init、start、end），然后再以此访问每一个属性及它们的子节点。id 是 Idenrifier的简写，name 属性表示变量名。
 
 ```json
 {
@@ -642,30 +636,30 @@ parse过程分为两个部分：词法分析、语法分析。
 
 以上结构表示一个标识符。
 
-接着看之后是init部分，init 也有好几个内部属性组成：
+接着看之后是init部分，init 由好几个内部属性组成：
 
 - type是`ArrowFunctionExpression`，表示这是一个箭头函数。
 - `params` 是这个箭头函数的入参，其中每一个参数都是一个 `Identifier` 类型的节点。
-- `body` 属性是这个箭头函数的主体，type是BlockStatement，表示这是一个块级声明BlockStatement。
-- 内层的body的type为一个 BinaryExpression二项式：lef`、operator、right，分别表示二项式的左边变量、运算符以及右边变量。
+- `body` 是这个箭头函数的主体，type是BlockStatement，表示这是一个块级声明BlockStatement。
+- 内层的body的type为一个 BinaryExpression二项式：left、operator、right，分别表示二项式的左边变量、运算符以及右边变量。
 
-下面开始进行语法转换，前面我们介绍过，babel的语法转换是通过插件完成的。没有插件，AST经过生成器生成的代码是和原来的源码一摸一样。babel默认提供了许多插件，让我们方便进行AST的操作。下面介绍两个比较重要的插件，同时用这两个实现一个比较简单的操作ast过程。
+下面进行语法转换，前面我们介绍过，Babel的语法转换是通过插件完成的。没有插件，抽象语法树经过生成器生成的代码和源代码一摸一样。Babel默认提供了许多插件，让我们方便地对抽象语法树进行操作。下面介绍两个比较重要的插件，同时用这两个插件实现一个简单的操作抽象语法树的过程。
 
 ```js
 let types = require('@babel/types');
 ```
 
-第一个是@babel/types，它的作用是创建、修改、删除、查找AST节点。AST的节点也是分为多种类型，比如ExpressionStatement是表达式、ClassDeclaration是类声明、VariableDeclaration是变量声明等，同样的这些类型都有对应的创建方法：t.expressionStatement、t.classDeclaration、t.variableDeclaration。types也提供了对应的判断方法：t.isExpressionStatement、t.isClassDeclaration、t.isVariableDeclaration。
+第一个是@babel/types，它的作用是创建、修改、删除、查找抽象语法树的节点。抽象语法树的节点可分为多种类型，比如，ExpressionStatement（表达式）、ClassDeclaration（类声明）和VariableDeclaration（变量声明）等。同样的，这些类型都有对应的创建方法：t.expressionStatement、t.classDeclaration、t.variableDeclaration。types也提供了对应的判断方法：t.isExpressionStatement、t.isClassDeclaration、t.isVariableDeclaration。
 
-不过，这些插件需要和traverse遍历插件一起使用，因为types只能对单一节点进行操作。所以第二个介绍的插件就是@babel/traverse。
+不过，这些插件需要和traverse遍历插件一起使用，因为types只能对单一节点进行操作。下面要介绍的插件是@babel/traverse。
 
 ```js
 let traverse = require("@babel/traverse").default;
 ```
 
-这个插件是对AST所有节点进行遍历，并使用指定Visitor来处理相关的节点。
+这个插件可对抽象语法树的所有节点进行遍历，并使用指定Visitor来处理相关的节点。
 
-我们继续接着本小节最初的例子继续补充转换过程。
+继续按本节最初的例子补充转换过程。
 
 ```js
 let { parse } = require("@babel/parser");
@@ -695,7 +689,7 @@ traverse(ast, {
 let targetCode = generate(ast)
 ```
 
-当有一个 `Identifier(ArrowFunctionExpression)` 成员方法的Visitor时，访问的路径而非节点。所以需要通过`path.node`找到对应的节点。通过node.params获得方法的参数。使用`types.blockStatement`创建“{ }”的结构，使用 `types.returnStatement(node.body)`返回'return a > b'这样的结构。使用`types.functionExpression(id,params,body,false,false)`创建一个形式如
+当有一个 Identifier(ArrowFunctionExpression) 成员方法的Visitor时，访问的就是路径而非节点。所以需要通过path.node找到对应的节点。通过node.params获得方法的参数。使用types.blockStatement创建“{ }”的结构，使用 types.returnStatement(node.body)返回'return a > b'这样的结构。使用types.functionExpression(id,params,body,false,false)创建一个如下面所示的结构。
 
 ```js
 function(a,b){
@@ -703,7 +697,7 @@ function(a,b){
 }
 ```
 
-的结构。到现在已经完成了新结构的创建。剩下要做的工作就是把原来的节点替换成新生成的节点。
+至此，就完成了新结构的创建。接下来，把原来的节点替换成新生成的节点。
 
 ```js
 path.replaceWith(functionExpression);
@@ -711,7 +705,7 @@ path.replaceWith(functionExpression);
 
 下一步就是进入到编译的最后一步，代码生成。
 
-经过了代码转换，AST已经变成期望的结构，现在需要@babel/generator插件做代码合成，生成需要的代码。
+经过代码转换之后，抽象语法树已经变成期望的结构，现在需要用@babel/generator插件做代码合成，生成需要的代码，如图1-7所示。
 
 ```js
 let targetCode = generate(ast)
@@ -722,7 +716,7 @@ console.log(targetCode)
 
 <center>图1-7</center>
 
-转换后代代码可以交付浏览器执行了。以上过程的核心在在于代码转换，转换过程的核心在于插件。所以在开发中，babel的插件配置就是非常关键的一环。
+转换后的代码谅可以交付给浏览器执行了。以上过程的核心在于代码转换，转换过程的核心在于插件。所以在开发中，Babel的插件配置是非常关键的一环。
 
 ```js
 //babel.config.js
@@ -736,7 +730,7 @@ module.exports = function (api) {
 }
 ```
 
-如果配了多个插件，那么执行顺序是按照从前到后依次执行。
+如果配置了多个插件，那么执行顺序是按照从前到后依次执行的。
 
 #### @babel/polyfill
 
