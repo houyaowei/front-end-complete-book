@@ -1154,9 +1154,7 @@ Promise.allSettled(promises).
 
 #### ES2019
 
-Array.flat Array.flatMap
-
-如果数组的成员还是数组，`flat()`将嵌套的数组“拉平”，变成一维的数组，参数指定。该方法返回一个新数组，对原数据没有影响。
+（1）Array.flat和Array.flatMap：如果数组的成员还是数组，则flat可将嵌套的数组“拉平”，变成一维数组，指定“拉平”级数。该方法返回一个新数组，对原始数据没有影响。
 
 ```js
 let origin = [1, ['aa','bb'], [3, ['cc','dd']]]
@@ -1174,9 +1172,7 @@ let result = [2, 3, 4].flatMap(duplicate); // [ 2, 2, 3, 3, 4, 4 ]
 
 
 
-Object.fromEntries
-
-Object.fromEntries()，将键值对数组转为对象
+（2）Object.fromEntries：将键值对数组转为对象。
 
 ```js
 let _entry = Object.entries({ name:"ass", age:22})
@@ -1188,9 +1184,7 @@ console.log(putorigin) //{ name: 'ass', age: 22 }
 
 
 
-String.trimStart   String.trimEnd
-
-trimStart 去掉字符串头部的空格，`trimEnd去掉尾部的空格。它们都返回新字符串，不影响原始字符串。
+（3）String.trimStart和 String.trimEnd。trimStart 去掉字符串头部的空格，`trimEnd去掉尾部的空格。它们都返回新字符串，不影响原始字符串。
 
 ```js
 const s = "  houyw  ";
@@ -1215,17 +1209,11 @@ const doggos = [
 doggos.sort((a, b) => b.rating - a.rating);
 ```
 
-
-
-JSON.stringfy改造
-
-如果遇到 `0xD800` 到 `0xDFFF` 之间的单个码点，或者不存在的配对形式，会返回转义字符串。
+（4）JSON.stringfy改造：如果遇到 0xD800 到 0xDFFF 之间的单个码点，或者不存在的配对形式，则返回转义字符串。
 
 
 
-Symbol description属性
-
-ES2019为Symbol 提供了一个实例属性`description`，可以查看Symbol 的描述。
+（5）Symbol description属性：ES2019为Symbol 提供了一个实例属性`description`，可以查看Symbol 的描述。
 
 ```js
 const sym = Symbol("des");
@@ -1237,9 +1225,7 @@ sym.description; // "des"
 
 ##### ES2018
 
-对象的Rest/Spread
-
-ES6中 为数组引入了扩展运算符的功能，从ES2018 中，对象也开始支持。
+（1）对象的Rest/Spread：ES6中 为数组引入了扩展运算符的功能，从ES2018 中，对象也开始支持。
 
 ```js
 const person = {
@@ -1258,9 +1244,7 @@ const personCopy = { firstName, lastName, ...rest };
 console.log(personCopy); //{ firstName: 'yw', lastName: 'hou', country: 'henan', state: 'cn' }
 ```
 
-Promise.finally
-
- 该方法用于指定不管 Promise 对象最后状态如何，都会执行的操作。
+（2）Promise.finally：该方法用于指定不管 Promise 对象的最后状态如何，都会执行的操作。
 
 ```js
 fetch(url)
@@ -1269,9 +1253,7 @@ fetch(url)
 .finally(() => {···});
 ```
 
-异步迭代器
-
-循环遍历异步可迭代对象以及同步可迭代对象，包括: 内置的 `String`, `Array`，类似数组对象 (例如 arguments或 `NodeList`，`TypedArray`,`Map`, `Set` 和用户定义的异步/同步迭代器。
+（3）异步迭代器：循环遍历异步可迭代对象以及同步可迭代对象，包括内置的 String、 Array，类似数组对象 （例如 arguments或 NodeList、TypedArray、Map、Set ）和用户定义的异步或同步迭代器。
 
 ```
 async function* asyncGenerator() {
@@ -1290,9 +1272,7 @@ async function* asyncGenerator() {
 
 
 
-正则表达式
-
-ES2018 引入 `s `修饰符(`dotAll`模式)，使`.`可以匹配任意单个字符。
+（4）正则表达式：ES2018 引入 `s `修饰符(`dotAll`模式)，使`.`可以匹配任意单个字符。
 
 ```js
 /obj.name/s.test("obj\nname"); // true
@@ -1313,9 +1293,7 @@ console.log(matchObj.groups.day); //24
 
 #### ES2017
 
-Object.values/Object.entries
-
-`Object.values` 方法返回一个数组，返回对象自身的（不含继承的）所有可遍历（enumerable）属性的值。
+（1）Object.values/Object.entries：Object.values方法返回一个数组，返回对象自身的（不含继承的）所有可遍历（enumerable）属性的值。
 
 ```js
 const obj = { foo: "bar", baz: 42 };
@@ -1334,9 +1312,7 @@ console.log(Object.entries(people)) //[ [ '0', 'Fred' ], [ '1', 'Tony' ] ]
 
 
 
-字符串补全
-
-`padStart(targetLength [, padString)`用于头部补全，`padEnd(targetLength [, padString)`用于尾部补全
+（2）字符串补全：`padStart(targetLength [, padString)`用于头部补全，`padEnd(targetLength [, padString)`用于尾部补全
 
 ```js
 "x".padStart(4, "ab"); // 'abax'
@@ -1345,9 +1321,7 @@ console.log(Object.entries(people)) //[ [ '0', 'Fred' ], [ '1', 'Tony' ] ]
 
 
 
-异步函数（asnyc）
-
-异步函数是 promises 和 generators(生成器) 的组合，简化了 promises 调用，提高了代码的可读性。
+（3）异步函数（asnyc）：异步函数是 promises 和 generators（生成器）的组合，简化了 promises 调用，提高了代码的可读性。
 
 ```js
 async function getData() {
@@ -1358,9 +1332,7 @@ async function getData() {
 
 
 
-Object.getOwnPropertyDescriptors
-
-该方法返回对象的自身属性，不包括继承的。
+（4）Object.getOwnPropertyDescriptors：该方法返回对象的自身属性，不包括继承的。
 
 ```js
 const person = { name: "houyw", age: 19 };
@@ -1381,9 +1353,9 @@ Object.getOwnPropertyDescriptors(person)
 
 #### 1.4 Deno开发入门
 
- deno是nodejs作者Ryan Dahl在2017年创立的项目，到现在已经发布到了1.9.2版本。这是一个安全的TS/js运行时，该运行时仍然是在V8的基础上使用rust开发，同时也内置了tsc引擎，用来解释typescript。event-loop由tokio提供支持。由于Rust原生支持WebAssembly，所以也能直接运行 WebAssembly。
+ deno是nodejs作者Ryan Dahl于2017年创立的项目，至今已经发布到了1.9.2版本。这是一个安全的TS/js运行时，该运行时是在V8的基础上使用Rust开发的，同时内置了tsc引擎，用来解释typescript。event-loop由tokio提供支持。由于Rust原生支持WebAssembly，所以能直接运行 WebAssembly。
 
-deno主要有如下几个特性：
+Deno的主要特性如下：
 
 - 默认安全，外部代码没有文件系统、网络、环境的访问权限，除非显式开启。
 
@@ -1397,19 +1369,21 @@ deno主要有如下几个特性：
 
 - 脚本代码能被打包为一个单独的 JavaScript 文件。
 
-Deno和node虽然出自一个人的手笔，但是是面向的对象是不同的。众所周知，node面向的是服务端，而Deno是要面向浏览器生态的。所以，Deno并不是要取代 Node.js，也不是下一代 Node.js，也不是要放弃 npm 重建 Node 生态。下面我们通过一个表格来对两者进行简单的对比。
+Deno和Node.js的作者虽然是同一个人，但面向的对象是不同的。众所周知，Node.js面向的是服务端，而Deno面向的是浏览器生态。所以，Deno并不是要取代 Node.js，也不是下一代 Node.js，更不是要放弃 npm 重建 Node 生态。下面我们对两者进行简单的对比，如表1-2所示。
 
-|          | nodejs           | Deno                   |
-| -------- | ---------------- | ---------------------- |
-| API引入  | 模块导入         | 全局                   |
-| 模块类型 | commonjs，ESM    | ESM,也可以是远程的模块 |
-| 安全策略 | 默认无安全限制   | 默认安全               |
-| TS支持   | 需要其他模块支持 | 开箱即用               |
-| 包管理   | npm包            | 原生ESM支持，不需要npm |
-| 包分发   | npm 仓库         | 去中心话               |
-| 入口文件 | package.json     | 直接引入文件           |
+|          | nodejs           | Deno                    |
+| -------- | ---------------- | ----------------------- |
+| API引入  | 模块导入         | 全局                    |
+| 模块类型 | CommonJS，ESM    | ESM，也可以是远程的模块 |
+| 安全策略 | 默认无安全限制   | 默认安全                |
+| TS支持   | 需要其他模块支持 | 开箱即用                |
+| 包管理   | npm包            | 原生ESM支持，不需要npm  |
+| 包分发   | npm 仓库         | 去中心化                |
+| 入口文件 | package.json     | 直接引入文件            |
 
-先通过一个例子看下看下Deno是怎么运行的：
+<center>表1-2</center>
+
+下面通过一个例子看看Deno是怎样运行的：
 
 ```js
 //hello-world.js
@@ -1419,13 +1393,13 @@ function say(){
 say()
 ```
 
-使用`deno run <文件名>`运行文件
+使用`deno run <文件名>`运行文件：
 
 ```js
 hello,world
 ```
 
-下面再测试一下TS，验证下是否是开箱即用，新建一个ts-test.ts文件，输入一下内容：
+下面再测试一下TypeScript，验证一下是否开箱即用。新建一个ts-test.ts文件，输入以下内容：
 
 ```typescript
 interface Person {
@@ -1451,7 +1425,7 @@ console.log(info)
 
 经测试，不需要对TS文件进行任何配置即可正常执行。
 
-Deno是如何import，export呢？我们前面介绍过，Deno是遵从ES module规范的，所以可以通过export暴露模块，使用import导入模块。先在module中暴露add和multiply两个方法。
+Deno是如何import和export的呢？前面介绍过，Deno是遵从ES module规范的，所以可以通过export暴露模块，使用import导入模块。先在module中暴露add和multiply两个方法。
 
 ```typescript
 export function add(a: number, b: number): number {
@@ -1473,7 +1447,7 @@ console.log(multiply(10, 10)); //100
 
 
 
-下面看下Deno怎么读取文件，新建person.json、readx.ts文件：
+下面看一下Deno怎样读取文件的。新建person.json和readx.ts文件：
 
 ```json
 {
@@ -1495,7 +1469,7 @@ const text = Deno.readTextFile("./person.json");
 text.then((response) => console.log(response));
 ```
 
-我们先按照上面的执行方法执行下readx.ts文件,看能否正常执行
+我们先按照上面的执行方法执行下readx.ts文件，看能否正常执行，如图1-8所示。
 
 ```shell
 deno run readx.ts
@@ -1505,7 +1479,7 @@ deno run readx.ts
 
 <center>图1-8</center>
 
-结果和我们想象的结果不一样。前面我们介绍过，Demo默认没有模块、文件、网络权限。所以在执行的时候添加需要开启读文件权限。
+从图中可以看出，和我们预想的结果并不一样。前面介绍过，Demo默认没有模块、文件和网络权限，所以在执行的时候添加需要开启读文件权限，如图1-9所示。
 
 ```
 deno run --allow-read readx.ts
@@ -1515,20 +1489,20 @@ deno run --allow-read readx.ts
 
 <center>图1-9</center>
 
-在Deno中除了读权限，还有其他的权限：
+在Deno中除读权限外，还有其他权限：
 
-- **-A, --allow-all** 开启所有权限，屏蔽了所有的权限
-- **--allow-env** 设置环境变量权限，例如读取和设置环境变量。
-- **--allow-hrtime** 允许高精度时间测量，高精度时间能够在计时攻击和特征识别中使用。
-- **--allow-net=<allow-net>** 允许网络访问权限。、多个域名用逗号分隔，来提供域名白名单。
-- **--allow-plugin** 允许加载插件权限
-- **--allow-read=<allow-read>** 允许读取文件系统权限。多个目录或文件用逗号分隔，来提供文件系统白名单。
-- **--allow-run** 运行执行子进程权限，需要注意的是子进程并不是在沙箱中执行，所以需要特别注意。
-- **--allow-write=<allow-write>** 允许写入文件系统。多个目录或文件用逗号分隔，来提供文件系统白名单。
+- **-A, --allow-all** ：开启或屏蔽所有权限。
+- **--allow-env** ：设置环境变量权限。例如，读取和设置环境变量。
+- **--allow-hrtime** ：允许高精度时间测量。高精度时间能够在计时攻击和特征识别中使用。
+- **--allow-net=<allow-net>** ：允许网络访问权限。多个域名之间用逗号分隔，来提供域名白名单。
+- **--allow-plugin**： 允许加载插件权限
+- **--allow-read=<allow-read>** ：允许读取文件系统权限。多个目录或文件用逗号分隔，来提供文件系统白名单。
+- **--allow-run**： 运行执行子进程权限，需要注意的是子进程并不是在沙箱中执行，所以需要特别注意。
+- **--allow-write=<allow-write>**： 允许写入文件系统。多个目录或文件用逗号分隔，提供文件系统白名单。
 
-再来看下几个需要制定权限的例子。
+下面再来看几个需要指定权限的例子。
 
-先看个使用fetch方法请求Deno REST API的例子，如下面的代码：
+（1）使用fetch方法请求Deno REST API，代码如下所示。
 
 ```js
 //fetch.js
@@ -1537,7 +1511,7 @@ const data = await res.json();
 console.log(data);
 ```
 
-运行该文件：
+运行该文件，结果如图1-10所示。
 
 ```shell
 deno run fetch.js
@@ -1547,7 +1521,7 @@ deno run fetch.js
 
 <center>图1-10</center>
 
-加上必要的参数。
+加上必要的参数：
 
 ```shell
 deno run --allow-net fetch.js
@@ -1590,13 +1564,13 @@ deno run --allow-net fetch.js
 }
 ```
 
-从这个例子可以知道，如果需要网络权限，必须显示指定。如果不指定具体的域名，默认可以访问全部的域名。如果指定，表示只能访问指定的域名。
+通过这个例子可以看出，如果需要网络权限，则必须显示指定。如果不指定具体的域名，则默认可以访问全部的域名。如果指定具体的域名，则只能访问指定的域名。
 
 ```shell
 deno run --allow-net=api.github.com fetch.js
 ```
 
-接下面看下怎么设置环境变量：
+设置环境变量，如图1-11所示。
 
 ```js
 //read_env.ts
@@ -1622,9 +1596,9 @@ deno run --allow-env read_env.ts
 
 ##### 加载三方包
 
-在前面比较Deno和nodejs的时候说过，Deno没有包管理工具。所以不需要创建package.json。Deno提供了通过URL引入三方包的形式。Deno提供官方的资源库：https://deno.land/x，到目前为止，已经有2170个模块可以选择。
+Deno没有包管理工具，所以不需要创建package.json。Deno提供了通过URL引入第三方包的形式。Deno提供了官方的资源库，到目前为止，已经有2170个模块可供选择。
 
-我们用BCrypt为例，说明下怎么引入三方库。
+我们以BCrypt为例，介绍一下如何引入第三方库。
 
 ```typescript
 import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
@@ -1632,7 +1606,7 @@ const hash = await bcrypt.hash("hello,world");
 console.log(hash)
 ```
 
-需要说明的是，三方库都是以“https://deno.land/x”开头，后面跟三方库标识和入口文件。
+需要说明的是，第三方库都是以“https://deno.land/x”开头的，后面跟第三方库标识和入口文件。
 
 ```shell
 ➜  deno-intro git:(master) ✗ deno run --allow-net --unstable module.ts
@@ -1642,13 +1616,13 @@ Check https://deno.land/x/bcrypt@v0.2.4/src/worker.ts
 $2a$10$NPIstDpWGv90.99/Xjz3euey/eVvyjKpDC6cys508aiqT3NIWCaKi
 ```
 
-引用三方库的时候，先从资源库中下载文件，然后执行。
+在引用第三方库时，应先从资源库中下载文件，然后执行。
 
 
 
 创建服务器
 
-Deno中也有和web相关的模块，即http服务。该模块和node的http模块功能相同，都是提供一套封装级别很低的API，仅仅是流控制和简单的解析。
+Deno中也有和Web相关的模块，即http服务。该模块和Node.js的http模块功能相同，都是提供一套封装级别很低的API，仅仅是流控制和简单的解析。
 
 ```typescript
 import { serve } from "https://deno.land/std@0.95.0/http/server.ts";
@@ -1659,7 +1633,7 @@ for await (const req of server) {
 }
 ```
 
-首先导入serve模块，并指定端口`9001`,在返回的Server实例中遍历出Listener对象，为每个请求指定返回的内容体。
+首先导入serve模块，并指定端口`9001`，在返回的Server实例中遍历出Listener对象，为每个请求指定返回的内容体，如图1-12所示。
 
 ![](./images/deno-5.png)
 
@@ -1667,20 +1641,20 @@ for await (const req of server) {
 
 Deno web开发
 
-做过 Node.js web开发的朋友，对 Express、Koa 这些 Web 应用开发框架都不会陌生，特别巧合的是这两者也是师出同门，koa是 Express 原班人马在 ES6 新特性重新开发的框架，主要基于 co 中间件，框架自身不包含任何中间件，很多功能需要借助第三方中间件实现。
+做过 Node.js Web开发的朋友，对 Express、Koa 这些 Web 应用开发框架都不会陌生，特别巧合的是这两者也是师出同门，Koa是 Express 原班人马在 ES6 新特性中重新开发的框架，主要基于 co 中间件，框架自身不包含任何中间件，很多功能需要借助第三方中间件实现。
 
-同样在 Deno 平台中如果你也想做 Web 应用开发，还是有几个轮子可以选择，可以考虑使用以下现成的框架：
+同样的，在 Deno 平台中如果想做 Web 应用开发，也有几个“轮子”可供选择，即可以考虑使用以下现成的框架：
 
-- oak（start数：3.2K）
-- deno-drash（start数：829）
-- servest（start数：704）
-- abc（start数：528）
-- pogo（start数：359）
-- deno-express（start数：242）
+- oak（start数量：3.2K）。
+- deno-drash（start数量：829）。
+- servest（start数量：704）。
+- abc（start数量：528）。
+- pogo（start数量：359）。
+- deno-express（start数量：242）。
 
-GitHub上star的数量能感性地反应出开发人员对框架的接受程度。我们使用oak作为目标工具详细介绍下怎么用该工具开发一个web应用。
+GitHub上的star数量可反映出开发人员对框架的接受程度。我们以oak作为目标工具详细介绍如何开发一个Web应用。
 
-仔细看oak的官网介绍会看到一句让人眼前一亮的描述，如下：
+在oak的官网介绍中，有一句让人眼前一亮的描述：
 
 > A middleware framework for Deno’s [http](https://github.com/denoland/deno/tree/master/std/http#http) server, including a router middleware.
 >
@@ -1695,11 +1669,11 @@ import { Application } from "https://deno.land/x/oak/mod.ts";
 const app = new Application();
 ```
 
-mod.ts中提供了很多功能可以用，如Router，request，response，FormDataBody，Cookie等。
+mod.ts中提供了很多功能，如Router、request、response、FormDataBody和cookie等。
 
-Application初始化后，就可以使用app.use引用我们需要的中间件，如日志模块，权限模块，路由模块等。使用app.listen注册应用程序端口。
+在Application初始化之后，就可以使用app.use引用我们需要的中间件，如日志模块、权限模块、路由模块等。使用app.listen注册应用程序端口。
 
-web应用中一个很重要的模块是路由，URL根据path匹配结果渲染指定的页面或者返回对应的数据。
+在Web应用中有一个很重要的模块是路由，URL根据path匹配结果渲染指定的页面或者返回对应的数据。
 
 先声明一下路由主文件：
 
@@ -1714,9 +1688,9 @@ router.get("/main", main);
 export default router;
 ```
 
-当path为“/”时，调用sayHello模块;当path为"/main"时，渲染main模块。
+当path为“/”时，调用sayHello模块；当path为“/main”时，渲染main模块。
 
-然后看下两个模块的具体实现：
+下面看一下这两个模块的具体实现：
 
 ```typescript
 //handlers/hello.ts
@@ -1746,7 +1720,7 @@ export default async ({
 };
 ```
 
-接着，使用app.use在应用中加入路由中间件，使得路由生效。
+接着，使用app.use在应用中加入路由中间件，使路由生效。
 
 ```typescript
 import router from "./routing.ts";
@@ -1754,7 +1728,7 @@ app.use(router.routes());
 await app.listen({ port: 9002 });
 ```
 
-现在启动页面进行测试
+现在启动页面进行测试，测试结果如图1-13和图1-14所示。
 
 ```shell
 deno run --allow-net web/index.ts
