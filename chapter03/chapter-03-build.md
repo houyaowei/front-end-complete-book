@@ -1164,30 +1164,30 @@ created dist/encrypt.min.js in 2.6s
 
 
 
-### 3.4 parcel实战
+### 3.4 Parcel实战
 
-目前有很多前端打包工具可以选择，像前面几节咱们介绍的webpack、vite和rollup，还包括咱们马上要介绍的parcel，还有老牌的Grunt和gulp，甚至新秀esbuild、swc等等。
+目前在前端有很多打包工具可供选择，如前面介绍的Webpack 、Vite和Rollup，以及本节介绍的parcel，还有老牌的Grunt和gulp，甚至新秀esbuild、swc，等等。
 
-需要打包工具都是围绕着配置和plugin开始构建的，在配置文件中总要安装一堆的npm包，配置文件更是需要手动配置入口文件，输出文件，开发服务器配置，proxy代理，loader配置，优化配置等等，这一串配置下来，动辄就到100行了。这些配置不仅繁琐而且耗时。parcel被设计成零配置的：只需要将它指向应用程序的入口点，它就能正常工作。
+打包工具都是围绕着配置和plugin开始构建的。在配置文件中，总要安装一堆的npm包，配置文件更是需要手动配置入口文件、输出文件、开发服务器配置、proxy代理、loader配置、优化配置，等等，这样配置下来，代码常常会超过100行。这些配置不仅繁琐，而且耗时。parcel被设计成零配置的：只需要将它指向应用程序的入口点，它就能正常工作。
 
-parcel可以利用多核处理器编译多种语言及其工具链，并且速度极快，它获取所有文件和依赖项并进行转换，然后将他们合并为较小的bundle包。并且parcel让编译的包更好低移植，可以为不同的环境、web 服务器或应用程序构建代码。
+Parcel可以利用多核处理器编译多种语言及其工具链，并且速度极快，它获取所有文件和依赖项并进行转换，然后将他们合并为较小的bundle包。并且parcel让编译的包更好低移植，可以为不同的环境、web 服务器或应用程序构建代码。
 
-parcel将一个入口点作为输入，在parcel中定义了各种资源类型，它们知道如何处理特定的资源类型。资源文件被解析，它的依赖关系被提取，并转换成最终的编译形式。这创建了一个资源树。
+Parcel将一个入口点作为输入，在Parcel中定义了各种资源类型，它们知道如何处理特定的资源类型。资源文件被解析，它的依赖关系被提取，并转换成最终的编译形式。这创建了一个资源树。
 
 一旦资源树被构建，资源就被放入一个bundle树中。为入口资源创建一个bundle，并为动态导入的资源创建子bundle，这回导致代码拆分的发生。当导入不同类型的资源的时候就会创建子bundle，例如如果你在js中导入css文件，它就会打包成对应js的兄弟bundle。如果一个资源需要多个bundle，它会被打包到最近的共同父bundle中，因此它不会被包含多次。
 
 在构建bundle树之后，每一个包都有特定的文件类型的包装器写入文件。
 
-下面通过构建一个实例来说明parcel在日常开发中需要的组件是如何配置的。
+下面通过构建一个实例来讲解在日常开发中如何配置Parcel需要的组件。
 
-先新建一个package.json，并安装parcel核心包(本节实例基于2.0.0-beta.2)
+新建一个package.json，并安装Parcel核心包(（本节实例基于Parcel 2.0.0-beta.2版本）：
 
 ```
 yarn init -y
 yarn add parcel
 ```
 
-在package.json的同级目录下新建index.html和app.js, 在index.html中引入app.js, 了解一点web开发都知道，这是最直接、最方便的加载js文件的方式
+在package.json的同级目录下新建index.html和app.js，在index.html中引入app.js，了解一点web开发都知道，这是最直接、最方便的加载js文件的方式：
 
 ```
 <!DOCTYPE html>
@@ -1202,14 +1202,14 @@ yarn add parcel
 </html>
 ```
 
-为了验证方便，我们先输入最简单的一句：
+为了验证方便，这里输入最简单的一句：
 
 ```
 //app.js
 document.writeln("hello,parcel<br>")
 ```
 
-在package.json的scripts配置中也是非常简单
+在package.json的scripts中配置Parcel也非常的简单，运行结果如图3-10所示。
 
 ```
  "start": "parcel index.html",
@@ -1217,11 +1217,11 @@ document.writeln("hello,parcel<br>")
 
 ![parcel-01](./images/parcel-01.png)
 
-<center>图3-8</center>
+<center>图3-10</center>
 
-是我们预想的结果。这种开发方式确实能让人眼前一亮，没有任何配置，不用指定loader就可以运行。
+与预想的结果相同。这种开发方式确实能让人眼前一亮，既没有任何配置，也不用指定loader就可以运行。
 
-我们接着看下是不是能识别import和ES语法，
+接下来看看能否识别import和ES语法：
 
 ```js
 // src/scripts/index.js
@@ -1263,7 +1263,7 @@ export default class Person {
 }
 ```
 
-下面我们把这几个例子都import到app.js中测试下，
+下面我们把这几个例子都导入app.js中测试一下：
 
 ```js
 import name from "./src/utils/index"
@@ -1280,21 +1280,21 @@ console.log("project create at:", ss.getCreateTime())
 console.log("project created by:", name.getAuthor())
 ```
 
-修改代码后，parcel的服务会自动重启。
+修改代码后，Parcel的服务会自动重启，如下图3-11所示。
 
 ![parcel-02](./images/parcel-02.png)
 
-<center>图3-9</center>
+<center>图3-11</center>
 
-从测试结果来看，parcel并不需要配置babel就可以将ES6转成ES5。这是因为在parcel中已经预置了babel编译 @parcel-transform-babel，更多的内置都插件可以在node_modules/@parcel目录下找到。
+从测试结果来看，Parcel并不需要配置babel就可以将ES6转成ES5。这是因为在Parcel中已经预置了babel编译 @parcel-transform-babel，大部分内置插件都可以在node_modules/@parcel目录下找到。
 
-web开发中处理css文件是无论如何也不会少的。在parcel中，也提供比较清爽的处理方式：
+ 在Web开发中，处理CSS文件是必不可少的。在Parcel中，也提供了比较清爽的处理方式：
 
 ```js
 import "./style.css"
 ```
 
-对sass的支持是怎样的呢？再style.css同级目录新建style.scss，并修改原来的样式引入
+对scss的支持是怎样的呢？在style.css的同级目录中新建style.scss，并修改样式引入：
 
 ```scss
 .app {
@@ -1309,23 +1309,23 @@ import "./style.css"
 }
 ```
 
-服务重新启动后，页面报错
+重新启动服务后，页面报错，如图3-12所示。
 
 ![parcel-03](./images/parcel-03.png)
 
-<center>图3-10</center>
+<center>图3-12</center>
 
-这是因为parcel没有预置sass预处理器，需要我们手动安装
+这是因为Parcel没有预置scss预处理器，需要我们手动安装
 
 ```js
 yarn add scss -D
 ```
 
-重新编译，正常运行。
+重新编译，运行正常。
 
-接下来我们看下代理配置，这个配置在开发阶段经常用到，主要有两个方面的作用，第一是如果有单独的后端开发服务器 API，并且希望在同域名下发送 API 请求 ，那么这个配置会很有用。第二个也是最常见的解决开发环境的跨域问题。在开发过程中, 开发环境一般都是http://localhost, 但是如果请求的接口不在本地, 那么就要面对跨域请求的问题了。
+接下来看一下代理配置，这个配置在开发阶段会经常用到，主要有两方面的作用：（1）如果有单独的后端开发服务器 API，并且希望在同域名下发送 API 请求 ，那么这个配置会很有用。（2）解决最常见的开发环境的跨域问题。在开发过程中，开发环境一般都是http://localhost，但是如果请求的接口不在本地，那么就要面对跨域请求的问题了。
 
-parcel中配置proxy有两种方式，第一中是新建**.proxyrc**文件，该文件中是以json的方式定义proxy
+在Parcel中配置Proxy的方式有两种：一种是新建.proxyrc文件，该文件是以JSON的方式定义Proxy的。
 
 ```json
 {
@@ -1338,9 +1338,9 @@ parcel中配置proxy有两种方式，第一中是新建**.proxyrc**文件，该
 }
 ```
 
-这个代理表示的意思如果发起 **http://localhost:8080/api/getUsers** 会被代理到**ttp://demo.test.com:8000/getUsers**。
+这个代理的含义是只要发起 http://localhost:8080/api/getUsers ，就会会被代理到http://demo.test.com:8000/getUsers。
 
-另外一种代理就是如果是配置比较复杂，可以使用.proxyrc.js文件，然后引入**http-proxy-middleware**
+另一种是如果配置比较复杂，则可以使用.proxyrc.js文件，然后引入http-proxy-middleware：
 
 ```js
 const { createProxyMiddleware } = require("http-proxy-middleware");
@@ -1357,15 +1357,15 @@ module.exports = function (app) {
 };
 ```
 
-下面看下在parcel中怎么定义环境变量和在代码中怎么获取环境变量。
+下面看一下在Parcel中如何定义环境变量，以及在代码中是怎样获取环境变量的。
 
-Parcel 使用[dotenv](https://github.com/motdotla/dotenv)支持从`.env`文件加载环境变量，默认会安装dotenv包，所以可以通过新建 **.env.${NODE_ENV}** 这样的文件来定义环境变量，开发环境的可以如下面在.env.development中定义。
+Parcel 使用[dotenv](https://github.com/motdotla/dotenv)支持从.env文件加载环境变量，默认会安装dotenv包，所以可以通过新建 .env.${NODE_ENV}这样的文件来定义环境变量，开发环境可以在.env.development中定义。
 
 ```
 NODE_ENV='development'
 ```
 
-应用启动时默认加载development中定义的环境变量。相应的逻辑可以在parcel的源码中看到,具体的路径为src/utils/env.js
+在应用启动时默认加载development中定义的环境变量。相应的逻辑可以在Parcel的源码中看到，具体的路径为src/utils/env.js：
 
 ```
 const config = require('./config');
@@ -1394,13 +1394,11 @@ async function loadEnv(filepath) {
 }
 ```
 
-经过前面几个实验给人的感觉，0配置的parcel给人很好的开发体验，让前端开发避免陷入前端无穷配置的泥淖中，专注业务。但是有些问题还是会给实际的业务开发带来写不便， parcel现在稳定版本还是1.12.4，该分支也有至少1年的时间没有维护，并且很多关键的特性是缺失的，比如说公共文件提取，scope Hoisting，tree shake等。
+经过前面几个实验给人的感觉，零配置的Parcel的开发体验很好，可以避免前端开发陷入无穷配置的泥淖中，从而专注业务。但是有些问题还是会给实际的业务开发带来不便，目前Parcel的稳定版本是1.12.4，该分支已至少有1年的时间没有人维护了，并且很多关键特性是缺失的，例如公共文件提取、Scope Hoisting、Tree Shaking等。
 
-从parcel 在GitHub上的提交记录上看，该团队在着力开发2.0的代码，并且在2.0中也加入了使用配置，如显式proxy，scope Hoisting, 可扩展的API接口，SourceMap，Optimizer等等。但是要想成立主力分支现在看来还为时尚早，和三方包的集成也存在很多问题，parcel团队还需要很多的时间修复问题并保持feature的稳定。
+从Parcel 在GitHub上的提交记录来看，该团队正在着力开发Parcel 2.0代码，并且在Parcel 2.0中加入了使用配置，如显式Proxy、Scope Hoisting、可扩展的API接口、SourceMap和Optimizer等。但是要想成立主力分支目前来看还为时尚早，与三方包的集成也存在很多问题，parcel团队还需要很多的时间修复问题并保持feature的稳定。
 
-所以建议大家长期关注并实验，积累parcel的最佳实践。不要急于用来上手项目，毕竟产品不等于试验品。
-
-期待parcel的稳定版早日到来，也期待这新版本让前端在开发的路上如释重负。
+建议读者长期关注并积累Parcel的最佳实践，不要急于上手项目，毕竟产品不等于试验品。期待Parcel的稳定版早日到来。
 
 
 
