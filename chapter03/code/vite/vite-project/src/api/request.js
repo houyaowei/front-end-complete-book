@@ -6,7 +6,7 @@ const instance = axios.create({
   timeout: 50000,
   xsrfCookieName: "xsrf-token",
 });
-
+//请求拦截器，如果需要在hearder中增加一些参数，则可以在这里统一处理
 instance.interceptors.request.use(
   (config) => {
     return config;
