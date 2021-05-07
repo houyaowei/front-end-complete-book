@@ -931,18 +931,18 @@ axios拦截器为我们的日常开发提供了很多便利，如果需要在每
 
 ### 3.3 Rollup实战
 
-Rollup 是一个 JavaScript 模块打包器，可以将小块代码编译成大块复杂的代码。当你用ES2015及其以后的规范来编写应用或者库时，它也可以对它有效的打包来，打包成为一个单独文件供浏览器和 Node.js 使用。从这个角度讲，它和browserify、webpack、gulp有几分相似。
+Rollup 是一个 JavaScript 模块打包器，它可以将小块代码编译成大块复杂的代码。当用ES2015及其以后的规范来编写应用或者库时，也可以很方便打包。打包成为一个单独文件供浏览器和 Node.js 使用。从这个角度讲，它和browserify、Webpack、gulp有几分相似。
 
-为了更好说明rollup的应用场景，我们先简单比较一下rollup和webpack：
+为了更好地说明Rollup的应用场景，下面先简单比较一下Rollup和Webpack ：
 
-- webpack天然支持code spliting和HRM,但是rollup却不支持。
-- Rollup打包出来的代码体积更小，webpack4版本的bundle中有大量的模块适配代码。
-- Rollup 是基于 ES2015 模块的，它相比于webpack 所使用的 CommonJS 模块更加具有效率，另外 Rollup也支持 *tree-shaking*（ES 模块中支持 ），这意味着在最终的 bundle中只有我们实际需要的代码。
-- webpack更适合做应用开发，Rollup更适合打包库
+- • Webpack 天然支持code spliting和HRM，Rollup却不支持。
+- Rollup打包后的代码体积更小，Webpack 4版本的Bundle中有大量的模块适配代码。
+- Rollup 是基于 ES2015 模块的，比Webpack  所使用的 CommonJS 模块更有效率。另外， Rollup还支持 tree_shaking（ES 模块中支持 ），这意味着在最终的 Bundle中只有我们实际需要的代码
+- Webpack更适合做应用开发，Rollup更适合打包库。
 
-下面通过一个简单的加解密例子说明下Rollup的用法。
+下面通过一个简单的加密解密案例介绍Rollup的用法。
 
-目录基本是这样的：
+目录如图3-9所示。
 
 ```js
 ├── node_modules
@@ -958,13 +958,15 @@ Rollup 是一个 JavaScript 模块打包器，可以将小块代码编译成大�
 └── yarn.lock
 ```
 
-先使用yarn命令生成package.json
+<center>图3-9</center>
+
+先使用yarn命令生成package.json：
 
 ```js
 yarn init -y 
 ```
 
-再新建一个rollup.config.js,这是rollup要求的配置文件，在package.json中指定该配置启动
+再新建一个rollup.config.js,这是Rollup要求的配置文件，在package.json中指定该配置启动：
 
 ```js
 //package.json
@@ -983,22 +985,22 @@ module.exports={
 }
 ```
 
-先初始化一个基本的rollup配置，指明入口文件和输出文件。input比较好理解，指的是rollup启动时需要执行的文件。我们需要对output中的字段进行下说明，它允许传入一个对象或一个数组，当为数组时，依次输出多个文件：
+先初始化一个基本的rollup配置，指明入口文件和输出文件。input比较好理解，指的是rollup启动时需要执行的文件。下面对output中的字段进行说明，它允许传入一个对象或者一个数组。当传入数组时，可依次输出多个文件。
 
 - file：输出文件的详细路径。
-- format：Rollup 支持多种输出格式。因为要兼容其他模式，在这里指定为”UMD“格式。还有其他的格式可以选择，cjs（commonjs）,esm(ES module), system, amd,iife。
+- format：Rollup 支持多种输出格式。因为要兼容其他模式，所以这里指定为”UMD“格式。其他可选 的格式有cjs（commonjs）、,esm(ES module)、 system、amd和iife。
 - name：输出文件名。
 - sourceMap ：如果有 sourcemap 的话，那么调试代码时会比较轻松，这个选项会在生成文件中直接添加 sourcemap。
 
-接下来先介绍几款插件，要不然改工程依然无法正常运行。
+接下来介绍几款插件。
 
-首先是babel插件rollup-plugin-babel，这个插件详细大家比较熟悉了，主要作用就是编译ES6的语法为ES5，让浏览器可以识别。
+（1）babel插件rollup-plugin-babel，。该插件的主要作用是编译ES6的语法为ES5，让浏览器可以识别。
 
 ```js
 yarn add @rollup/plugin-babel -D
 ```
 
-在rollup.config.js中增加plugin配置
+在rollup.config.js中增加plugin配置：
 
 ```js
 //rollup.config.js
@@ -1008,7 +1010,7 @@ plugins: [
 ]
 ```
 
-还需要增加babel配置，在.babel文件中增加
+还需要增加babel配置，在.babel文件中增加如下代码：
 
 ```json
 {
@@ -1025,7 +1027,7 @@ plugins: [
 
 
 
-第二个插件是*rollup-plugin-node-resolve*，默认包后的`bundle.js`仍然会在`Node.js`中工作。为了解决这个问题，将我们的代码与依赖的第三方库进行合并才能解决这个问题。
+（2）rollup-plugin-node-resolve插件。因为默认打包后的bundle.js仍然在Node.js中工作，为了解决这个问题，我们需要把代码与依赖的第三方库进行合并。
 
 ```js
 import resolve from "@rollup/plugin-node-resolve";
@@ -1034,7 +1036,7 @@ plugins: [
 ]
 ```
 
-第三个是commonjs插件，rollup.js编译源码中的模块引用默认只支持ES6+的模块方式`import/export`。然而有大量npm模块是基于`CommonJS`模块方式，这就导致了大量 npm模块不能直接编译使用
+（3）commonjs插件。rollup.js编译源码中的模块引用默认只支持ES6+的模块方式import/export，但是有大量的npm模块是基于CommonJS模块方式的，这就导致大量的 npm模块不能直接编译使用。
 
 ```js
 import commonjs from "@rollup/plugin-commonjs";
@@ -1043,7 +1045,7 @@ plugins: [
 ]
 ```
 
-第四个就是json插件，在咱们的实例中，我们会根据package.json生成加密、解密的密钥,
+（4）json插件。在本书的实例中，我们会根据package.json生成加密和解密的密钥：
 
 ```js
 const hash = require("content-hash");
@@ -1054,7 +1056,7 @@ function generatorKey() {
 }
 ```
 
-在rollup中加载json文件需要插件协助，@rollup/plugin-json
+在rollup中加载JSON文件时需要@rollup/plugin-json插件的协助：
 
 ```js
 import json from '@rollup/plugin-json';
@@ -1063,7 +1065,7 @@ plugins: [
 ]
 ```
 
-有了上面的插件，rollup的基本构建就已经成型，下面我们看下具体的加解密代码。
+有了上面的插件之后，Rollup的基本构建就已经成型了，下面看一下具体的加密和解密代码。
 
 ```js
 const crypto = require('crypto');
@@ -1093,7 +1095,7 @@ function encrypt(src) {
 
 /**
  * 解密方法
- * @param {*} sign ,需要解密的字符串
+ * @param {*} sign,需要解密的字符串
  */
 function decrypt(sign) {
     let src = '';
@@ -1117,9 +1119,9 @@ module.exports = {
 }
 ```
 
-这个加密工具方法中 ，我们使用128位aes-128-cbc加密方法，该加密方法17位的key和iv向量，为了不暴露key和iv，我们在generatorKey方法中，通过生成package.json文件的内容hash值来计算出。
+这里使用是的128位aes-128-cbc加密方法，该加密方法有17位的key和iv向量。为了不暴露key和iv，在generatorKey方法中，是通过生成package.json文件的内容hash值来计算出。
 
-我们先测试一下，看加解密是否能起作用
+下面测试一下加密和解密是否起作用：
 
 ```js
 const sign = encrypt('hello world');
@@ -1130,7 +1132,7 @@ const src= decrypt(sign);
 console.log(src); 
 ```
 
-经过测试，符合我们的预期效果
+经过测试，符合我们的预期效果：
 
 ```
 f09a42f0e4b7c667f3ba26e0d5d6e0b3
@@ -1138,7 +1140,7 @@ f09a42f0e4b7c667f3ba26e0d5d6e0b3
 helloworld
 ```
 
-平时我们见到的工具包，以压缩文件居多，目的主要有两个，一来可以减少文件体积，二者可以隐藏代码实现。我们也按照这样的思路来，先安装插件 rollup-plugin-uglify，并在配置文件中进行配置
+平时我们见到的工具包以压缩文件居多，压缩文件目的主要有两个，一是可以减少文件体积，二是可以隐藏代码实现。我们也按照这样的思路来，先安装插件 rollup-plugin-uglify，并在配置文件中进行配置：
 
 ```js
 import { uglify } from "rollup-plugin-uglify";
@@ -1147,7 +1149,7 @@ plugins: [
 ]
 ```
 
-下面开始最终打包，
+下面开始最终打包：
 
 ```js
 yarn run build
