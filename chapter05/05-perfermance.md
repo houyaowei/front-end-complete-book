@@ -38,69 +38,69 @@ Chrome是多进程的，两个进程之间以IPC（Inter Process Communication�
 
 - Browser Process（浏览器进程）：负责包括地址栏、书签栏，以及前进或后退按钮等工作；负责处理浏览器的一些不可见的底层操作，比如网络请求和文件访问等。
 
-- Renderer Process：主要负责一个Tab内（这是啥意思？）关于网页渲染的所有事情。
+- Renderer Process（渲染进程）：主要负责tab页内网页渲染。
 
-- Plugin Process：管理一个网页用到的所有插件，比如逐渐被淘汰的Flash插件等。
+- Plugin Process（插件进程）：管理一个网页用到的所有插件，比如逐渐被淘汰的Flash插件等。
 
-- GPU Process：处理GPU相关的任务。
+- GPU Process（GPU进程）：处理GPU相关的任务。
 
-从上面各个进程的职责来看，Browser Process主要协调Tab之外的工作，并且它对这些工作进行了细粒度的划分，主要是使用不同的线程进行处理：
+从上面各个进程的职责来看，浏览器进程主要协调Tab之外的工作，并且它对这些工作进行了细粒度的划分，主要使用不同的线程进行处理：
 
 - UI线程： 控制浏览器上的按钮及输入项等。
 
 - network线程: 处理网络请求，从网上获取数据。
 
 - storage线程: 控制文件等的访问。
-  
-  现在，我们回到上面那个面试题：在地址栏中输入网址并单击“Enter”键后到看到整个页面大概分成如下几步。
 
-**处理用户输入**
+现在，我们回到前面那个面试题——从地址栏输入URL到页面加载完成，中间都经历了什么？在地址栏中输入网址并单击“Enter”键后到看到整个页面大概可分成如下几步。
 
-先由UI线程判断用户输入的是一个网址还是一个要查询的关键字。因为Chrome中的地址栏同时也是一个输入框。UI线程去解析内容并判断是需要把输入的内容交给查询引擎，还是要导航到需要的网站。
+第1步，处理用户输入。
 
-**开始导航**
+先由UI线程判断用户输入的是一个网址还是一个要查询的关键字。因为Chrome中的地址栏也是一个输入框。UI线程负责解析内容，并判断是把输入的内容交给查询引擎，还是导航到具体的网站。
 
-单击“Enter”键，UI线程通知network线程获取网页内容，并控制Tab上的spinner展现，表示正在努力加载中。
+第2步，开始导航。
 
-network线程会执行DNS查询，随后为请求建立TLS连接。
+单击“Enter”键，UI线程通知network线程获取网页内容，并控制Tab上的spinner展现，表示正在努力加载中。network线程会执行DNS查询，随后为请求建立TLS连接。
 
-> DNS(运行在UDP上)是互联网上域名和IP地址相互映射的分布式数据库，有了DNS，用户无须记住每个域名的IP地址就可以上网。比如，当在地址栏中输入http://developer.mozilla.org时，DNS服务器就可以解析该主机名得到IP地址，该过程就叫作域名解析。
+> DNS（运行在UDP上）是互联网上域名和IP地址相互映射的分布式数据库。有了DNS，用户无须记住每个域名的IP地址就可以上网。比如，当在地址栏中输入http://developer.mozilla.org时，DNS服务器就可以解析该主机名得到IP地址，该过程就叫作域名解析。
 > 
 > 主机到IP地址的映射一般有两种方式：静态映射和动态映射。区别在于：静态映射是在每台设备上分别配置映射关系，各自维护，只能独享；动态映射是建立一套DNS系统，并在该系统上配置映射关系，各域名解析都用这套系统，达到共享的目的。
 
-如果network线程接收了301状态码重定向请求头，那么network线程会通知UI线程 "服务器要求重定向"，随后加载新的URL。
+如果network线程接收了301状态码并重定向了请求头，那么network线程会通知UI线程“服务器要求重定向”，随后加载新的URL。
 
-**读取响应体**
+第3步，读取响应体。
 
-一旦服务器返回内容，network线程会读取响应主体中的MIME类型信息，"Content-Type"字段说明返回内容的格式，"Content-Length"描述响应主体的内容长度。
+一旦服务器返回内容，network线程就会读取响应主体中的MIME类型信息，“Content-Type”字段为返回内容的格式，“Content-Length”字段为响应主体的内容长度。
 
-网页的MIME类型信息为"test/html"。接下来把这些数据传递给renderer process，如果是压缩文件或者其他文件，会把相关数据传输给下载管理器。
+网页的MIME类型信息为“test/html”。接下来把这些数据传递给渲染进程。如果是压缩文件或者其他文件，就把相关数据传输给下载管理器。
 
-[Safe Browsing](https://link.zhihu.com/?target=https%3A//safebrowsing.google.com/) 检查也会在此时触发，如果域名或者请求内容匹配到已知的恶意站点，则network线程会显示一个警告页。此外， [CORB](https://link.zhihu.com/?target=https%3A//www.chromium.org/Home/chromium-security/corb-for-developers) (Cross Origin Read Blocking)检测也会触发,确保敏感数据不会被传递给渲染进程。
+[Safe Browsing](https://link.zhihu.com/?target=https%3A//safebrowsing.google.com/) 检查也会在此时触发，如果域名或者请求内容匹配到已知的恶意站点，则network线程会显示一个警告页。此外， [CORB](https://link.zhihu.com/?target=https%3A//www.chromium.org/Home/chromium-security/corb-for-developers) （Cross Origin Read Blocking）检测也会被触发，确保敏感数据不会被传递给渲染进程。
 
 > Safe Browsing: https://safebrowsing.google.com/
 > 
 > CORB:  https://www.chromium.org/Home/chromium-security/corb-for-developers
 
-**查找渲染进程（renderer process）**
+第4步，查找渲染进程。
 
- 当上述所有检查完成，并且通过安全检查后，network线程确信浏览器可以导航到请求的页面，就会通知UI线程数据已经就绪，这时UI线程会查找一个Renderer Process进行网页渲染。其实，为了能快速响应，UI线程会预查找和启动一个渲染线程，如果可以访问，则该渲染进程继续。如果有重定向，则准备好的线程就会废弃并重启一个线程。
+  当上述所有检查完成并且通过安全检查后，network线程确信浏览器可以导航到请求的页面，就会通知UI线程数据已经就绪，这时UI线程会查找一个渲染进程进行网页渲染。其实，为了能快速响应，UI线程会预查找和启动一个渲染线程，如果可以访问，则该渲染进程继续。如果有重定向，则废弃准备好的线程并重启一个线程。
 
-**确认导航**
+第5步，确认导航。
 
-经过上面的步骤，数据已就绪，渲染线程也已经创建，可以说是万事俱备只欠东风了，这个东风是什么呢？就是前面咱们提到的进程间的通信，IPC消息。Browser Process 会给 renderer process 发送 IPC 消息来确认导航，一旦 Browser Process 收到 renderer process 的渲染确认回复，导航过程结束，页面加载过程开始。
+经过上面的步骤，数据已就绪，渲染线程也已经创建，可以说是“万事俱备只欠东风”了。这个“东风”是什么呢？就是前面提到的进程间的通信，IPC消息。浏览器进程会给渲染进程发送 IPC 消息来确认导航，一旦浏览器进程收到渲染进程的渲染确认回复，导航过程就结束，页面加载过程开始，如图5-2所示。
 
 <img src="images/browser-arch-2.png" style="zoom:67%;" />
 
-此时，地址栏已更新为新网址，呈现出新网页内容。history tab同样会更新，此刻可通过返回键返回到原来的页面。为了让tab页签 或者窗口关闭后能够恢复，这些信息都会保存到硬盘中。
+<center>图5-2</center>
 
-**额外的操作**
+此时，地址栏已更新为新网址，呈现出新网页内容。History Tab同样会更新，此时可以通过返回键返回到原来的页面。为了让Tab页签或者窗口关闭后能够恢复，这些信息都会保存到硬盘中。
 
-一旦导航被确认，renderer process 会加载资源并渲染页面，渲染流程是怎么工作的，这里先不展开了，后面我们将重点介绍渲染流程。当 renderer process 渲染完所有的页面，并且触发了所有帧的onload事件，会到 Browser process发送 IPC 信号， UI 线程停止展示 tab 中的 spinner。
+第6步，额外的操作。
 
-当输入另一个URL加载新页面时，上面的加载流程会重新执行； 当出现新的导航请求时，Browser Process会通知Renderer Process进行相关检查，并对相关事件进行处理，毕竟所有代码的执行都是由Renderer Process来完成的。
+一旦导航被确认，渲染进程会加载资源并渲染页面。渲染流程会在后面重点介绍。渲染进程在渲染完所有的页面并且触发所有帧的onload事件后，回到 浏览器进程发送 IPC 信号， UI 线程停止展示Tab中的 Spinner。
 
-当通过js代码(window.location="http://xxx.com")导航到新站点时，Renderer Process会首先检查beforeunload事件，导航请求由Renderer Process传递给Browser Process。
+当输入另一个URL加载新页面时，上面的加载流程会重新执行；当出现新的导航请求时，浏览器进程会通知渲染进程进行相关检查，并对相关事件进行处理，毕竟所有代码的执行都是由渲染进程完成。
+
+当通过js代码（window.location="http://xxx.com"）导航到新站点时，渲染进程会首先检查beforeunload事件，导航请求由渲染进程传递给浏览器进程。
 
 > Google官网关于页面生命周期的帖子：https://developers.google.com/web/updates/2018/07/page-lifecycle-api
 
