@@ -13,7 +13,7 @@ module.exports = {
     ],
     sidebar: [
       ['/', '介绍'],
-      ['/guide/web/', 'web'],
+      ['/guide/web/', 'Web'],
       ['/guide/ts/', 'TS'],
       ['/guide/w3c/', 'W3C'],
       ['/guide/superman/','前端牛人'],

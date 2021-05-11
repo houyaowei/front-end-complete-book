@@ -23,7 +23,7 @@
           },
           {
             name: "Go web编程",
-            author: "郑兆熊"
+            author: "Sau Sheong Chang"
           }
         ]
       }
