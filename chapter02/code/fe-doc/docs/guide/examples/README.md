@@ -18,11 +18,11 @@
       return {
         books: [
           {
-            name: "Typescript编程",
+            name: "TypeScript编程",
             author: "Boris Cherny"
           },
           {
-            name: "Go web编程",
+            name: "Go Web编程",
             author: "Sau Sheong Chang"
           }
         ]
