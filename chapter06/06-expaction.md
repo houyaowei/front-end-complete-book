@@ -18,7 +18,7 @@
 
 ##### 6.1 PWA实践
 
-PWA（Progressive Web App）于2016年由Google提出，主旨在于增强Web体验，堪称“下一代Web应用模型”，自从2015年初次发布后，从Google、Twitter、 Facebook、Instagram、Uber、Flipboard、维基百科到国内的AliExpress、饿了么、新浪微博、飞猪旅行都已经发布了相关的应用。
+PWA（Progressive Web App）于2015年由设计师弗朗西斯·贝里曼和Google Chrome的工程师亚历克斯·罗素提出，主旨在于增强Web体验，堪称“下一代Web应用模型”。自从初次发布后，从Google、Twitter、 Facebook、Instagram、Uber、Flipboard、维基百科到国内的AliExpress、饿了么、新浪微博、飞猪旅行都已经发布了相关的应用。
 
 > 国内pwa应用可以访问 https://pwapp.net/ ，这里汇集了一批好的应用。
 
