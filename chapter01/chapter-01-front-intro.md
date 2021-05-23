@@ -1,21 +1,21 @@
-## 第1章 前端开发基础
+## 第1章 前端开发核心及Deno Web实战
 
 在前端开发中，经常要和package.json文件、Babel和ES规范打交道，本章详细介绍这三部分的内容。另外，Deno给Web开发提供了新的开发方式，因此本章还会介绍Deno的基础模块、依赖模块、HTTP模块和Web开发。
 
 本章主要内容如下：
 
-1. package.json配置详述。
+1. 前端中的“大管家”package.json文件。
 
-2. 配置babel7。
+2. 前端中的编译原理Babel7。
 
-3. ES规范。
+3. 前端面试必知的ES语法规范。
 
-4. 使用Deno换一种方式开发。
+4. Deno Web实践。
 
    
 
 
-#### 1.1 package.json配置详述
+#### 1.1 前端中的“大管家”package.json文件
 
 每个前端项目中都有package.json文件，在Web工程中，最常见的配置有配置项目启动、打包命令和声明依赖的npm包。如果打开一个npm包的package.json文件，则很可能会发现，它比常见的Web工程的配置要多一些。下面以vue@2.6.12版本为例，看一下它的package.json中都包含了哪些配置。
 
@@ -387,7 +387,7 @@ babel配置：这里是指babel编译配置，代码如下。
 
 
 
-#### 1.2 Babel7
+#### 1.2 前端中的编译原理Babel7
 
 Babel是前端开发中最常见的第三方工具，它的功能有三个。一是转义ECMAScript2015+语法的代码，保证比较新的语法也可以在旧版本的浏览器中运行；二是可以通过 Polyfill方式在目标环境中添加缺失的特性；三是源码转换功能。
 
@@ -832,7 +832,7 @@ presets: [
 
 
 
-#### 1.3 ES规范
+#### 1.3 前端面试必知的ES语法规范
 
 截止到2021年3月9日，EcmaScript规范已经发布到了2021版的候选版本，6月份将发布GA版。该版本包含了几个实用的特性。本节我们总结一下从2016（ES7）到2021各个规范的新增特性，便于大家综合参考。
 
@@ -1351,9 +1351,9 @@ Object.getOwnPropertyDescriptors(person)
 
 
 
-#### 1.4 Deno开发入门
+#### 1.4 Deno Web实践
 
- deno是nodejs作者Ryan Dahl于2017年创立的项目，至今已经发布到了1.9.2版本。这是一个安全的TS/js运行时，该运行时是在V8的基础上使用Rust开发的，同时内置了tsc引擎，用来解释typescript。event-loop由tokio提供支持。由于Rust原生支持WebAssembly，所以能直接运行 WebAssembly。
+ eno是nodejs作者Ryan Dahl于2017年创立的项目，至今已经发布到了1.9.2版本。这是一个安全的TS/js运行时，该运行时是在V8的基础上使用Rust开发的，同时内置了tsc引擎，用来解释typescript。event-loop由tokio提供支持。由于Rust原生支持WebAssembly，所以能直接运行 WebAssembly。
 
 Deno的主要特性如下：
 

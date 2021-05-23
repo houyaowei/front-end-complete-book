@@ -1,6 +1,6 @@
 
 
-#### 第6章  前端展望
+#### 第6章  实践：从0开发微前端和WebAssembly
 
 前端的发展日新月异，因此在前端圈里流行这样一句话，“每三个月就会有新的轮子出现”，前端的发展速度可见一斑。有些技术经得起时间的检验而日益强大，而有些技术则慢慢地消失在人们的视线中，或许能留下一点痕迹，如PWA、微前端、Serverless、 WebAssembly、Flutter、BFF，等等，很多技术已不再年轻，却值得慢慢琢磨。
 
@@ -16,7 +16,7 @@
 
 
 
-##### 6.1 PWA实践
+##### 6.1 从0开发PWA实践
 
 PWA（Progressive Web App）于2015年由设计师弗朗西斯·贝里曼和Google Chrome的工程师亚历克斯·罗素提出，主旨在于增强Web体验，堪称“下一代Web应用模型”。自从初次发布后，从Google、Twitter、 Facebook、Instagram、Uber、Flipboard、维基百科到国内的AliExpress、饿了么、新浪微博、飞猪旅行都已经发布了相关的应用。
 
@@ -1183,7 +1183,7 @@ Dockerfile的描述如下：
 
 
 
-6.4 用webAssembly提高前端性能
+6.4 用WebAssembly提高前端性能
 
 6.4.1 WebAssembly概述
 
