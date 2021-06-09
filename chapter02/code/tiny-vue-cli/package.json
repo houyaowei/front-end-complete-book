@@ -7,7 +7,7 @@
     "tiny-cli": "./bin/tiny.js"
   },
   "scripts": {
-    "build-dir" : "tree -l 3 --ignore node_modules"
+    "build-dir": "tree -l 3 --ignore node_modules"
   },
   "license": "MIT",
   "dependencies": {

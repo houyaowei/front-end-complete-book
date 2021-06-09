@@ -1,1 +1,1 @@
-代码从https://github.com/woai3c/mini-cli/tree/v1fork 而来
+代码从https://github.com/woai3c/mini-cli/tree/v1 fork 而来

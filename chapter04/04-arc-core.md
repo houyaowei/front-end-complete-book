@@ -61,7 +61,7 @@ export default class Context {
 
 在transitionTo方法中改变当前状态，参数为实例化的子状态类。如果需要将上下文转换为另一个状态，只需要将当前活动的状态对象替换为新的状态对象即可。需要说明的是，如果想采用这种方式，状态的各子类必须保证实现相同的接口。
 
-> 为什么要实现相同的接口呢？大家可以类比下面向对象中的多态特性。多态具体说就是在父类中定义的属性和方法被子类继承之后，子类就具有表现不同的数据类型或表现的能力。它可以消除类型之间的强耦合关系，让子类具有了可替换性，所以就更加的灵活。
+> 为什么要实现相同的接口呢？大家可以类比下面向对象中的多态特性。多态具体说就是在父类中定义的属性和方法被子类继承之后，子类就具有不同的表现形式和形态的能力。它可以消除类型之间的强耦合关系，让子类具有了可替换性，所以就更加的灵活。
 
 再来看State的实现及其SlightLightClass的实现，限于篇幅，这里只贴出部分代码，完整的代码参考外链<4-1>[https://github.com/houyaowei/front-end-complete-book/tree/master/chapter04/code/4.1DesignPattern/State](https://github.com/houyaowei/front-end-complete-book/tree/master/chapter04/code/4.1DesignPattern/State)。
 
@@ -1412,23 +1412,23 @@ define(function () {
 
 4.4.2  CMD和SeaJS
 
-requirejs在声明依赖的模块时会第一时间加载并执行。cmd（Common Module Definition，通用模块定义）规范地址见链接<4-5>[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)），它是另一种模块加载方案，和amd的不同之处在于：amd推崇依赖前置，提前执行。cmd是就近依赖，延迟执行。
+requirejs在声明依赖的模块时会第一时间加载并执行。CMD（Common Module Definition，通用模块定义）规范地址见链接<4-5>[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)），它是另一种模块加载方案，和amd的不同之处在于：AMD推崇依赖前置，提前执行。CMD是就近依赖，延迟执行。
 
-seajs则专注于Web浏览器，同时可以通过Node扩展的方式在Node环境中运行。
+SeaJS则专注于Web浏览器，同时可以通过Node扩展的方式在Node环境中运行。
 
 > 扩展阅读：
 > 
-> seajs与requirejs的不同参见链接<4-6>。[https://github.com/seajs/seajs/issues/277](https://github.com/seajs/seajs/issues/277)
+> SeaJS与RequireJS的不同参见链接<4-6>。[https://github.com/seajs/seajs/issues/277](https://github.com/seajs/seajs/issues/277)
 > 
-> seajs和requirejs对比参见链接<4-7>。[https://www.douban.com/note/283566440/](https://www.douban.com/note/283566440/)
+> SeaJS和RequireJS对比参见链接<4-7>。[https://www.douban.com/note/283566440/](https://www.douban.com/note/283566440/)
 > 
-> seajs规范文档参见链接<4-8>。[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)
+> SeaJS规范文档参见链接<4-8>。[https://github.com/seajs/seajs/issues/242](https://github.com/seajs/seajs/issues/242)
 > 
-> require书写规范参见链接<4-9>。[https://github.com/seajs/seajs/issues/259](https://github.com/seajs/seajs/issues/259)
+> RequireJS书写规范参见链接<4-9>。[https://github.com/seajs/seajs/issues/259](https://github.com/seajs/seajs/issues/259)
 
-seajs官方文档参见链接<4-10>，[https://github.com/seajs/seajs](https://github.com/seajs/seajs)
+SeaJS官方文档参见链接<4-10>，[https://github.com/seajs/seajs](https://github.com/seajs/seajs)
 
-seajs是cmd规范的实现，这里对规范部分不做详细的介绍，下面通过一个例子来说明。
+SeaJS是CMD规范的实现，这里对规范部分不做详细的介绍，下面通过一个例子来说明。
 
 用一般引入js文件的方法导入对seajs的支持：
 
@@ -1766,7 +1766,7 @@ showStudent('222')
 函数式编程的自由度较高，可以实现接近自然语言的代码。比如要计算一个数学表达式 (2+4)*15+72的值，翻译成代码语句可能要编程下面这样：
 
 ```js
-add(multiply(sum(2,4), 15))
+add(multiply(sum(2,4), 15),27)
 ```
 
 这样的实现方式是不是更容易理解了。

@@ -37,7 +37,7 @@ Webpack 4于2018年2月发布，这个版本引入了大量非常实用的特性
 - 去除掉只在开发阶段运行的代码。
 - Scope Hoisting和Tree Shaking。
 
-除上述特性外，v4还优化了许多插件，可以在optimization.splitChunks和 optimization.runtimeChunk中完成大部分的优化项。当然，还有更多的特性支持（如webassembly开箱即用），以及更多module支持（javascript、esm，javascript、dynamic，json）。
+除上述特性外，v4还优化了许多插件，可以在optimization.splitChunks和 optimization.runtimeChunk中完成大部分的优化项。当然，还有更多的特性支持（如webassembly开箱即用），以及更多module支持。
 
 v4版本从刚开始到2020年10月10日发布的V5版本经历2年多的时间，在没有重大更新的情况下，推出了很多功能。作为发布Webpack5这个大版本来说，新特性自然不会缺席，现在我们就开始捋一下有哪些比较实用的功能。
 
@@ -1221,7 +1221,7 @@ document.writeln("hello,parcel<br>")
 
 与预想的结果相同。这种开发方式确实能让人眼前一亮，既没有任何配置，也不用指定loader就可以运行。
 
-接下来看看能否识别import和ES语法：
+接下来看看能否识别import和ES6语法：
 
 ```js
 // src/scripts/index.js
@@ -1286,7 +1286,7 @@ console.log("project created by:", name.getAuthor())
 
 <center>图3-11</center>
 
-从测试结果来看，Parcel并不需要配置babel就可以将ES6转成ES5。这是因为在Parcel中已经预置了babel编译 @parcel-transform-babel，大部分内置插件都可以在node_modules/@parcel目录下找到。
+从测试结果来看，Parcel并不需要配置babel就可以识别import并将ES6转成ES5。这是因为在Parcel中已经预置了babel编译 @parcel-transform-babel，大部分内置插件都可以在node_modules/@parcel目录下找到。
 
  在Web开发中，处理CSS文件是必不可少的。在Parcel中，也提供了比较清爽的处理方式：
 

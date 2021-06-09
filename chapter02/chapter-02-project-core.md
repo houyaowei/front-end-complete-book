@@ -283,7 +283,7 @@ const _answers = await inquirer.prompt(_creator.getFinalPrompts())
 { features: ['babel', 'linter'] }
 ```
 
-其中，features是上面问题中的name属性。features` 数组中的值是每个选项中的 `value。
+其中，features是图2-4问题中的选择模块的name属性。features` 数组中的值是每个选项中的 `value。
 
 还有就是上一个问题选择了指定的选项，下一个问题怎样会显示出来？这个是选择的相关性。仔细看下router.js中有一个when配置
 
@@ -1115,7 +1115,7 @@ test('test asyn code with cb', done => {
 
 （2）Promise式验证。
 
-Promise设计的初衷是使用链式解决回调炼狱（callback hell）的问题，在Jest的单元测试中同样适用，也让测试变得更加简单。Jest的断言可以放到Promise的回调中，等Promise被resolve时再执行。代码如下所示：
+Promise设计的初衷是使用链式解决回调炼狱（callback hell）的问题，在Jest的单元测试中同样适用，也让测试变得更加简单。Jest的断言可以放到Promise的回调中，等Promise操作成功完成时再执行。代码如下所示：
 
 ```js
 test('should return data when fetchData request success', () => {
@@ -1326,7 +1326,7 @@ describe("mock functions continued",()=> {
 })
 ```
 
-需要注意的是，我们需要为每个需要测试的方法mock返回值。用这样的方法也可以mock整个AJAX请求，检查AJAX请求是否正常，而不是真正去发请求。
+需要注意的是，我们需要为每个需要测试的方法模拟返回值。用这样的方法也可以mock整个AJAX请求，检查AJAX请求是否正常，而不是真正去发请求。
 
 ```js
 // funcList.js
@@ -1602,7 +1602,7 @@ vuepress内置了markdown loader，可以方便地把 markdown 转成 Vue，再�
 </style>
 ```
 
-在guide目录下新建examples文件夹和README.md文件。在md文件中直接引入**boos**组件，同时嵌入代码。
+在guide目录下新建examples文件夹和README.md文件。在md文件中直接引入**books**组件，同时嵌入代码。
 
 ```markdown
 ## 嵌入 vue 组件
