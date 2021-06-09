@@ -230,7 +230,7 @@ class Creator {
 }
 ```
 
-声明完成后，可以通过creator.getFinalPrompts()方法获得所有需要提示的选项。但是这里有一个前提，把这几个都要require进来并且执行。所以需要在core/create.js中加上一下部分，这样就保证了各部分的数据集中在Creator类中进行了保存。
+声明完成后，可以通过creator.getFinalPrompts()方法获得所有需要提示的选项。但是这里有一个前提，把这几个都要加载进来并且执行。所以需要在core/create.js中加上一下部分，这样就保证了各部分的数据集中在Creator类中进行了保存。
 
 ```js
 function getPromptModules() {

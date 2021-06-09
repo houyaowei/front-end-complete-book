@@ -124,7 +124,7 @@ keywords： 包关键字，会对包中的 `description` 字段和 `keywords` �
 
 依赖包：
 
-npm包声明会添加到dependencies或者devDependencies中，dependencies中的包指定了项目在生产运行所必需的包。devDependencies中声明的是开发阶段需要的包，如Webpack、eslint、babel等，用来辅助开发，打包上线时并不需要这些包。所以大家要根据包的实际用处声明到适当的位置。
+npm包的声明会添加到dependencies或者devDependencies中，dependencies中的包指定了项目在生产运行所必需的包。devDependencies中声明的是开发阶段需要的包，如Webpack、eslint、babel等，用来辅助开发，打包上线时并不需要这些包。所以大家要根据包的实际用处声明到适当的位置。
 
 若希望在包找不到或者安装失败时，npm能继续运行，可将该包放在optionalDependencies对象中。optionalDependencies会覆盖dependencies中同名的包，这点需要特别注意。
 
@@ -168,9 +168,7 @@ scripts: after index.js
 
 这三个script都执行了，执行的顺序是 `predev-> dev -> postdev`。如果scripts命令存在一定的先后关系，则采取这种pre&post scripts不失为一种好的方案。
 
-files配置：
-
-files是一个数组配置，用来描述作为依赖包安装时所描述的文件列表。当npm包release时，files指定哪些文件会被推送到npm服务器，如果指定的是文件夹，那么该文件夹下面的所有的文件都会被提交。
+files配置：files是一个数组配置，用来描述作为依赖包安装时需要说明的入口文件列表。当npm包发布（release）时，files指定哪些文件会被推送到npm服务器，如果指定的是文件夹，那么该文件夹下面的所有的文件都会被提交。
 
 如果有文件不想提交，则可以在.npmignore中说明。首先看一下vue包中的配置，如图1-4所示
 
@@ -1040,7 +1038,7 @@ export const doStuff = () => {
 </script>
 ```
 
-这种导入模块的语法形式是一个静态声明：它仅接受字符串文字作为模块标识，通过运行前的“链接”过程，引入bindings到本地作用域中。 静态导入只能在文件的顶层使用。
+这种导入模块的语法形式是一个静态声明：它仅接受字符串文字作为模块标识，通过运行前的“链接”过程，引入绑定（bindings）到本地作用域中。 静态导入只能在文件的顶层使用。
 
 import(specifier)函数支持动态加载模块。import 函数的参数 specifier，可指定所要加载的模块的位置，并返回promise对象。
 
@@ -1196,7 +1194,7 @@ console.log(s.trimEnd()); // '  houyw'
 
 
 
-Arrary.sort
+Arrary.sort稳定排序：早期的规范没有规定该方法是否稳定，而是留给浏览器实现。在对象排序时可能无法达到预期的目的。所以在ES2019中规定该排序必须稳定。
 
 ```js
 const doggos = [
@@ -1321,7 +1319,7 @@ console.log(Object.entries(people)) //[ [ '0', 'Fred' ], [ '1', 'Tony' ] ]
 
 
 
-（3）异步函数（asnyc）：异步函数是 promises 和 generators（生成器）的组合，简化了 promises 调用，提高了代码的可读性。
+（3）异步函数（asnyc）：异步函数是 Promise 和 Generators（生成器）的组合，简化了 Promise 调用，提高了代码的可读性。
 
 ```js
 async function getData() {
@@ -1353,7 +1351,7 @@ Object.getOwnPropertyDescriptors(person)
 
 #### 1.4 Deno Web实践
 
- eno是nodejs作者Ryan Dahl于2017年创立的项目，至今已经发布到了1.9.2版本。这是一个安全的TS/js运行时，该运行时是在V8的基础上使用Rust开发的，同时内置了tsc引擎，用来解释typescript。event-loop由tokio提供支持。由于Rust原生支持WebAssembly，所以能直接运行 WebAssembly。
+ eno是nodejs作者Ryan Dahl于2017年创立的项目，至今已经发布到了1.9.2版本。这是一个安全的TypeScript/JavaScript运行时，该运行时是在V8的基础上使用Rust开发的，同时内置了tsc引擎，用来解释typescript。event-loop由tokio提供支持。由于Rust原生支持WebAssembly，所以能直接运行 WebAssembly。
 
 Deno的主要特性如下：
 
