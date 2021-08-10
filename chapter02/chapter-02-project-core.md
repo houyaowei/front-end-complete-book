@@ -422,7 +422,7 @@ babel: {
 }
 ```
 
-实际上把该项配置放到babel的配置文件才比较标准，所以需要提取一下。我们可以调用 `generator.extractConfigFiles()` 将内容提取出来并生成 `babel.config.js` 文件中。
+实际上把该项配置放到babel的配置文件才比较标准，所以需要提取一下。我们可以使用 Generator中的extractConfigFiles方法将相关配置提取出来并生成 babel.config.js。
 
 ```js
 module.exports = {
@@ -436,7 +436,7 @@ module.exports = {
 
 ```js
 async function writeFileTree(dir, files) {
-    Object.keys(files).forEach((name) => {
+    Object.keys(files).forEach(name => {
         const filePath = path.join(dir, name)
         fs.ensureDirSync(path.dirname(filePath))
         fs.writeFileSync(filePath, files[name])

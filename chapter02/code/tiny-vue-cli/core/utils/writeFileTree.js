@@ -1,11 +1,12 @@
 const fs = require('fs-extra')
 const path = require('path')
 
-async function writeFileTree(dir, files) {
-    Object.keys(files).forEach((name) => {
-        const filePath = path.join(dir, name)
-        fs.ensureDirSync(path.dirname(filePath))
-        fs.writeFileSync(filePath, files[name])
+async function writeFiles(dir, files) {
+    Object.keys(files).forEach(name => {
+        //构造文件路径
+        const _filePath = path.join(dir, name)
+        fs.ensureDirSync(path.dirname(_filePath))
+        fs.writeFileSync(_filePath, files[name])
     })
 }
-module.exports = writeFileTree
+module.exports = writeFiles

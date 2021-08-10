@@ -33,8 +33,9 @@ async function create(name) {
   clearConsole()
 
   const _answers = await inquirer.prompt(_creator.getFinalPrompts())
+  console.log("---------", _answers)
   //默认加入vue和webpack
-  _answers.unshift('vue', 'webpack')
+  _answers.features.unshift('vue', 'webpack')
 
   //默认package.json配置
   const pkg = {

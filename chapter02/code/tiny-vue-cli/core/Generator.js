@@ -4,7 +4,7 @@ const ejs = require('ejs')
 const sortObject = require('./utils/sortObject')
 const normalizeFilePaths = require('./utils/normalizeFilePaths')
 const { runTransformation } = require('vue-codemod')
-const writeFileTree = require('./utils/writeFileTree')
+const writeFiles = require('./utils/writeFileTree')
 const { isBinaryFileSync } = require('isbinaryfile')
 const isObject = (val) => val && typeof val === 'object'
 const ConfigTransform = require('./ConfigTransform')
@@ -92,7 +92,7 @@ class Generator {
         this.sortPkg()
         this.files['package.json'] = JSON.stringify(this.pkg, null, 2) + '\n'
         // 将所有文件写入到用户要创建的目录
-        await writeFileTree(this.context, this.files)
+        await writeFiles(this.context, this.files)
     }
 
     // 按照下面的顺序对 package.json 中的 key 进行排序
