@@ -1933,7 +1933,7 @@ floorAndToString(121.512121) // '122'
 
 ![](images/state-2.png)
 
-已完成任务部分（List组件）和右侧（未）完成任务（count组件）部分分别对应两个组件。
+已完成任务部分（List组件）和右侧已完成任务统计（count组件）部分分别对应两个组件。
 
 
 
@@ -2010,7 +2010,7 @@ export default class PubSub {
 }
 ```
 
-下面梳理一下store的情况，store由action、mutation和state三部分组成。action用来标识每个请求，它是触发state变化的唯一因素。mutation类似于事件，每个mutation都有一个事件类型和回调函数，这个回调函数是进行状态改变的地方，可接收state和payload作为参数。
+下面梳理一下store的情况，Store由Action、Mutation和State三部分组成。action用来标识每个请求，它是触发state变化的唯一因素。mutation类似于事件，每个mutation都有一个事件类型和回调函数，这个回调函数是进行状态改变的地方，可接收state和payload作为参数。
 
 ```js
 export default new Store({
@@ -2126,7 +2126,7 @@ export default {
 self.actions[actionKey](self, payload);
 ```
 
-因为action在执行时需要把self传进来，所以action中方法的第一个参数还是指向store的。store继续commit（这个词用中文）：
+因为action在执行时需要把self传进来，所以action中方法的第一个参数还是指向store的。store继续commit：
 
 ```js
 commit(mutationKey, payload) {

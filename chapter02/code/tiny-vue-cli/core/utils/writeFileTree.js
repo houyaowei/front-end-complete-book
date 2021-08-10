@@ -5,6 +5,7 @@ async function writeFiles(dir, files) {
     Object.keys(files).forEach(name => {
         //构造文件路径
         const _filePath = path.join(dir, name)
+        //确保文件目录存在，如果不存在自动创建
         fs.ensureDirSync(path.dirname(_filePath))
         fs.writeFileSync(_filePath, files[name])
     })

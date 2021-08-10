@@ -435,11 +435,12 @@ module.exports = {
 模板文件渲染后还在内存中，需要进一步把文件写到硬盘。utils也提供了writeFileTree()方法来写文件：
 
 ```js
-async function writeFileTree(dir, files) {
+async function writeFiles(dir, files) {
     Object.keys(files).forEach(name => {
-        const filePath = path.join(dir, name)
-        fs.ensureDirSync(path.dirname(filePath))
-        fs.writeFileSync(filePath, files[name])
+        //构造文件路径
+        const _filePath = path.join(dir, name)
+        fs.ensureDirSync(path.dirname(_filePath))
+        fs.writeFileSync(_filePath, files[name])
     })
 }
 ```

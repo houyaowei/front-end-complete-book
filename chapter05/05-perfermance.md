@@ -37,12 +37,10 @@ Chrome是多进程的，两个进程之间以IPC（Inter Process Communication�
 具体来说，Chrome的主要进程及其职责如下：
 
 - Browser Process（浏览器进程）：负责包括地址栏、书签栏，以及前进或后退按钮等工作；负责处理浏览器的一些不可见的底层操作，比如网络请求和文件访问等。
-
 - Renderer Process（渲染进程）：主要负责tab页内网页渲染。
-
 - Plugin Process（插件进程）：管理一个网页用到的所有插件，比如逐渐被淘汰的Flash插件等。
-
 - GPU Process（GPU进程）：处理GPU相关的任务。
+- Utility Process（工具进程）：负责任务初始化。
 
 从上面各个进程的职责来看，浏览器进程主要协调Tab之外的工作，并且它对这些工作进行了细粒度的划分，主要使用不同的线程进行处理：
 
