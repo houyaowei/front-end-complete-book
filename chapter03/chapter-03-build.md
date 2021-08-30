@@ -217,7 +217,7 @@ node包引用的过程是这样的：在require的一个核心模块或者本地
 
 1. 解析npm包具体的版本号并搜集依赖信息（Resolving packages）。
 2. 如果缓存中无相应版本，就下载对应版本依赖的 tar 包到本地离线缓存（Fetching packages）。
-3. 将依赖从离线镜像解压到本地缓存，并拷贝到当前目录的node_modules目录（Linking dependencies）。
+3. 将依赖从离线镜像解压到本地缓存，并拷贝到当前目录的node_modules中（Linking dependencies）。
 4. 执行 install 相关的生命周期钩子（Building fresh packages）。
 
 这个过程同样涉及大量的文件 I/O操作，导致安装依赖时效率不高。
