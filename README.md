@@ -20,7 +20,7 @@
 | 已出版 |
 
 ### 购买地址
-<img src='https://raw.githubusercontent.com/houyaowei/front-end-complete-book/master/WechatIMG1228.jpeg' style="width:400px;height:600px;" />
+![地址](./WechatIMG1228.jpeg)
 
 当当、淘宝也均有销售，欢迎下单，并添加微信18191976090 加入读者群
 
