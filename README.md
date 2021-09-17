@@ -20,7 +20,7 @@
 | 已出版 |
 
 ### 购买地址
-<img src='./WechatIMG1228.jpeg' style="width:400px;height:600px;">
+<img src='WechatIMG1228.jpeg' style="width:400px;height:600px;">
 
 当当、淘宝也均有销售，欢迎下单，并添加微信18191976090 加入读者群
 
