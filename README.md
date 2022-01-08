@@ -1,4 +1,4 @@
-#  前端开发必知必会：从工程核心到前沿实战
+# 书名：前端开发必知必会：从工程核心到前沿实战
 
 ### 简介
 
@@ -18,6 +18,13 @@
 | Note:  |
 | :----- |
 | 已出版 |
+
+### 购买地址
+[京东购买](https://item.jd.com/13415768.html) 
+[当当购买](http://product.dangdang.com/29298289.html)
+[淘宝购买](https://item.taobao.com/item.htm?spm=a230r.1.14.34.696c7820VxK8mA&id=654415208334&ns=1&abbucket=10#detail)
+
+京东、当当、淘宝也均有销售，欢迎下单，并添加微信18191976090 加入读者群
 
 ### 购买地址
 <img src='./imgs/WechatIMG1228.jpeg' style="width:400px;height:600px;">
